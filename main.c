@@ -133,7 +133,9 @@ int main(void)
 ********************************************************************************************************/
 static void vTaskUSART(void *pvParameters)
 {
- // TickType_t xLastWakeTime;
+
+  uint8_t vTasktx[]="vTaskUSART-1 \r\n";
+  // TickType_t xLastWakeTime;
  // const TickType_t xFrequency = 300;
   uint8_t i,ch;
   MSG_T *ptMsg;
@@ -150,8 +152,8 @@ static void vTaskUSART(void *pvParameters)
   while(1)
     {
     
-      printf("vTaskUSART-1 \r\n");
-   
+      //printf("vTaskUSART-1 \r\n");
+       UART_WriteBlocking(DEMO_UART,vTasktx,sizeof(vTasktx)-1);
        UART_ReadBlocking(DEMO_UART, ptMsg->usData, 4);
       
         for(i=0;i<4;i++)
@@ -193,7 +195,10 @@ static void vTaskUSART(void *pvParameters)
 *********************************************************************************************************/
 static void vTaskSUBJ(void *pvParameters)
 {
-     uint8_t abc_s,door_s,wipers_s;
+     
+     uint8_t vTasktx1[]="ABC_= 1 @@@@~~~@@@\r\n";
+     uint8_t vTasktx2[]="ABC_= 0 ~~~~~~~~~\r\n";
+     uint8_t abc_s=0,door_s=0,wipers_s=0;
      uint32_t vlSubj;
      uint32_t ucConKeyValue;
 	 BaseType_t xResult;
@@ -219,12 +224,13 @@ static void vTaskSUBJ(void *pvParameters)
              if(ucConKeyValue==0x01)
 			 {
                  
-                 abc_s ++ ;
-                 if(abc_s == 1)
+                  //abc_s ++ ;
+                 if(abc_s == 0)
                  {
                    A_POWER_OUTPUT =0;
-                   
-                  printf("ABC_= 1 @@@@~~~@@@\r\n");  
+                   abc_s ++ ;
+                  //printf("ABC_= 1 @@@@~~~@@@\r\n");
+                  UART_WriteBlocking(DEMO_UART,vTasktx1,sizeof(vTasktx1)-1);
 		     
 			     }
 			     else 
@@ -232,7 +238,8 @@ static void vTaskSUBJ(void *pvParameters)
                    abc_s = 0;
                    A_POWER_OUTPUT =1;
                   
-                  printf("ABC_ = 0 @@@@@@@~~~\r\n");  
+                  //printf("ABC_ = 0 @@@@@@@~~~\r\n"); 
+                   UART_WriteBlocking(DEMO_UART,vTasktx2,sizeof(vTasktx2)-1);
                  }
 		     }
              #endif 
@@ -317,7 +324,7 @@ static void vTaskSUBJ(void *pvParameters)
 *********************************************************************************************************/
 static void vTaskBLDC(void *pvParameters)
 {
-    uint8_t txbuff[]="vTaskBLDC 3";
+    uint8_t txbuff[]="vTaskBLDC 3\r\n";
     uint32_t ucValue;
    
 	//TickType_t xLastWakeTime;
@@ -331,7 +338,7 @@ static void vTaskBLDC(void *pvParameters)
 	uint32_t ucConValue;
     uint16_t dirvalue;
 	uint8_t vTasktx1[]="BLDC receive success!!";
-    uint8_t vTask[]="ABC_= 1 @@@@~~~@@@\r\n";
+   
     uint8_t vBLDCtx2[] = "Motor Run is OK !!!!";
     uint8_t printx1[]="Dir = Dir is OK !!!! CW \r\n";
     uint8_t printx2[]="Dir = - Dir is OK #### CCW \r\n";
@@ -360,19 +367,20 @@ static void vTaskBLDC(void *pvParameters)
       if(ucValue == 0x01)
       {
          A_POWER_OUTPUT =1;
-		 B_POWER_OUTPUT =1;
-		 C_POWER_OUTPUT =1;
+		
+		 
         // printf("ABC_= 1 @@@@~~~@@@\r\n");
-         UART_WriteBlocking(DEMO_UART,vTask,sizeof(vTask)-1);
+         UART_WriteBlocking(DEMO_UART,vTasktx2,sizeof(vTasktx2)-1);
 		 
 	  }
 	  else if(ucValue == 0x02)
 	  {
 
          A_POWER_OUTPUT =0;
-		 B_POWER_OUTPUT =0;
-		 C_POWER_OUTPUT =0;
-		printf("ABC_= 0 ~~~~~~~~~\r\n");  
+		
+		
+		//printf("ABC_= 0 ~~~~~~~~~\r\n"); 
+         UART_WriteBlocking(DEMO_UART,vTasktx3,sizeof(vTasktx3)-1);
 	  }
 	  #endif 
 
@@ -488,7 +496,7 @@ static void vTaskCOTL(void *pvParameters)
 
 	while(1)
     {
-	      printf("vTaskCOTL-3 \r\n");
+	      printf("vTaskCOTL-4 \r\n");
           
 		   ucKeyCode = KEY_Scan(0);
            
@@ -506,7 +514,7 @@ static void vTaskCOTL(void *pvParameters)
             
 
           }
-            if(SD315AI_SO1_C_INPUT == 1 || SD315AI_SO2_C_INPUT == 1)
+          if(SD315AI_SO1_C_INPUT == 1 || SD315AI_SO2_C_INPUT == 1)
           {
                 GPIO_PinWrite(SD315AI_VL_C_GPIO,SD315AI_VL_C_PIN,1);
                

@@ -38,7 +38,7 @@ void OUTPUT_Fucntion_Init(void)
       
         PORT_SetPinMux(PORTA, 19U, kPORT_MuxAsGpio);
 		
-        GPIO_PinInit(GPIOC,  7,  &led_config );
+        GPIO_PinInit(GPIOC,  7, &led_config );
         GPIO_PinInit(GPIOC,  6, &led_config );
 		GPIO_PinInit(GPIOC,  4, &led_config );
 
@@ -48,7 +48,7 @@ void OUTPUT_Fucntion_Init(void)
         
         GPIO_PinInit(GPIOA,    19, &led_config );
 
-       
+        PORT_PinPullConfig(HW_GPIOC, 4, kPORT_PullDown);
        
      #if 0
         config.pullSelect= kPORT_PullDown;
