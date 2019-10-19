@@ -7,7 +7,7 @@ void SD315AI_SO12_Input_Init(void)
 	  0,
     };
     
-    // port_pin_config_t config ;
+     port_pin_config_t config ;
     // LLWU_PE3_WUPE11(0); 
     // LLWU_PE5_WUPE19(0);
     // LLWU_PE6_WUPE20(0);
@@ -15,7 +15,7 @@ void SD315AI_SO12_Input_Init(void)
     CLOCK_EnableClock(kCLOCK_PortE);
     CLOCK_EnableClock(kCLOCK_PortC);
 
-	//PORT_SetMultiplePinsConfig();
+
 
     /* 检测2SD315AI 输入信号 */
         PORT_SetPinMux(PORTE, 19U, kPORT_MuxAsGpio);
@@ -48,6 +48,8 @@ void SD315AI_SO12_Input_Init(void)
         PORT_SetPinConfig(PORTC,10,&config);
         PORT_SetPinConfig(PORTC, 9,&config);
         #endif
+
+       
 
         #if 0
 

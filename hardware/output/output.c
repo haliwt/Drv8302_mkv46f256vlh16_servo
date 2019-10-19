@@ -16,7 +16,7 @@ void OUTPUT_Fucntion_Init(void)
 	  0,                    //set a defult output logic,which has no use input
     };
 
-  // port_pin_config_t config ;
+    port_pin_config_t config ;
 
     // LLWU_PE5_WUPE18(0) ;
     // LLWU_PE3_WUPE10(0);
@@ -48,8 +48,14 @@ void OUTPUT_Fucntion_Init(void)
         
         GPIO_PinInit(GPIOA,    19, &led_config );
 
+   #if 1
+        config.pullSelect= kPORT_PullDown;
+        PORT_PinPullConfig(HW_GPIOC, 7, kPORT_PullDown);
+        PORT_PinPullConfig(HW_GPIOC, 6, kPORT_PullDown);
         PORT_PinPullConfig(HW_GPIOC, 4, kPORT_PullDown);
-       
+        
+        
+   #endif    
      #if 0
         config.pullSelect= kPORT_PullDown;
         PORT_PinPullConfig(HW_GPIOC, 7, kPORT_PullDown);

@@ -480,6 +480,7 @@ static void vTaskBLDC(void *pvParameters)
 static void vTaskCOTL(void *pvParameters)
 {
    
+     uint8_t vTaskCotltx[]= "vTaskCOTL-4";
      uint8_t ucKeyCode=0,abc_s=0,digital_s=0;
      uint8_t start_s =0,door_s = 0,wiper_s=0,air_s=0;
      uint8_t hall_s = 0,wheel_s=0,abc_power_s=0;
@@ -496,29 +497,44 @@ static void vTaskCOTL(void *pvParameters)
 
 	while(1)
     {
-	      printf("vTaskCOTL-4 \r\n");
+	       //printf("vTaskCOTL-4 \r\n");
+          
+            UART_WriteBlocking(DEMO_UART,vTaskCotltx,sizeof(vTaskCotltx)-1);
+          
           
 		   ucKeyCode = KEY_Scan(0);
-           
+           /*Check U phase*/
            if(GPIO_PinRead(SD315AI_SO1_A_GPIO,SD315AI_SO1_A_PIN)==1 ||GPIO_PinRead(SD315AI_SO2_A_GPIO,SD315AI_SO1_A_PIN)==1)
           {
                GPIO_PinWrite(SD315AI_VL_A_GPIO,SD315AI_VL_A_PIN,1);//SD315_VL_A_OUTPUT=0;
-              // GPIO_PinWrite(SD315AI_VL_B_GPIO,SD315AI_VL_B_PIN,1);//SD315_VL_B_OUTPUT=0;
-            
+           
+          }
+          //else
+          {
+            //   GPIO_PinWrite(SD315AI_VL_A_GPIO,SD315AI_VL_A_PIN,0);//SD315_VL_A_OUTPUT=0;
 
           }
-          if(SD315AI_SO1_B_INPUT == 1 || SD315AI_SO2_B_INPUT == 1)
+          /*Check V phase*/
+          if(GPIO_PinRead(SD315AI_SO1_B_GPIO,SD315AI_SO1_B_PIN)== 1 ||GPIO_PinRead(SD315AI_SO2_B_GPIO,SD315AI_SO2_B_PIN)== 1)
           {
                
                GPIO_PinWrite(SD315AI_VL_B_GPIO,SD315AI_VL_B_PIN,1);//SD315_VL_B_OUTPUT=0;
             
 
           }
-          if(SD315AI_SO1_C_INPUT == 1 || SD315AI_SO2_C_INPUT == 1)
+          //else
+          {
+              //  GPIO_PinWrite(SD315AI_VL_B_GPIO,SD315AI_VL_B_PIN,0);//SD315_VL_B_OUTPUT=0;
+          }
+          /*Check W phase*/
+          if(GPIO_PinRead(SD315AI_SO1_C_GPIO,SD315AI_SO1_C_PIN)== 1 || GPIO_PinRead(SD315AI_SO2_C_GPIO,SD315AI_SO2_C_PIN)== 1)
           {
                 GPIO_PinWrite(SD315AI_VL_C_GPIO,SD315AI_VL_C_PIN,1);
                
-              
+          }
+          //else
+          {
+            //GPIO_PinWrite(SD315AI_VL_C_GPIO,SD315AI_VL_C_PIN,0);
           }
 		  xResult = xTaskNotifyWait(0x00000000,      
 						            0xFFFFFFFF,      

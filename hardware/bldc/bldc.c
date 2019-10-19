@@ -185,10 +185,10 @@ static void PWM_DRV_Init3PhPwm(void)
     uint16_t deadTimeVal;
     pwm_signal_param_t pwmSignal[2];
     uint32_t pwmSourceClockInHz;
-    uint32_t pwmFrequencyInHz = 2000;//1300; //1.3KHZ
+    uint32_t pwmFrequencyInHz = 1500;//1300; //1.3KHZ
 
 
-    pwmSourceClockInHz = PWM_SRC_CLK_FREQ;
+    pwmSourceClockInHz = PWM_SRC_CLK_FREQ ;
 
     /* Set deadtime count, we set this to about 650ns */
     deadTimeVal =650; //((uint64_t)pwmSourceClockInHz * 650) / 1000000000;
