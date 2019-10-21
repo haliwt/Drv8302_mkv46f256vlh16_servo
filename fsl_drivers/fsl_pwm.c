@@ -255,7 +255,7 @@ void PWM_GetDefaultConfig(pwm_config_t *config)
  * param subModule   PWM submodule to configure
  * param chnlParams  Array of PWM channel parameters to configure the channel(s)
  * param numOfChnls  Number of channels to configure, this should be the size of the array passed in.
- *                   Array size should not be more than 2 as each submodule has 2 pins to output PWM
+ *                    Array size should not be more than 2 as each submodule has 2 pins to output PWM
  * param mode        PWM operation mode, options available in enumeration ::pwm_mode_t
  * param pwmFreq_Hz  PWM signal frequency in Hz
  * param srcClock_Hz PWM main counter clock in Hz.
@@ -811,3 +811,4 @@ void PWM_ClearStatusFlags(PWM_Type *base, pwm_submodule_t subModule, uint32_t ma
     reg |= ((mask >> 16U) & PWM_FSTS_FFLAG_MASK);
     base->FSTS = reg;
 }
+
