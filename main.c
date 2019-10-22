@@ -341,7 +341,7 @@ static void vTaskBLDC(void *pvParameters)
 	uint16_t sampleMask;
 	BaseType_t xResult;
    
-    const TickType_t xMaxBlockTime = pdMS_TO_TICKS(10); /* 设置最大等待时间为300ms */
+    const TickType_t xMaxBlockTime = pdMS_TO_TICKS(5); /* 设置最大等待时间为300ms */
 	uint32_t ucConValue;
     uint16_t dirvalue;
 	uint8_t vTasktx1[]="BLDC receive success!!";
@@ -473,7 +473,7 @@ static void vTaskBLDC(void *pvParameters)
         }
 	
     // vTaskDelayUntil(&xLastWakeTime, xFrequency); // vTaskDelay(xMaxBlockTime);  
-      vTaskDelay(xMaxBlockTime); 
+      vTaskDelay(xMaxBlockTime); //taskYIELD();////vTaskDelay(xMaxBlockTime); 
       }
  } 
 
