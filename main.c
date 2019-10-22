@@ -462,9 +462,9 @@ static void vTaskBLDC(void *pvParameters)
 				UART_WriteBlocking(DEMO_UART,printx2,sizeof(printx2)-1);
 			}
 			/***********Motor Run**************/
-          //  PMW_AllClose_ABC_Channel();
+          
 			 uwStep = HallSensor_GetPinState();
-        	PRINTF("ouread = %d \r\n",uwStep);
+        	//PRINTF("ouread = %d \r\n",uwStep);
         	
         	
         	HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue); 
