@@ -198,6 +198,12 @@ static void vTaskSUBJ(void *pvParameters)
      
      uint8_t vTasktx1[]="ABC_= 1 @@@@~~~@@@\r\n";
      uint8_t vTasktx2[]="ABC_= 0 ~~~~~~~~~\r\n";
+
+      TickType_t xLastWakeTime;
+	
+	  const TickType_t xFrequency = 200;
+      xLastWakeTime = xTaskGetTickCount();
+     
      uint8_t abc_s=0,door_s=0,wipers_s=0;
      uint32_t vlSubj;
      uint32_t ucConKeyValue;
@@ -312,7 +318,7 @@ static void vTaskSUBJ(void *pvParameters)
 			
 		}
 
-     taskYIELD();// // vTaskDelayUntil(&xLastWakeTime, xFrequency); // vTaskDelay(xMaxBlockTime); 
+    vTaskDelayUntil(&xLastWakeTime, xFrequency); // vTaskDelay(xMaxBlockTime); 
 	}
 }
 /*********************************************************************************************************
@@ -327,14 +333,15 @@ static void vTaskBLDC(void *pvParameters)
     uint8_t txbuff[]="vTaskBLDC 3\r\n";
     uint32_t ucValue;
    
-	//TickType_t xLastWakeTime;
+//	TickType_t xLastWakeTime;
 	
 //	const TickType_t xFrequency = 100;
-  //  xLastWakeTime = xTaskGetTickCount();
+ //  xLastWakeTime = xTaskGetTickCount();
     volatile uint16_t pwm_f=0;
 	uint16_t sampleMask;
 	BaseType_t xResult;
-    const TickType_t xMaxBlockTime = pdMS_TO_TICKS(100); /* 设置最大等待时间为300ms */
+   
+    const TickType_t xMaxBlockTime = pdMS_TO_TICKS(10); /* 设置最大等待时间为300ms */
 	uint32_t ucConValue;
     uint16_t dirvalue;
 	uint8_t vTasktx1[]="BLDC receive success!!";
@@ -465,7 +472,8 @@ static void vTaskBLDC(void *pvParameters)
 
         }
 	
-      taskYIELD();// // vTaskDelayUntil(&xLastWakeTime, xFrequency); // vTaskDelay(xMaxBlockTime);         
+    // vTaskDelayUntil(&xLastWakeTime, xFrequency); // vTaskDelay(xMaxBlockTime);  
+      vTaskDelay(xMaxBlockTime); 
       }
  } 
 
@@ -834,7 +842,7 @@ static void vTaskCOTL(void *pvParameters)
         }
         
 	}
-      vTaskDelayUntil(&xLastWakeTime, xFrequency);//taskYIELD();//
+     vTaskDelayUntil(&xLastWakeTime, xFrequency);//taskYIELD();//
    }//end whilt(1)
 }
 /********************************************************************************************************
