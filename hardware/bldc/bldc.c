@@ -10,9 +10,10 @@ __IO int32_t uwStep = 0;      //六步引脚状态
 
 __IO uint32_t Lock_Time = 0;  // 堵转电流
 
+__IO int8_t Dir;
 
 
-__IO int16_t  PWM_Duty= 10;	 //占空比
+__IO int16_t  PWM_Duty= 20;	 //占空比
 
 
 /**********************************************************
@@ -251,14 +252,14 @@ static void PWM_DRV_Init3PhPwm(void)
  *
  *
 *********************************************************/
-void HALLSensor_Detected_BLDC(uint32_t uvw,uint16_t pwmf,uint16_t dir)
+void HALLSensor_Detected_BLDC()
 {
       
 
   //uwStep = HallSensor_GetPinState();
  // PRINTF("uwStep = %d\n",uwStep);
   // __IO uint32_t tmp = 0; 
- if(dir == 0)
+ if(Dir == 0)
   {
     uwStep = (uint32_t)7 - uwStep;        // 逆时针 CW = 7 - CCW;
   }
@@ -274,7 +275,7 @@ void HALLSensor_Detected_BLDC(uint32_t uvw,uint16_t pwmf,uint16_t dir)
        PWMA_Close_ABC_Channel(2);  //close C channel 
       
       /*  PWM_A1 and PWM_B1 output */
-       PWMA_Select_BC_Channel(0,pwmf);
+       PWMA_Select_BC_Channel(0,PWM_Duty);
      
      // PRINTF("uwStep = %d\n",uvw);
       break;
@@ -284,7 +285,7 @@ void HALLSensor_Detected_BLDC(uint32_t uvw,uint16_t pwmf,uint16_t dir)
          PWMA_Close_ABC_Channel(0); //close A channel 
      
       /*  Channe3 configuration B+  */
-         PWMA_Select_BC_Channel(1,pwmf);
+         PWMA_Select_BC_Channel(1,PWM_Duty);
     
       
       //  PRINTF("uwStep = %d\n",uvw);
@@ -296,7 +297,7 @@ void HALLSensor_Detected_BLDC(uint32_t uvw,uint16_t pwmf,uint16_t dir)
    
     
       /*  Channel configuration A+ */
-         PWMA_Select_AB_Channel(1,pwmf);
+         PWMA_Select_AB_Channel(1,PWM_Duty);
       
     
      // PRINTF("uwStep = %d\n",uvw);
@@ -306,7 +307,7 @@ void HALLSensor_Detected_BLDC(uint32_t uvw,uint16_t pwmf,uint16_t dir)
          /*  Channe2 configuration */ 
          PWMA_Close_ABC_Channel(2); //close A channel 
      
-         PWMA_Select_AB_Channel(0,pwmf);
+         PWMA_Select_AB_Channel(0,PWM_Duty);
          
          break;
     
@@ -316,7 +317,7 @@ void HALLSensor_Detected_BLDC(uint32_t uvw,uint16_t pwmf,uint16_t dir)
           PWMA_Close_ABC_Channel(0); //close A channel 
       
         /*  Channe2 configuration */
-         PWMA_Select_CA_Channel(1,pwmf);
+         PWMA_Select_CA_Channel(1,PWM_Duty);
       
       break;
     
@@ -325,7 +326,7 @@ void HALLSensor_Detected_BLDC(uint32_t uvw,uint16_t pwmf,uint16_t dir)
       /*  Channe3 configuration */       
         PWMA_Close_ABC_Channel(1); //close B channel 
  
-        PWMA_Select_CA_Channel(0,pwmf);
+        PWMA_Select_CA_Channel(0,PWM_Duty);
     
       break;
     

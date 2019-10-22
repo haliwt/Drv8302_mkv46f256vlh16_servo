@@ -42,8 +42,8 @@
 extern __IO int32_t  uwStep ;
 
 extern __IO uint32_t Lock_Time; // 堵转时间
-//extern __IO int16_t   PWM_Duty;   //占空比
-//extern __IO int8_t Dir;
+extern __IO int16_t   PWM_Duty;   //占空比
+extern __IO int8_t Dir;
 extern uint16_t SPEED_VALUE ;   //速度值
 
 
@@ -58,7 +58,7 @@ void HALL_Init(void);
 
 uint32_t HallSensor_GetPinState(void);
 
-void HALLSensor_Detected_BLDC(uint32_t uvw,uint16_t tpwmf,uint16_t dir);
+void HALLSensor_Detected_BLDC(void);
 
 
 void PWM_BLDC_Init(void);   // initial pwm function

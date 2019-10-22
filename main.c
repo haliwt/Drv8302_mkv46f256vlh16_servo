@@ -15,10 +15,10 @@
 #include "gmclib_FP.h"
 
 /* Kernel includes. */
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "timers.h"
+//#include "FreeRTOS.h"
+//#include "task.h"
+//#include "queue.h"
+//#include "timers.h"
 
 /* Freescale includes. */
 #include "fsl_device_registers.h"
@@ -48,38 +48,21 @@
 output_t recoder_number;
 
 
-static void vTaskUSART(void *pvParameters);
-static void vTaskSUBJ(void *pvParameters);
-static void vTaskBLDC(void *pvParameters);
-static void vTaskCOTL(void *pvParameters);
-
-
-static void AppTaskCreate (void);
-//static void AppObjCreate (void);
 
 /*
 **********************************************************************************************************
 											变量声明
 **********************************************************************************************************
 */
-static TaskHandle_t xHandleTaskUSART = NULL;
-static TaskHandle_t xHandleTaskSUBJ =  NULL;
-static TaskHandle_t xHandleTaskBLDC = NULL;
-static TaskHandle_t xHandleTaskCOTL = NULL;
+//__IO int32_t uwStep ;      //六步引脚状态
+    
+//__IO uint32_t Lock_Time ;  // 堵转电流
 
-//static QueueHandle_t xQueue1 = NULL;
-//static QueueHandle_t xQueue2 = NULL;
+//__IO int16_t  PWM_Duty;  //占空比
+
+//__IO int8_t Dir;
 
 
-
-typedef struct Msg
-{
-	uint8_t  ucMessageID;
-	uint8_t  usData[10];
-	
-}MSG_T;
-
-MSG_T   g_tMsg; /* 定义一个结构体用于消息队列 */
 
 
 
@@ -93,6 +76,16 @@ MSG_T   g_tMsg; /* 定义一个结构体用于消息队列 */
 ******************************************************************************/
 int main(void)
 {
+
+ 
+    uint8_t printx1[]="Dir = Dir is OK !!!! CW \r\n";
+    uint8_t printx2[]="Dir = - Dir is OK #### CCW \r\n";
+    volatile uint16_t pwm_f=0;
+	//uint16_t sampleMask;
+     uint8_t ucKeyCode=0,abc_s=0,dirvalue=0;
+     uint8_t start_s =0,motor;
+   
+
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
@@ -113,17 +106,168 @@ int main(void)
     PWM_BLDC_Init();
     USART_POLLING_Init();
      
-    /* 创建任务 */
-	AppTaskCreate();
-    
-    /* 创建任务通信机制 */
-//	AppObjCreate();// WT.EDIT log_init(10, MAX_LOG_LENGTH);
-    
-    vTaskStartScheduler();
-    for (;;)
-        ;
-}
+   while(1)
+   {
 
+          ucKeyCode = KEY_Scan(0);
+          
+          if(motor == 1)
+          {
+
+            uwStep = HallSensor_GetPinState();
+            HALLSensor_Detected_BLDC();
+          }
+      
+   
+           /*Check U phase*/
+          if(GPIO_PinRead(SD315AI_SO1_A_GPIO,SD315AI_SO1_A_PIN)==1 ||GPIO_PinRead(SD315AI_SO2_A_GPIO,SD315AI_SO1_A_PIN)==1)
+          {
+               GPIO_PinWrite(SD315AI_VL_A_GPIO,SD315AI_VL_A_PIN,1);//SD315_VL_A_OUTPUT=0;
+           
+          }
+          else
+          {
+              GPIO_PinWrite(SD315AI_VL_A_GPIO,SD315AI_VL_A_PIN,0);//SD315_VL_A_OUTPUT=0;
+
+          }
+          /*Check V phase*/
+          if(GPIO_PinRead(SD315AI_SO1_B_GPIO,SD315AI_SO1_B_PIN)== 1 ||GPIO_PinRead(SD315AI_SO2_B_GPIO,SD315AI_SO2_B_PIN)== 1)
+          {
+               
+               GPIO_PinWrite(SD315AI_VL_B_GPIO,SD315AI_VL_B_PIN,1);//SD315_VL_B_OUTPUT=0;
+            
+
+          }
+          else
+          {
+               GPIO_PinWrite(SD315AI_VL_B_GPIO,SD315AI_VL_B_PIN,0);//SD315_VL_B_OUTPUT=0;
+          }
+          /*Check W phase*/
+          if(GPIO_PinRead(SD315AI_SO1_C_GPIO,SD315AI_SO1_C_PIN)== 1 || GPIO_PinRead(SD315AI_SO2_C_GPIO,SD315AI_SO2_C_PIN)== 1)
+          {
+                GPIO_PinWrite(SD315AI_VL_C_GPIO,SD315AI_VL_C_PIN,1);
+               
+          }
+          else
+          {
+                GPIO_PinWrite(SD315AI_VL_C_GPIO,SD315AI_VL_C_PIN,0);
+          }
+		
+	    
+       
+
+      /*处理接收到的按键功能*/  
+		if(ucKeyCode !=KEY_UP) 
+		{
+           switch(ucKeyCode)
+            { 
+                 
+                  case ABC_POWER_PRES :
+                     PRINTF("ABC_PRES key  \r\n");
+                     abc_s ++;
+                    if(abc_s == 1)
+				    {
+                      A_POWER_OUTPUT =0;
+
+                      if(recoder_number.dir_change == 1) 
+                        {
+                              dirvalue = 1 ;
+            				 // printf("Dir = Dir is OK !!!! CW \r\n");
+            				  UART_WriteBlocking(DEMO_UART,printx1,sizeof(printx1)-1);
+            			}
+            			else 
+            			{
+            			    dirvalue = 0;
+            				//printf("Dir = - Dir is OK #######\r\n");
+            				UART_WriteBlocking(DEMO_UART,printx2,sizeof(printx2)-1);
+            			}
+            			/***********Motor Run**************/
+                     
+                     }
+				     else 
+				     {
+                            A_POWER_OUTPUT =1; //shut down
+                            abc_s =0;
+                        
+				     }
+                      
+				  	break;
+
+				 case START_PRES:
+                   PRINTF("START_PRES key \r\n");
+				    start_s ++;
+		          if(start_s == 1)
+		          {
+                     motor = 1;
+                     printf("motor is one \n");
+                    
+    			   }
+				  else 
+				  {
+                     motor = 0;
+					 start_s =0;
+					 
+					 printf("START KEY IS STOP\n");
+				  }
+                 
+				  break;
+				  
+				 case DIR_PRES: //3
+
+			       dirvalue ++;
+	  			 if(dirvalue == 1)
+	   			 {
+                        Dir =1;
+				  }
+				 else 
+				   {
+                      Dir = 0;
+                      dirvalue =0;
+					  printf(" dir is  =0 \r\n");
+				   }
+			
+           		break;
+            default :
+              
+      
+              break;
+			
+        }
+        
+	}
+   }
+
+}
+/******************************************************************************
+ *
+ * Function Name:BARKE_KEY_IRQ_HANDLER(void)
+ * Function Active: Interrpt brake input key 
+ * @brief Interrupt service fuction of switch.
+ *
+ * This function toggles the LED
+ *
+******************************************************************************/
+#if 1
+void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
+{
+  
+    /* Clear external interrupt flag. */
+    GPIO_PortClearInterruptFlags(BRAKE_KEY_GPIO, 1U << BRAKE_KEY_GPIO_PIN );
+    /* Change state of button. */
+    A_POWER_OUTPUT =1;
+	recoder_number.break_f =1;
+	PRINTF("interrupte has happed  \r\n");
+	                  
+/* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
+  exception return operation might vector to incorrect interrupt */
+#if defined __CORTEX_M && (__CORTEX_M == 4U)
+    __DSB();
+#endif
+}
+#endif 
+/*******************************************************************************************/
+
+#if 0
 /******************************************************************************************************
 *	函 数 名: vTaskTaskUSART
 *	功能说明: 接口消息处理。
@@ -473,7 +617,7 @@ static void vTaskBLDC(void *pvParameters)
         }
 	
     // vTaskDelayUntil(&xLastWakeTime, xFrequency); // vTaskDelay(xMaxBlockTime);  
-      vTaskDelay(xMaxBlockTime); //taskYIELD();////vTaskDelay(xMaxBlockTime); 
+     vTaskDelay(xMaxBlockTime); //taskYIELD();////vTaskDelay(xMaxBlockTime); 
       }
  } 
 
@@ -912,32 +1056,7 @@ static void AppObjCreate (void)
 
 }
 #endif 
-/******************************************************************************
- *
- * Function Name:BARKE_KEY_IRQ_HANDLER(void)
- * Function Active: Interrpt brake input key 
- * @brief Interrupt service fuction of switch.
- *
- * This function toggles the LED
- *
-******************************************************************************/
-#if 1
-void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
-{
-  
-    /* Clear external interrupt flag. */
-    GPIO_PortClearInterruptFlags(BRAKE_KEY_GPIO, 1U << BRAKE_KEY_GPIO_PIN );
-    /* Change state of button. */
-
-	recoder_number.break_f =1;
-	PRINTF("interrupte has happed  \r\n");
-	                  
-/* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
-  exception return operation might vector to incorrect interrupt */
-#if defined __CORTEX_M && (__CORTEX_M == 4U)
-    __DSB();
-#endif
-}
 #endif 
+
 
 
