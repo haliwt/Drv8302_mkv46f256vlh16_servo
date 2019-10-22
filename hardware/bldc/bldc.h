@@ -36,7 +36,12 @@
 
 #define  PWMA_INIT_ON                    1
 
+typedef struct _BLDC_REF_
+{
 
+  uint8_t motor_run ;
+  
+}BLDC_REF;
 
 
 extern __IO int32_t  uwStep ;

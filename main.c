@@ -45,8 +45,9 @@
 #define MAX_LOG_LENGTH 20
 
 
-output_t recoder_number;
 
+
+BLDC_REF bldc_ref ;
 
 
 /*
@@ -80,7 +81,7 @@ int main(void)
  
     uint8_t printx1[]="Dir = Dir is OK !!!! CW \r\n";
     uint8_t printx2[]="Dir = - Dir is OK #### CCW \r\n";
-    volatile uint16_t pwm_f=0;
+     uint16_t sampleMask;
 	//uint16_t sampleMask;
      uint8_t ucKeyCode=0,abc_s=0,dirvalue=0;
      uint8_t start_s =0,motor;
@@ -111,7 +112,7 @@ int main(void)
 
           ucKeyCode = KEY_Scan(0);
           
-          if(motor == 1)
+          if(bldc_ref.motor_run == 1)
           {
 
             uwStep = HallSensor_GetPinState();
@@ -169,19 +170,7 @@ int main(void)
 				    {
                       A_POWER_OUTPUT =0;
 
-                      if(recoder_number.dir_change == 1) 
-                        {
-                              dirvalue = 1 ;
-            				 // printf("Dir = Dir is OK !!!! CW \r\n");
-            				  UART_WriteBlocking(DEMO_UART,printx1,sizeof(printx1)-1);
-            			}
-            			else 
-            			{
-            			    dirvalue = 0;
-            				//printf("Dir = - Dir is OK #######\r\n");
-            				UART_WriteBlocking(DEMO_UART,printx2,sizeof(printx2)-1);
-            			}
-            			/***********Motor Run**************/
+                      
                      
                      }
 				     else 
@@ -198,13 +187,13 @@ int main(void)
 				    start_s ++;
 		          if(start_s == 1)
 		          {
-                     motor = 1;
+                     bldc_ref.motor_run = 1;
                      printf("motor is one \n");
                     
     			   }
 				  else 
 				  {
-                     motor = 0;
+                    bldc_ref.motor_run = 0;
 					 start_s =0;
 					 
 					 printf("START KEY IS STOP\n");
@@ -228,7 +217,35 @@ int main(void)
 			
            		break;
             default :
-              
+               /**********************adjust frequency ****************************/
+			{
+            
+		    CADC_DoSoftwareTriggerConverter(CADC_BASEADDR, kCADC_ConverterA);
+	             /* Wait the conversion to be done. */
+	         while (kCADC_ConverterAEndOfScanFlag !=
+	               (kCADC_ConverterAEndOfScanFlag & CADC_GetStatusFlags(CADC_BASEADDR)))
+	        {
+	        }
+
+	        /* Read the result value. */
+	        if (sampleMask == (sampleMask & CADC_GetSampleReadyStatusFlags(CADC_BASEADDR)))
+	        {
+              //  pwm_f =(int16_t)CADC_GetSampleResultValue(CADC_BASEADDR, 1U);
+		      //   PRINTF("%d\t\t",pwm_f );
+	           
+			 // DelayMs(100U);
+             // pwm_f = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 1U))/ 330);
+	         // PRINTF("PWM_Duty = %d\r\n",pwm_f);
+			 // DelayMs(200U);
+	           
+            }
+            CADC_ClearStatusFlags(CADC_BASEADDR, kCADC_ConverterAEndOfScanFlag);
+
+     	    }
+
+            PWM_Duty = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 1U))/ 330);
+           
+            PRINTF("PWM_Duty = %d\r\n",PWM_Duty);
       
               break;
 			
@@ -255,7 +272,7 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
     GPIO_PortClearInterruptFlags(BRAKE_KEY_GPIO, 1U << BRAKE_KEY_GPIO_PIN );
     /* Change state of button. */
     A_POWER_OUTPUT =1;
-	recoder_number.break_f =1;
+    bldc_ref.motor_run = 0;
 	PRINTF("interrupte has happed  \r\n");
 	                  
 /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -342,7 +359,7 @@ static void vTaskSUBJ(void *pvParameters)
      
      uint8_t vTasktx1[]="ABC_= 1 @@@@~~~@@@\r\n";
      uint8_t vTasktx2[]="ABC_= 0 ~~~~~~~~~\r\n";
-
+     uint16_t sampleMask;
       TickType_t xLastWakeTime;
 	
 	  const TickType_t xFrequency = 200;
