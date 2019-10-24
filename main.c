@@ -79,12 +79,10 @@ int main(void)
 {
 
  
-    uint8_t printx1[]="Dir = Dir is OK !!!! CW \r\n";
-    uint8_t printx2[]="Dir = - Dir is OK #### CCW \r\n";
+   
      uint16_t sampleMask;
-	//uint16_t sampleMask;
      uint8_t ucKeyCode=0,abc_s=0,dirvalue=0;
-     uint8_t start_s =0,motor;
+     uint8_t start_s =0;
    
 
     BOARD_InitPins();
@@ -118,6 +116,11 @@ int main(void)
             uwStep = HallSensor_GetPinState();
             HALLSensor_Detected_BLDC();
           }
+          else 
+         {
+           PMW_AllClose_ABC_Channel();  
+          
+         }
       
    
            /*Check U phase*/
@@ -227,18 +230,7 @@ int main(void)
 	        {
 	        }
 
-	        /* Read the result value. */
-	        if (sampleMask == (sampleMask & CADC_GetSampleReadyStatusFlags(CADC_BASEADDR)))
-	        {
-              //  pwm_f =(int16_t)CADC_GetSampleResultValue(CADC_BASEADDR, 1U);
-		      //   PRINTF("%d\t\t",pwm_f );
-	           
-			 // DelayMs(100U);
-             // pwm_f = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 1U))/ 330);
-	         // PRINTF("PWM_Duty = %d\r\n",pwm_f);
-			 // DelayMs(200U);
-	           
-            }
+	       
             CADC_ClearStatusFlags(CADC_BASEADDR, kCADC_ConverterAEndOfScanFlag);
 
      	    }
