@@ -527,7 +527,7 @@ void PWMA_Close_ABC_Channel(uint8_t f_pwmabc)
 void PMW_AllClose_ABC_Channel(void)
 {
 
-   
+   #if 0
    //close PWMA_A0/B0 channel
     PWM_UpdatePwmDutycycle(BOARD_PWM_BASEADDR, kPWM_Module_0, kPWM_PwmA,  kPWM_SignedEdgeAligned, 0); 
    
@@ -550,6 +550,8 @@ void PMW_AllClose_ABC_Channel(void)
     
 	PWM_SetPwmLdok(BOARD_PWM_BASEADDR, kPWM_Control_Module_2, true);
  
+  #endif
+  PWM_StopTimer(BOARD_PWM_BASEADDR,kPWM_Control_Module_0|kPWM_Control_Module_1|kPWM_Control_Module_2);
   
 }
 

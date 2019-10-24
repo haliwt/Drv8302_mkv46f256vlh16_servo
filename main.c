@@ -191,6 +191,7 @@ int main(void)
 		          if(start_s == 1)
 		          {
                      bldc_ref.motor_run = 1;
+                     PWM_StartTimer(BOARD_PWM_BASEADDR, kPWM_Control_Module_1 |kPWM_Control_Module_2|kPWM_Control_Module_0 );
                      printf("motor is one \n");
                     
     			   }
