@@ -129,171 +129,27 @@ int main(void)
                         switch(uwStep)
                         {
                         case 5 :
-                          for(i = 0; i<3;i++)
-                          {
-                              
-                              if(i == 0)
-                                PWM_Duty = 60;
-                              else if(i==1)PWM_Duty = 70;
-                              else if(i==2)PWM_Duty = 80;
-                              uwStep = 5;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 4;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 6 ;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 2 ;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 3 ;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 1 ;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                          }
+                         BLDC_CCW_SIX_5_Run();
                           break;
                         case 4:
-                          for(i = 0;i<3 ;i++)
-                          {
-                           if(i == 0)
-                               PWM_Duty = 60;
-                              else if(i==1)PWM_Duty = 70;
-                              else if(i==2)PWM_Duty = 80;
-                            uwStep = 4;
-                            HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                            uwStep = 6;
-                            HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                            uwStep = 2 ;
-                            HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                            uwStep = 3 ;
-                            HALLSensor_Detected_BLDC();
-                            DelayMs(8);
-                            uwStep = 1 ;
-                            HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                            uwStep = 5 ;
-                            HALLSensor_Detected_BLDC();
-                        
-                          }
-                         break;
-                          case 6:
-                            for(i = 0;i<3 ;i++)
-                          {
-                              
-                              if(i == 0)
-                                PWM_Duty = 60;
-                              else if(i==1)PWM_Duty = 70;
-                              else if(i==2)PWM_Duty = 80;
-                              uwStep = 6;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 2;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 3 ;
-                              HALLSensor_Detected_BLDC();
-                               DelayMs(8);
-                              uwStep = 1 ;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 5 ;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 4 ;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                          }
-                         break;
-                         case 2:
-                           for(i = 0;i<3 ;i++)
-                          {
-                            if(i == 0)
-                                PWM_Duty = 60;
-                              else if(i==1)PWM_Duty = 70;
-                              else if(i==2)PWM_Duty = 80;
-                            
-                              uwStep = 2;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 3;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 1 ;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 5 ;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 4 ;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 6 ;
-                              HALLSensor_Detected_BLDC();
-                 DelayMs(8);
-                          }
-                         break;
-                         case 3:
-                           for(i = 0;i<3 ;i++)
-                          {
-                              if(i == 0)
-                                PWM_Duty = 60;
-                              else if(i==1)PWM_Duty = 70;
-                              else if(i==2)PWM_Duty = 80;
-                              uwStep = 3;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 1;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 5 ;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 4 ;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 6 ;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                              uwStep = 2 ;
-                              HALLSensor_Detected_BLDC();
-                              DelayMs(8);
-                          }
-                         break;
-                         case 1:
-                            for(i = 0;i<3 ;i++)
-                              {
-                                  if(i == 0)
-                                    PWM_Duty = 60;
-                                  else if(i==1)PWM_Duty = 70;
-                                  else if(i==2)PWM_Duty = 80;
-                                
-                                  uwStep = 1;
-                                  HALLSensor_Detected_BLDC();
-                                  DelayMs(8);
-                                  uwStep = 5;
-                                  HALLSensor_Detected_BLDC();
-                                  DelayMs(8);
-                                  uwStep = 4 ;
-                                  HALLSensor_Detected_BLDC();
-                                  DelayMs(8);
-                                  uwStep = 6 ;
-                                  HALLSensor_Detected_BLDC();
-                                  DelayMs(8);
-                                  uwStep = 2 ;
-                                  HALLSensor_Detected_BLDC();
-                                  DelayMs(8);
-                                  uwStep = 3 ;
-                                  HALLSensor_Detected_BLDC();
-                                  DelayMs(8);
-                              }
                           
+                          BLDC_CCW_SIX_4_Run();
+                         break;
+                        
+                        case 6:
+                          BLDC_CCW_SIX_6_Run();
+                        break;
+                          
+                         case 2:
+                           BLDC_CCW_SIX_2_Run();
+                         break;
+                         
+                         case 3:
+                           BLDC_CCW_SIX_3_Run();
+                         break;
+                         
+                         case 1:
+                            BLDC_CCW_SIX_1_Run();
                          break;
                         }
                           
