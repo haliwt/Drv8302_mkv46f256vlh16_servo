@@ -80,6 +80,20 @@ void BLDC_CCW_SIX_5_Run(void);
 void BLDC_CCW_SIX_6_Run(void);
 
 
+void BLDC_CW_Six_1_Run(void);
+void BLDC_CW_Six_2_Run(void);
+void BLDC_CW_Six_3_Run(void);
+void BLDC_CW_Six_4_Run(void);
+void BLDC_CW_Six_5_Run(void);
+void BLDC_CW_Six_6_Run(void);
+
+
+
+
+
+
+
+
 
 
 

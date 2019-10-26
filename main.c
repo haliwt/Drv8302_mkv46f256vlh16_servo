@@ -157,9 +157,39 @@ int main(void)
                      printf("PWM_Duty= %d\r \n",PWM_Duty);
                          
                  }
-                 else 
+                 else //CW 
                  {
-                  printf("Dir = %d\r \n",Dir); 
+
+
+                    uwStep = HallSensor_GetPinState();
+                        switch(uwStep)
+                        {
+                        case 5 :
+                         BLDC_CW_Six_5_Run();
+                          break;
+                        case 4:
+                          
+                          BLDC_CW_Six_4_Run();
+                         break;
+                        
+                        case 6:
+                          BLDC_CW_Six_6_Run();
+                        break;
+                          
+                         case 2:
+                           BLDC_CW_Six_2_Run();
+                         break;
+                         
+                         case 3:
+                           BLDC_CW_Six_3_Run();
+                         break;
+                         
+                         case 1:
+                            BLDC_CW_Six_1_Run();
+                         break;
+                        }
+
+                    printf("Dir = %d\r \n",Dir); 
                  
                  }
                }
