@@ -45,9 +45,9 @@
 #define MAX_LOG_LENGTH 20
 
 
+output_t recoder_number;
 
 
-BLDC_REF bldc_ref ;
 
 /*
 **********************************************************************************************************
@@ -55,6 +55,15 @@ BLDC_REF bldc_ref ;
 **********************************************************************************************************
 */
 
+
+typedef struct Msg
+{
+	uint8_t  ucMessageID;
+	uint8_t  usData[10];
+	
+}MSG_T;
+
+MSG_T   g_tMsg; /* 定义一个结构体用于消息队列 */
 
 
 
@@ -75,7 +84,8 @@ int main(void)
     volatile uint16_t pwm_f=0;
 	//uint16_t sampleMask;
      uint8_t ucKeyCode=0,abc_s=0,dirvalue=0;
-     uint8_t start_s =0,motor;
+     uint8_t start_s =0,motor,dir_s =0,i;
+     volatile uint8_t power_on = 0;
    
 
     BOARD_InitPins();
@@ -90,7 +100,7 @@ int main(void)
     
     SD315AI_SO12_Input_Init();
     
-    HallSensor_GetPinState();
+    
     OUTPUT_Fucntion_Init();
     ADC_CADC_Init();
     ABC_POWER_OUTPUT_Init();
@@ -103,16 +113,216 @@ int main(void)
 
           ucKeyCode = KEY_Scan(0);
           
-          if(bldc_ref.motor_run == 1)
-          {
-
-            uwStep = HallSensor_GetPinState();
-            HALLSensor_Detected_BLDC();
-          }
+          if(motor == 1 )
+           {
+               if(power_on == 0)
+               {
+                   printf("************************************************************\r \n");
+                   power_on ++ ;
+                  
+                   if(dirvalue==0)  
+                   {
+                        
+                  
+                         
+                        uwStep = HallSensor_GetPinState();
+                        switch(uwStep)
+                        {
+                        case 5 :
+                          for(i = 0; i<3;i++)
+                          {
+                              
+                              if(i == 0)
+                                pwm_f = 60;
+                              else if(i==1)pwm_f = 70;
+                              else if(i==2)pwm_f = 80;
+                              uwStep = 5;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 4;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 6 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 2 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 3 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 1 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                          }
+                          break;
+                        case 4:
+                          for(i = 0;i<3 ;i++)
+                          {
+                           if(i == 0)
+                                pwm_f = 60;
+                              else if(i==1)pwm_f = 70;
+                              else if(i==2)pwm_f = 80;
+                            uwStep = 4;
+                            HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                            uwStep = 6;
+                            HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                            uwStep = 2 ;
+                            HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                            uwStep = 3 ;
+                            HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                            DelayMs(8);
+                            uwStep = 1 ;
+                            HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                            uwStep = 5 ;
+                            HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                        
+                          }
+                         break;
+                          case 6:
+                            for(i = 0;i<3 ;i++)
+                          {
+                              
+                              if(i == 0)
+                                pwm_f = 60;
+                              else if(i==1)pwm_f = 70;
+                              else if(i==2)pwm_f = 80;
+                              uwStep = 6;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 2;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 3 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                               DelayMs(8);
+                              uwStep = 1 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 5 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 4 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                          }
+                         break;
+                         case 2:
+                           for(i = 0;i<3 ;i++)
+                          {
+                            if(i == 0)
+                                pwm_f = 60;
+                              else if(i==1)pwm_f = 70;
+                              else if(i==2)pwm_f = 80;
+                            
+                              uwStep = 2;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 3;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 1 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 5 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 4 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 6 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                 DelayMs(8);
+                          }
+                         break;
+                         case 3:
+                           for(i = 0;i<3 ;i++)
+                          {
+                              if(i == 0)
+                                pwm_f = 60;
+                              else if(i==1)pwm_f = 70;
+                              else if(i==2)pwm_f = 80;
+                              uwStep = 3;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 1;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 5 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 4 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 6 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 2 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                          }
+                         break;
+                         case 1:
+                          for(i = 0;i<3 ;i++)
+                          {
+                              if(i == 0)
+                                pwm_f = 60;
+                              else if(i==1)pwm_f = 70;
+                              else if(i==2)pwm_f = 80;
+                            
+                              uwStep = 1;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 5;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 4 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 6 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 2 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                              uwStep = 3 ;
+                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              DelayMs(8);
+                          }
+                          
+                         break;
+                        }
+                          
+                     printf("Dir = %d\r \n",dirvalue); 
+                     printf("pwm_f= %d\r \n",pwm_f);
+                         
+                 }
+                 else 
+                 {
+                 
+                 
+                 }
+               }
+              else 
+                {
+                  
+                  pwm_f =20;
+                  uwStep = HallSensor_GetPinState();
+                                 
+                  HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                  printf("pwm_f= %d\r \n",pwm_f);
+                 
+                }
+             }
+          
           else
           {
-            PMW_AllClose_ABC_Channel();
-
+              PMW_AllClose_ABC_Channel();
+          
           }
       
    
@@ -164,14 +374,15 @@ int main(void)
                      abc_s ++;
                     if(abc_s == 1)
 				    {
-                      A_POWER_OUTPUT =0;
-
-                      
+                       A_POWER_OUTPUT =1;
+                       power_on = 0;
+                       pwm_f=20;
                      
                      }
 				     else 
 				     {
-                            A_POWER_OUTPUT =1; //shut down
+                            A_POWER_OUTPUT =0; //shut down
+                            power_on = 1;
                             abc_s =0;
                         
 				     }
@@ -181,15 +392,17 @@ int main(void)
 				 case START_PRES:
                    PRINTF("START_PRES key \r\n");
 				    start_s ++;
-		          if(start_s == 1)
+		          if( start_s== 1)
 		          {
-                     bldc_ref.motor_run = 1;
+                      motor  = 1;
+                      power_on = 0;
                      printf("motor is one \n");
                     
     			   }
 				  else 
 				  {
-                    bldc_ref.motor_run = 0;
+                      motor = 0;
+                      power_on = 1;
 					 start_s =0;
 					 
 					 printf("START KEY IS STOP\n");
@@ -199,38 +412,23 @@ int main(void)
 				  
 				 case DIR_PRES: //3
 
-			       dirvalue ++;
-	  			 if(dirvalue == 1)
+			       dir_s ++ ;
+	  			 if(dir_s == 1)
 	   			 {
-                        Dir =1;
+                         dirvalue=1;
+                         power_on = 0;
 				  }
 				 else 
 				   {
-                      Dir = 0;
-                      dirvalue =0;
+                      
+                      dirvalue =0; //逆时针旋转
+                  
 					  printf(" dir is  =0 \r\n");
 				   }
 			
            		break;
             default :
-               /**********************adjust frequency ****************************/
-			{
-            
-		    CADC_DoSoftwareTriggerConverter(CADC_BASEADDR, kCADC_ConverterA);
-	             /* Wait the conversion to be done. */
-	         while (kCADC_ConverterAEndOfScanFlag !=
-	               (kCADC_ConverterAEndOfScanFlag & CADC_GetStatusFlags(CADC_BASEADDR)))
-	        {
-	        }
-
-	        
-            CADC_ClearStatusFlags(CADC_BASEADDR, kCADC_ConverterAEndOfScanFlag);
-
-     	    }
-
-            PWM_Duty = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 1U))/ 330);
-           
-            PRINTF("PWM_Duty = %d\r\n",PWM_Duty);
+              
       
               break;
 			
@@ -257,7 +455,7 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
     GPIO_PortClearInterruptFlags(BRAKE_KEY_GPIO, 1U << BRAKE_KEY_GPIO_PIN );
     /* Change state of button. */
     A_POWER_OUTPUT =1;
-
+	recoder_number.break_f =1;
 	PRINTF("interrupte has happed  \r\n");
 	                  
 /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping

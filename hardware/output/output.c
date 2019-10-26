@@ -83,7 +83,7 @@ void ABC_POWER_OUTPUT_Init(void)
 {
    GPIO_QuickInit(HW_GPIOC,  1, kGPIO_Mode_OPP);
    
-   A_POWER_OUTPUT =1;
+   A_POWER_OUTPUT =0;
    
 }
 
