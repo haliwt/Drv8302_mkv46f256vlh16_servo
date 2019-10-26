@@ -83,7 +83,7 @@ int main(void)
     uint8_t printx2[]="Dir = - Dir is OK #### CCW \r\n";
  
 	//uint16_t sampleMask;
-     uint8_t ucKeyCode=0,abc_s=0,dirvalue=0;
+     uint8_t ucKeyCode=0,abc_s=0;
      uint8_t start_s =0,motor,dir_s =0,i;
      volatile uint8_t power_on = 0;
    
@@ -120,7 +120,7 @@ int main(void)
                    printf("************************************************************\r \n");
                    power_on ++ ;
                   
-                   if(dirvalue==0)  
+                   if(Dir==0)  
                    {
                         
                   
@@ -297,13 +297,13 @@ int main(void)
                          break;
                         }
                           
-                     printf("Dir = %d\r \n",dirvalue); 
+                     printf("Dir = %d\r \n",Dir); 
                      printf("PWM_Duty= %d\r \n",PWM_Duty);
                          
                  }
                  else 
                  {
-                 
+                  printf("Dir = %d\r \n",Dir); 
                  
                  }
                }
@@ -417,10 +417,11 @@ int main(void)
 	   			 {
                          Dir=1;
                          power_on = 0;
+                         printf(" dir is  =1 \r\n");
 				  }
 				 else 
 				   {
-                      
+                       dir_s = 0;
                       //dirvalue =0; //ÄæÊ±ÕëÐý×ª
                         Dir = 0;
 					  printf(" dir is  =0 \r\n");
