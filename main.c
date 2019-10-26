@@ -81,7 +81,7 @@ int main(void)
  
     uint8_t printx1[]="Dir = Dir is OK !!!! CW \r\n";
     uint8_t printx2[]="Dir = - Dir is OK #### CCW \r\n";
-    volatile uint16_t pwm_f=0;
+ 
 	//uint16_t sampleMask;
      uint8_t ucKeyCode=0,abc_s=0,dirvalue=0;
      uint8_t start_s =0,motor,dir_s =0,i;
@@ -133,26 +133,26 @@ int main(void)
                           {
                               
                               if(i == 0)
-                                pwm_f = 60;
-                              else if(i==1)pwm_f = 70;
-                              else if(i==2)pwm_f = 80;
+                                PWM_Duty = 60;
+                              else if(i==1)PWM_Duty = 70;
+                              else if(i==2)PWM_Duty = 80;
                               uwStep = 5;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 4;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 6 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 2 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 3 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 1 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                           }
                           break;
@@ -160,26 +160,26 @@ int main(void)
                           for(i = 0;i<3 ;i++)
                           {
                            if(i == 0)
-                                pwm_f = 60;
-                              else if(i==1)pwm_f = 70;
-                              else if(i==2)pwm_f = 80;
+                               PWM_Duty = 60;
+                              else if(i==1)PWM_Duty = 70;
+                              else if(i==2)PWM_Duty = 80;
                             uwStep = 4;
-                            HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                            HALLSensor_Detected_BLDC();
                               DelayMs(8);
                             uwStep = 6;
-                            HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                            HALLSensor_Detected_BLDC();
                               DelayMs(8);
                             uwStep = 2 ;
-                            HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                            HALLSensor_Detected_BLDC();
                               DelayMs(8);
                             uwStep = 3 ;
-                            HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                            HALLSensor_Detected_BLDC();
                             DelayMs(8);
                             uwStep = 1 ;
-                            HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                            HALLSensor_Detected_BLDC();
                               DelayMs(8);
                             uwStep = 5 ;
-                            HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                            HALLSensor_Detected_BLDC();
                         
                           }
                          break;
@@ -188,26 +188,26 @@ int main(void)
                           {
                               
                               if(i == 0)
-                                pwm_f = 60;
-                              else if(i==1)pwm_f = 70;
-                              else if(i==2)pwm_f = 80;
+                                PWM_Duty = 60;
+                              else if(i==1)PWM_Duty = 70;
+                              else if(i==2)PWM_Duty = 80;
                               uwStep = 6;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 2;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 3 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                                DelayMs(8);
                               uwStep = 1 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 5 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 4 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                           }
                          break;
@@ -215,27 +215,27 @@ int main(void)
                            for(i = 0;i<3 ;i++)
                           {
                             if(i == 0)
-                                pwm_f = 60;
-                              else if(i==1)pwm_f = 70;
-                              else if(i==2)pwm_f = 80;
+                                PWM_Duty = 60;
+                              else if(i==1)PWM_Duty = 70;
+                              else if(i==2)PWM_Duty = 80;
                             
                               uwStep = 2;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 3;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 1 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 5 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 4 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 6 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                  DelayMs(8);
                           }
                          break;
@@ -243,62 +243,62 @@ int main(void)
                            for(i = 0;i<3 ;i++)
                           {
                               if(i == 0)
-                                pwm_f = 60;
-                              else if(i==1)pwm_f = 70;
-                              else if(i==2)pwm_f = 80;
+                                PWM_Duty = 60;
+                              else if(i==1)PWM_Duty = 70;
+                              else if(i==2)PWM_Duty = 80;
                               uwStep = 3;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 1;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 5 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 4 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 6 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                               uwStep = 2 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
+                              HALLSensor_Detected_BLDC();
                               DelayMs(8);
                           }
                          break;
                          case 1:
-                          for(i = 0;i<3 ;i++)
-                          {
-                              if(i == 0)
-                                pwm_f = 60;
-                              else if(i==1)pwm_f = 70;
-                              else if(i==2)pwm_f = 80;
-                            
-                              uwStep = 1;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
-                              DelayMs(8);
-                              uwStep = 5;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
-                              DelayMs(8);
-                              uwStep = 4 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
-                              DelayMs(8);
-                              uwStep = 6 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
-                              DelayMs(8);
-                              uwStep = 2 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
-                              DelayMs(8);
-                              uwStep = 3 ;
-                              HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
-                              DelayMs(8);
-                          }
+                            for(i = 0;i<3 ;i++)
+                              {
+                                  if(i == 0)
+                                    PWM_Duty = 60;
+                                  else if(i==1)PWM_Duty = 70;
+                                  else if(i==2)PWM_Duty = 80;
+                                
+                                  uwStep = 1;
+                                  HALLSensor_Detected_BLDC();
+                                  DelayMs(8);
+                                  uwStep = 5;
+                                  HALLSensor_Detected_BLDC();
+                                  DelayMs(8);
+                                  uwStep = 4 ;
+                                  HALLSensor_Detected_BLDC();
+                                  DelayMs(8);
+                                  uwStep = 6 ;
+                                  HALLSensor_Detected_BLDC();
+                                  DelayMs(8);
+                                  uwStep = 2 ;
+                                  HALLSensor_Detected_BLDC();
+                                  DelayMs(8);
+                                  uwStep = 3 ;
+                                  HALLSensor_Detected_BLDC();
+                                  DelayMs(8);
+                              }
                           
                          break;
                         }
                           
                      printf("Dir = %d\r \n",dirvalue); 
-                     printf("pwm_f= %d\r \n",pwm_f);
+                     printf("PWM_Duty= %d\r \n",PWM_Duty);
                          
                  }
                  else 
@@ -310,11 +310,11 @@ int main(void)
               else 
                 {
                   
-                  pwm_f =20;
+                  PWM_Duty=20;
                   uwStep = HallSensor_GetPinState();
                                  
-                  HALLSensor_Detected_BLDC(uwStep,pwm_f,dirvalue);
-                  printf("pwm_f= %d\r \n",pwm_f);
+                  HALLSensor_Detected_BLDC();
+                  printf("PWM_Duty= %d\r \n",PWM_Duty);
                  
                 }
              }
@@ -376,7 +376,7 @@ int main(void)
 				    {
                        A_POWER_OUTPUT =1;
                        power_on = 0;
-                       pwm_f=20;
+                 
                      
                      }
 				     else 
@@ -415,14 +415,14 @@ int main(void)
 			       dir_s ++ ;
 	  			 if(dir_s == 1)
 	   			 {
-                         dirvalue=1;
+                         Dir=1;
                          power_on = 0;
 				  }
 				 else 
 				   {
                       
-                      dirvalue =0; //ÄæÊ±ÕëÐý×ª
-                  
+                      //dirvalue =0; //ÄæÊ±ÕëÐý×ª
+                        Dir = 0;
 					  printf(" dir is  =0 \r\n");
 				   }
 			

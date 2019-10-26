@@ -42,8 +42,8 @@
 extern __IO int32_t  uwStep ;
 
 extern __IO uint32_t Lock_Time; // 堵转时间
-//extern __IO int16_t   PWM_Duty;   //占空比
-//extern __IO int8_t Dir;
+extern __IO int16_t   PWM_Duty;   //占空比
+extern __IO int8_t Dir;
 extern uint16_t SPEED_VALUE ;   //速度值
 
 
@@ -58,19 +58,31 @@ void HALL_Init(void);
 
 uint32_t HallSensor_GetPinState(void);
 
-void HALLSensor_Detected_BLDC(uint32_t uvw,uint16_t tpwmf,uint16_t dir);
+void HALLSensor_Detected_BLDC(void);
 
 
 void PWM_BLDC_Init(void);   // initial pwm function
 
-void PWMA_Select_AB_Channel(uint8_t s_pwmA,uint16_t pwmf);  //select one PWM A channel,H-bridge first 
-void PWMA_Select_BC_Channel(uint8_t s_pwmB,uint16_t pwmf);  //select one PWM B  channel,H-bridge second
-void PWMA_Select_CA_Channel(uint8_t s_pwmC,uint16_t pwmf); 
+void PWMA_Select_AB_Channel(uint8_t s_pwmA);  //select one PWM A channel,H-bridge first 
+void PWMA_Select_BC_Channel(uint8_t s_pwmB);  //select one PWM B  channel,H-bridge second
+void PWMA_Select_CA_Channel(uint8_t s_pwmC); 
 void PMW_AllClose_ABC_Channel(void);
 
 
 
 void PWMA_Close_ABC_Channel(uint8_t f_pwma);
+
+void BLDC_CCW_SIX_1_Run(void);
+void BLDC_CCW_SIX_2_Run(void);
+void BLDC_CCW_SIX_3_Run(void);
+void BLDC_CCW_SIX_4_Run(void);
+void BLDC_CCW_SIX_5_Run(void);
+void BLDC_CCW_SIX_6_Run(void);
+
+
+
+
+
 
 
 
