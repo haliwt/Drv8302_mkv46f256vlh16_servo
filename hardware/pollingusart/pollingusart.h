@@ -15,6 +15,11 @@
 #define DEMO_UART UART1
 #define DEMO_UART_CLKSRC       kCLOCK_FastPeriphClk
 #define DEMO_UART_CLK_FREQ     CLOCK_GetFreq(kCLOCK_FastPeriphClk)
+
+
+
+
+
 	
 /*******************************************************************************
  * Variables
@@ -22,6 +27,8 @@
 
 void USART_POLLING_Init(void);
 unsigned char ASCIIToHex(unsigned char bHex);
+void USART_txtSend(void);
+
 
 
 #endif 

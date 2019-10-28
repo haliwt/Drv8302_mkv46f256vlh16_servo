@@ -82,8 +82,8 @@ void ADC_CADC_Init(void)
 
     /* The available sample slots are sample 0, 1, 2, 3. */
 
-    PRINTF("Press any key to trigger the conversion ...\r\n");
-    PRINTF("\r\nSample 0\tSample 1\tSample 2\tSample 3\r\n");
+   // PRINTF("Press any key to trigger the conversion ...\r\n");
+   // PRINTF("\r\nSample 0\tSample 1\tSample 2\tSample 3\r\n");
 
 
 }

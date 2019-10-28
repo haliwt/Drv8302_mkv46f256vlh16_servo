@@ -1,8 +1,8 @@
 #include "pollingusart.h"
 
 
-uint8_t txbuff[]   = "Uart polling example\r\nBoard will send back received characters\r\n";
-uint8_t rxbuff[20] = {0};
+uint8_t txbuff[]   = "Vers:2019-10-28\r\n";
+uint8_t rxbuff[20] ;
 
 
 void USART_POLLING_Init(void)
@@ -79,3 +79,9 @@ unsigned char charToHex(unsigned char bHex)
 	 return bHex;
  }
 #endif 
+void USART_txtSend(void)
+
+{
+   
+
+}

@@ -184,7 +184,7 @@ void PWM_BLDC_Init(void)
     /* Start the PWM generation from Submodules 0, 1 and 2 */
     PWM_StartTimer(BOARD_PWM_BASEADDR, kPWM_Control_Module_0 | kPWM_Control_Module_1 | kPWM_Control_Module_2);
     
-    PRINTF("PWMA init end \n");
+    PRINTF("PWMA init end \r\n");
 }
 /**************************************************************
  *
@@ -203,7 +203,7 @@ static void PWM_DRV_Init3PhPwm(void)
     uint16_t deadTimeVal;
     pwm_signal_param_t pwmSignal[2];
     uint32_t pwmSourceClockInHz;
-    uint32_t pwmFrequencyInHz = 2000;//1300; //1.3KHZ
+    uint32_t pwmFrequencyInHz = 4000;//1300; //1.3KHZ
 
 
     pwmSourceClockInHz = PWM_SRC_CLK_FREQ;
