@@ -87,8 +87,56 @@ void ABC_POWER_OUTPUT_Init(void)
    
 }
 
+/*******************************************
+ *
+ *Function Name:2SD315AI_Check_Fault()
+ *Function : air conditioner output
+ *
+ *
+*******************************************/
 
 
+void SD315AI_Check_Fault(void)
+{
+   /*Check U phase*/
+          if(GPIO_PinRead(SD315AI_SO1_A_GPIO,SD315AI_SO1_A_PIN)==1 ||GPIO_PinRead(SD315AI_SO2_A_GPIO,SD315AI_SO1_A_PIN)==1)
+          {
+               GPIO_PinWrite(SD315AI_VL_A_GPIO,SD315AI_VL_A_PIN,1);//SD315_VL_A_OUTPUT=0;
+           
+          }
+          else
+          {
+              GPIO_PinWrite(SD315AI_VL_A_GPIO,SD315AI_VL_A_PIN,0);//SD315_VL_A_OUTPUT=0;
+
+          }
+          /*Check V phase*/
+          if(GPIO_PinRead(SD315AI_SO1_B_GPIO,SD315AI_SO1_B_PIN)== 1 ||GPIO_PinRead(SD315AI_SO2_B_GPIO,SD315AI_SO2_B_PIN)== 1)
+          {
+               
+               GPIO_PinWrite(SD315AI_VL_B_GPIO,SD315AI_VL_B_PIN,1);//SD315_VL_B_OUTPUT=0;
+            
+
+          }
+          else
+          {
+               GPIO_PinWrite(SD315AI_VL_B_GPIO,SD315AI_VL_B_PIN,0);//SD315_VL_B_OUTPUT=0;
+          }
+          /*Check W phase*/
+          if(GPIO_PinRead(SD315AI_SO1_C_GPIO,SD315AI_SO1_C_PIN)== 1 || GPIO_PinRead(SD315AI_SO2_C_GPIO,SD315AI_SO2_C_PIN)== 1)
+          {
+                GPIO_PinWrite(SD315AI_VL_C_GPIO,SD315AI_VL_C_PIN,1);
+               
+          }
+          else
+          {
+                GPIO_PinWrite(SD315AI_VL_C_GPIO,SD315AI_VL_C_PIN,0);
+          }
+		
+
+
+
+
+}
 
 
 

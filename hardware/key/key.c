@@ -80,17 +80,17 @@ void KEY_Init(void)
 }
 
 
-/*****************************************************
-
-* 按键扫描程序 
-* mode: 0 - 不支持连续按，1-支持连续按
-* 0，没有任何按键按下
-*，按下按键
-* 优先权 ：BRAKE>START_KEY>DIR_KEY>DIGITAL_ADD_KEY>DIGITAL_REDUCE_RKEY>
-*
-****************************************************/
-	uint8_t KEY_Scan(uint8_t mode)
-	{
+/*************************************************************************************
+    *
+    * 按键扫描程序 
+    * mode: 0 - 不支持连续按，1-支持连续按
+    * 0，没有任何按键按下
+    *，按下按键
+    * 优先权 ：BRAKE>START_KEY>DIR_KEY>DIGITAL_ADD_KEY>DIGITAL_REDUCE_RKEY>
+    *
+**************************************************************************************/
+uint8_t KEY_Scan(uint8_t mode)
+{
 	   static uint8_t key_up = 1; //按键松开标志
 	   if(mode == 1) key_up =1;
 	  if(key_up &&(ABC_POWER_KEY == 1 || START_KEY ==1 ||DIR_KEY ==1 || DIGITAL_ADD_KEY==1||\
@@ -180,13 +180,16 @@ void KEY_Init(void)
 		 }
          #endif 
 	   }
-	   else if(ABC_POWER_KEY == 0 && START_KEY == 0 && DIR_KEY==0 && DIGITAL_ADD_KEY==0 &&\
-				   DIGITAL_REDUCE_KEY==0 &&DOOR_KEY==0 && HALL_SWITCH_KEY==0 && \
-					  WHEEL_KEY == 0 && WIPERS_KEY== 0 ) key_up = 1;
+	  else if(ABC_POWER_KEY == 0 && START_KEY == 0 && DIR_KEY==0 && DIGITAL_ADD_KEY==0 &&\
+				  DIGITAL_REDUCE_KEY==0 &&DOOR_KEY==0 && HALL_SWITCH_KEY==0 && \
+					 WHEEL_KEY == 0 && WIPERS_KEY== 0 ) 
+      {
+        key_up = 1;
+      }
+
+        return KEY_UP;
 	   
-		 return KEY_UP;
-	   
-	   
+      
 	}
 
 
@@ -215,3 +218,26 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
 #endif
 }
 #endif 
+/***************************************************************
+    *
+    *Name:Start_key_stateRead(void)
+    *
+    *
+    *
+****************************************************************/
+KEYState_TypeDef Start_Key_StateRead(void)
+{
+
+   if(GPIO_PinRead(START_KEY_GPIO, START_KEY_GPIO_PIN)==1)
+   {
+      DelayMs(10);
+      while(GPIO_PinRead(START_KEY_GPIO, START_KEY_GPIO_PIN)==1);
+      return KEY_DOWN ; 
+
+   }
+   return KEY_UP;
+
+
+}
+
+

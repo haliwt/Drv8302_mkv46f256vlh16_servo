@@ -111,7 +111,7 @@ int main(void)
                {
                    printf("************************************************************\r \n");
                    power_on ++ ;
-                  
+                   SD315AI_Check_Fault();
                    if(Dir==0)  
                    {
                         
@@ -186,60 +186,32 @@ int main(void)
                  }
                }
               else 
-                {
+              {
                   
-                 
+             
                   uwStep = HallSensor_GetPinState();
                                  
                   HALLSensor_Detected_BLDC();
                   PWM_Duty = CADC_Read_ADC_Value();
                   printf("PWM_Duty= %d\r \n",PWM_Duty);
-                  
+                  SD315AI_Check_Fault();
                  
-                }
+               }
              }
           
           else
           {
+              
+              GPIO_PinWrite(SD315AI_VL_A_GPIO,SD315AI_VL_A_PIN,1);
+              GPIO_PinWrite(SD315AI_VL_B_GPIO,SD315AI_VL_B_PIN,1);
+              GPIO_PinWrite(SD315AI_VL_C_GPIO,SD315AI_VL_C_PIN,1);
               PMW_AllClose_ABC_Channel();
+              
           
           }
       
    
-           /*Check U phase*/
-          if(GPIO_PinRead(SD315AI_SO1_A_GPIO,SD315AI_SO1_A_PIN)==1 ||GPIO_PinRead(SD315AI_SO2_A_GPIO,SD315AI_SO1_A_PIN)==1)
-          {
-               GPIO_PinWrite(SD315AI_VL_A_GPIO,SD315AI_VL_A_PIN,1);//SD315_VL_A_OUTPUT=0;
-           
-          }
-          else
-          {
-              GPIO_PinWrite(SD315AI_VL_A_GPIO,SD315AI_VL_A_PIN,0);//SD315_VL_A_OUTPUT=0;
-
-          }
-          /*Check V phase*/
-          if(GPIO_PinRead(SD315AI_SO1_B_GPIO,SD315AI_SO1_B_PIN)== 1 ||GPIO_PinRead(SD315AI_SO2_B_GPIO,SD315AI_SO2_B_PIN)== 1)
-          {
-               
-               GPIO_PinWrite(SD315AI_VL_B_GPIO,SD315AI_VL_B_PIN,1);//SD315_VL_B_OUTPUT=0;
-            
-
-          }
-          else
-          {
-               GPIO_PinWrite(SD315AI_VL_B_GPIO,SD315AI_VL_B_PIN,0);//SD315_VL_B_OUTPUT=0;
-          }
-          /*Check W phase*/
-          if(GPIO_PinRead(SD315AI_SO1_C_GPIO,SD315AI_SO1_C_PIN)== 1 || GPIO_PinRead(SD315AI_SO2_C_GPIO,SD315AI_SO2_C_PIN)== 1)
-          {
-                GPIO_PinWrite(SD315AI_VL_C_GPIO,SD315AI_VL_C_PIN,1);
-               
-          }
-          else
-          {
-                GPIO_PinWrite(SD315AI_VL_C_GPIO,SD315AI_VL_C_PIN,0);
-          }
-		
+          
 	    
        
 
@@ -268,8 +240,8 @@ int main(void)
 				     }
                       
 				  	break;
-
-				 case START_PRES:
+                 			
+                   case START_PRES:
                    PRINTF("START_PRES key \r\n");
 				    start_s ++;
 		          if( start_s== 1)
@@ -320,6 +292,33 @@ int main(void)
         }
         
 	}
+#if 0
+        if(Start_Key_StateRead() == KEY_DOWN)
+        {
+
+           PRINTF("START_PRES key \r\n");
+				    start_s ++;
+		          if( start_s== 1)
+		          {
+                      motor  = 1;
+                      power_on = 0;
+                    // printf("motor is one \n");
+                     UART_WriteBlocking(DEMO_UART, printx3, sizeof(printx3) - 1);
+                    
+    			   }
+				  else 
+				  {
+                      motor = 0;
+                      power_on = 1;
+					 start_s =0;
+					 
+					  //printf("START KEY IS STOP\n");
+					  UART_WriteBlocking(DEMO_UART, printx4, sizeof(printx4) - 1);
+				  }
+
+
+        }
+#endif 
    }
 
 }

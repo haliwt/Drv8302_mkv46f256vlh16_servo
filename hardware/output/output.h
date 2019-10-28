@@ -5,6 +5,7 @@
 #include "fsl_gpio.h"
 #include "fsl_port.h"
 #include "fsl_llwu.h"
+#include "input.h"
 
 #define A_POWER_OUTPUT           PCout(1)//PCout(10) //2SD315AI ABC电源切换输出，打开15V供电电源
 //#define B_POWER_OUTPUT         PCout(11)
@@ -60,6 +61,7 @@ void WIPER_OUTPUT_F(void);
 void DOOR_OUTPUT_F(void);
 void WHEEL_OUTPUT_F(void);
 void ABC_POWER_OUTPUT_Init(void);
+void SD315AI_Check_Fault(void);
 
 
 #endif 

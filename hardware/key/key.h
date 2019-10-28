@@ -75,6 +75,6 @@ void KEY_Init(void);
 uint8_t KEY_Scan(uint8_t mode);
 
 
-
+KEYState_TypeDef Start_Key_StateRead(void);
 
 #endif 

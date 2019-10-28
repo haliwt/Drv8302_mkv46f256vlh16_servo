@@ -99,7 +99,7 @@ void ADC_CADC_Init(void)
 uint16_t CADC_Read_ADC_Value(void)
 {
 
-          
+           uint16_t pwm_f;
            CADC_DoSoftwareTriggerConverter(CADC_BASEADDR, kCADC_ConverterA);
 	             /* Wait the conversion to be done. */
 	         while (kCADC_ConverterAEndOfScanFlag !=
@@ -112,11 +112,13 @@ uint16_t CADC_Read_ADC_Value(void)
 
      	    
 
-           PWM_Duty = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 1U))/ 330);
+           pwm_f = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 1U))/ 330);
+           if(pwm_f == 99)
+             pwm_f =100;
           
            // PRINTF("PWM_Duty = %d\r\n",pwm_f);
 
-          
+          return pwm_f;
 
 
 }
