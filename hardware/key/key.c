@@ -66,12 +66,16 @@ void KEY_Init(void)
                 
      /* Brake_Key Init input interrupt switch GPIO. */
   #if (defined(FSL_FEATURE_PORT_HAS_NO_INTERRUPT) && FSL_FEATURE_PORT_HAS_NO_INTERRUPT)
-   GPIO_SetPinInterruptConfig(BRAKE_KEY_GPIO , BRAKE_KEY_GPIO_PIN ,  kPORT_InterruptEitherEdge );
+   GPIO_SetPinInterruptConfig(BRAKE_KEY_GPIO , BRAKE_KEY_GPIO_PIN , kPORT_InterruptEitherEdge );
+   GPIO_SetPinInterruptConfig(START_KEY_GPIO , START_KEY_GPIO_PIN,  kPORT_InterruptLogicOne);
   #else
     PORT_SetPinInterruptConfig(BRAKE_KEY_PORT, BRAKE_KEY_GPIO_PIN,  kPORT_InterruptEitherEdge);
+    PORT_SetPinInterruptConfig(START_KEY_PORT , START_KEY_GPIO_PIN,  kPORT_InterruptLogicOne);
   #endif
     EnableIRQ(BRAKE_KEY_IRQ);
+	EnableIRQ(START_KEY_IRQ);
     GPIO_PinInit(BRAKE_KEY_GPIO, BRAKE_KEY_GPIO_PIN, &key_config);
+    GPIO_PinInit(START_KEY_GPIO, START_KEY_GPIO_PIN, &key_config);
 
      
 
@@ -108,7 +112,7 @@ uint8_t KEY_Scan(uint8_t mode)
 			   /* 按键扫描完毕，确定按键按下 */
 			 return ABC_POWER_PRES;
 		 }
-	
+	#if 0
 		 else if(START_KEY == 1)
 		 {
 			 /* 等待按键弹开，退出按键扫描函数 */
@@ -116,6 +120,7 @@ uint8_t KEY_Scan(uint8_t mode)
 			   /* 按键扫描完毕，确定按键按下 */
 			  return START_PRES;
 		  }
+   #endif 
 		 else if(DIR_KEY==1)
 		 {
 			 /* 等待按键弹开，退出按键扫描函数 */

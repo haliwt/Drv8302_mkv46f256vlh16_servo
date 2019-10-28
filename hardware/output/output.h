@@ -47,8 +47,10 @@
 typedef struct _output_t_
 {
 
-  volatile uint8_t dir_change;
-  volatile uint8_t break_f;
+   uint8_t motor_run;
+   uint8_t power_on ;
+   uint8_t abc_numbers;
+  
 
 }output_t;
 

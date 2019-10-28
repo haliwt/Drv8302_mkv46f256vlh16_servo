@@ -17,7 +17,11 @@ typedef enum
 
 #define BRAKE_KEY_GPIO            	GPIOA
 #define BRAKE_KEY_PORT            	PORTA
+
 #define START_KEY_GPIO            	GPIOE 
+#define START_KEY_PORT              PORTE
+
+
 #define DIR_GPIO             		GPIOE
 #define KEY4_GPIO             		GPIOA
 #define KEY5_GPIO             		GPIOA
@@ -66,8 +70,10 @@ typedef enum
 
 
 #define BRAKE_KEY_IRQ           PORTA_IRQn  //interrupt number
+#define START_KEY_IRQ           PORTE_IRQn
 
 #define BARKE_KEY_IRQ_HANDLER   PORTA_IRQHandler   //BCD;Pin detect (Port E)--'startup_MKV46F16.s'  
+#define START_KEY_IRQ_HANDLER   PORTE_IRQHandler   //DCD -PORTE_IRQHandler ;Pin detect (Port E)-'startup_MKV46F16.s' 
 
 /*³õÊ¼»¯°´¼ü*/
 void KEY_Init(void);

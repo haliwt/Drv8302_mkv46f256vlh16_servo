@@ -42,7 +42,8 @@
  * Definitions
  ******************************************************************************/
 
-#define MAX_LOG_LENGTH 20
+output_t motor_ref;
+
 
 
 
@@ -73,11 +74,11 @@ int main(void)
      
      uint8_t printx1[]="Dir = 1 is OK !!!! CW \r\n";
      uint8_t printx2[]="Dir = 0 is OK #### CCW \r\n";
-     uint8_t printx3[]="Start key is run @@@@@@@@@@@@@@@@@ \r\n";
-     uint8_t printx4[]="Start key is stop !!!!\n";
+   //  uint8_t printx3[]="Start key is run @@@@@@@@@@@@@@@@@ \r\n";
+   //  uint8_t printx4[]="Start key is stop !!!!\n";
      uint8_t ucKeyCode=0,abc_s=0;
-     uint8_t start_s =0,motor,dir_s =0;
-     volatile uint8_t power_on = 0;
+     uint8_t dir_s =0;
+
  
 
     BOARD_InitPins();
@@ -105,12 +106,12 @@ int main(void)
 
           ucKeyCode = KEY_Scan(0);
           
-          if(motor == 1 )
+          if(motor_ref.motor_run == 1 )
            {
-               if(power_on == 0)
+               if(motor_ref.power_on == 1)
                {
                    printf("************************************************************\r \n");
-                   power_on ++ ;
+                   motor_ref.power_on ++ ;
                    SD315AI_Check_Fault();
                    if(Dir==0)  
                    {
@@ -210,12 +211,7 @@ int main(void)
           
           }
       
-   
-          
-	    
-       
-
-      /*处理接收到的按键功能*/  
+       /*处理接收到的按键功能*/  
 		if(ucKeyCode !=KEY_UP) 
 		{
            switch(ucKeyCode)
@@ -224,23 +220,22 @@ int main(void)
                   case ABC_POWER_PRES :
                      PRINTF("ABC_PRES key  \r\n");
                      abc_s ++;
-                    if(abc_s == 1)
+                    if((abc_s == 1)||(motor_ref.abc_numbers ==1))
 				    {
                        A_POWER_OUTPUT =1;
-                       power_on = 0;
+                       motor_ref.abc_numbers =0;
                  
-                     
-                     }
+                    }
 				     else 
 				     {
-                            A_POWER_OUTPUT =0; //shut down
-                            power_on = 1;
-                            abc_s =0;
+                         A_POWER_OUTPUT =0; //shut down
+                         
+                         abc_s =0;
                         
 				     }
                       
 				  	break;
-                 			
+                 	#if 0		
                    case START_PRES:
                    PRINTF("START_PRES key \r\n");
 				    start_s ++;
@@ -263,20 +258,21 @@ int main(void)
 				  }
                  
 				  break;
-				  
+				  #endif 
 				 case DIR_PRES: //3
 
 			       dir_s ++ ;
 	  			 if(dir_s == 1)
 	   			 {
                          Dir=1;
-                         power_on = 0;
+                         motor_ref.power_on = 1;
                        //  printf(" dir is  =1 \r\n");
                          UART_WriteBlocking(DEMO_UART, printx1, sizeof(printx1) - 1);
 				  }
 				 else 
 				   {
                        dir_s = 0;
+                       motor_ref.power_on = 1;
                       //dirvalue =0; //逆时针旋转
                         Dir = 0;
 					 // printf(" dir is  =0 \r\n");
@@ -338,8 +334,9 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
     /* Clear external interrupt flag. */
     GPIO_PortClearInterruptFlags(BRAKE_KEY_GPIO, 1U << BRAKE_KEY_GPIO_PIN );
     /* Change state of button. */
-    A_POWER_OUTPUT =1;
-	
+    A_POWER_OUTPUT =0;
+	motor_ref.abc_numbers = 1;
+    motor_ref.motor_run = 0;
 	PRINTF("interrupte has happed  \r\n");
 	                  
 /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -348,6 +345,42 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
     __DSB();
 #endif
 }
+
+void START_KEY_IRQ_HANDLER(void )
+{
+    uint8_t i;
+    /* Clear external interrupt flag. */
+    GPIO_PortClearInterruptFlags(START_KEY_GPIO, 1U << START_KEY_GPIO_PIN );
+    /* Change state of button. */
+    if(GPIO_PinRead(START_KEY_GPIO,25)== 1)
+    {
+        DelayMs(5);
+        if(GPIO_PinRead(START_KEY_GPIO,25)== 1)
+        {
+            i++;
+            if(i == 1)
+            {
+              motor_ref.motor_run =1 ;
+              motor_ref.power_on = 1;
+            }
+        	else
+        	{
+                motor_ref.motor_run = 0;
+                motor_ref.power_on =0;
+                i=0;
+        	}
+        }
+    }
+	PRINTF("motor_run is   \r\n");
+	                  
+/* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
+  exception return operation might vector to incorrect interrupt */
+#if defined __CORTEX_M && (__CORTEX_M == 4U)
+    __DSB();
+#endif
+}
+
+
 #endif 
 /*******************************************************************************************/
 

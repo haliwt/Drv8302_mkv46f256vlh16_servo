@@ -113,8 +113,7 @@ uint16_t CADC_Read_ADC_Value(void)
      	    
 
            pwm_f = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 1U))/ 330);
-           if(pwm_f == 99)
-             pwm_f =100;
+         
           
            // PRINTF("PWM_Duty = %d\r\n",pwm_f);
 
