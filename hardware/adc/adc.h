@@ -8,6 +8,8 @@
 
 #include "pin_mux.h"
 #include "clock_config.h"
+#include "bldc.h"
+
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -28,6 +30,7 @@
 void ADC_CADC_Init(void);
 
 
+uint16_t CADC_Read_ADC_Value(void);
 
 
 

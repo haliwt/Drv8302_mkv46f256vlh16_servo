@@ -47,10 +47,6 @@
 
 
 
-uint8_t printx1[]="Dir = 1 is OK !!!! CW \r\n";
-uint8_t printx2[]="Dir = 0 is OK #### CCW \r\n";
-uint8_t printx3[]="Start key is run @@@@@@@@@@@@@@@@@ \r\n";
-uint8_t printx4[]="Start key is stop !!!!\n";
 
 
 
@@ -74,9 +70,13 @@ int main(void)
 {
 
  
-
+     
+     uint8_t printx1[]="Dir = 1 is OK !!!! CW \r\n";
+     uint8_t printx2[]="Dir = 0 is OK #### CCW \r\n";
+     uint8_t printx3[]="Start key is run @@@@@@@@@@@@@@@@@ \r\n";
+     uint8_t printx4[]="Start key is stop !!!!\n";
      uint8_t ucKeyCode=0,abc_s=0;
-     uint8_t start_s =0,motor,dir_s =0,i;
+     uint8_t start_s =0,motor,dir_s =0;
      volatile uint8_t power_on = 0;
  
 
@@ -188,10 +188,11 @@ int main(void)
               else 
                 {
                   
-                  PWM_Duty=80;
+                 
                   uwStep = HallSensor_GetPinState();
                                  
                   HALLSensor_Detected_BLDC();
+                  PWM_Duty = CADC_Read_ADC_Value();
                   printf("PWM_Duty= %d\r \n",PWM_Duty);
                   
                  

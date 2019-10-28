@@ -42,7 +42,7 @@
 extern __IO int32_t  uwStep ;
 
 extern __IO uint32_t Lock_Time; // 堵转时间
-extern __IO int16_t   PWM_Duty;   //占空比
+extern __IO uint16_t   PWM_Duty;   //占空比
 extern __IO int8_t Dir;
 extern uint16_t SPEED_VALUE ;   //速度值
 

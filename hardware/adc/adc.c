@@ -1,8 +1,9 @@
 #include "adc.h"
 
 /* Initialize CADC */
-//void ADC_CADC_Init(void);
 
+
+//__IO uint16_t  PWM_Duty	; //占空比
 
 
 /*******************************************************************************
@@ -88,5 +89,35 @@ void ADC_CADC_Init(void)
 
 }
 
+/*******************************************************************************
+ * 
+ *Function Name: void CADC_Read_ADC_Value(void)
+ *
+ *
+ *
+ ******************************************************************************/
+uint16_t CADC_Read_ADC_Value(void)
+{
 
+          
+           CADC_DoSoftwareTriggerConverter(CADC_BASEADDR, kCADC_ConverterA);
+	             /* Wait the conversion to be done. */
+	         while (kCADC_ConverterAEndOfScanFlag !=
+	               (kCADC_ConverterAEndOfScanFlag & CADC_GetStatusFlags(CADC_BASEADDR)))
+	        {
+	        }
+
+	       
+            CADC_ClearStatusFlags(CADC_BASEADDR, kCADC_ConverterAEndOfScanFlag);
+
+     	    
+
+           PWM_Duty = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 1U))/ 330);
+          
+           // PRINTF("PWM_Duty = %d\r\n",pwm_f);
+
+          
+
+
+}
 
