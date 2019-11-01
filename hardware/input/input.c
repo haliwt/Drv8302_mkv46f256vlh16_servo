@@ -7,7 +7,7 @@ void SD315AI_SO12_Input_Init(void)
 	  0,
     };
     
-     port_pin_config_t config ;
+   //  port_pin_config_t config ;
     // LLWU_PE3_WUPE11(0); 
     // LLWU_PE5_WUPE19(0);
     // LLWU_PE6_WUPE20(0);

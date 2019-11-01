@@ -65,6 +65,7 @@ void DOOR_OUTPUT_F(void);
 void WHEEL_OUTPUT_F(void);
 void ABC_POWER_OUTPUT_Init(void);
 void SD315AI_Check_Fault(void);
+void SD315AI_Disable_Output(void);
 
 
 #endif 

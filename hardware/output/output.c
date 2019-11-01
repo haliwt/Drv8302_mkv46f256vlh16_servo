@@ -16,7 +16,7 @@ void OUTPUT_Fucntion_Init(void)
 	  0,                    //set a defult output logic,which has no use input
     };
 
-    port_pin_config_t config ;
+  //  port_pin_config_t config ;
 
     // LLWU_PE5_WUPE18(0) ;
     // LLWU_PE3_WUPE10(0);
@@ -49,7 +49,7 @@ void OUTPUT_Fucntion_Init(void)
         GPIO_PinInit(GPIOA,    19, &led_config );
 
    #if 1
-        config.pullSelect= kPORT_PullDown;
+      //  config.pullSelect= kPORT_PullDown;
         PORT_PinPullConfig(HW_GPIOC, 7, kPORT_PullDown);
         PORT_PinPullConfig(HW_GPIOC, 6, kPORT_PullDown);
         PORT_PinPullConfig(HW_GPIOC, 4, kPORT_PullDown);
@@ -87,13 +87,13 @@ void ABC_POWER_OUTPUT_Init(void)
    
 }
 
-/*******************************************
+/********************************************************************************************
  *
  *Function Name:2SD315AI_Check_Fault()
  *Function : air conditioner output
  *
  *
-*******************************************/
+*********************************************************************************************/
 
 
 void SD315AI_Check_Fault(void)
@@ -139,6 +139,22 @@ void SD315AI_Check_Fault(void)
 }
 
 
+/********************************************************************************************
+ *
+ *Function Name:SD315AI_Disable_Output()
+ *Function : air conditioner output
+ *
+ *
+*********************************************************************************************/
+void SD315AI_Disable_Output(void)
+{
+
+     GPIO_PinWrite(SD315AI_VL_A_GPIO,SD315AI_VL_A_PIN,1);//SD315_VL_A_OUTPUT=0;
+     GPIO_PinWrite(SD315AI_VL_B_GPIO,SD315AI_VL_B_PIN,1);//SD315_VL_B_OUTPUT=0;
+     GPIO_PinWrite(SD315AI_VL_C_GPIO,SD315AI_VL_C_PIN,1);
+
+
+}
 
 
 

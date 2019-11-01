@@ -177,32 +177,24 @@ int main(void)
               else 
               {
                   
+                  SD315AI_Check_Fault();
                   PWM_Duty = CADC_Read_ADC_Value();
                   uwStep = HallSensor_GetPinState();
                                  
                   HALLSensor_Detected_BLDC();
                  // PWM_Duty = CADC_Read_ADC_Value();
                   printf("PWM_Duty= %d\r \n",PWM_Duty);
-                  SD315AI_Check_Fault();
+                  
                  
                }
              }
           
           else
           {
-              if(motor_ref.stop_numbers !=1)
-              {
+              
                  PMW_AllClose_ABC_Channel();
-                 printf("PWMA_ALLClose_0 \r \n");
-              }
-              else if(motor_ref.stop_numbers==1)
-              {
-                  PMW_AllClose_ABC_Duty_20_Channel();
-                  PMW_AllClose_ABC_Duty_10_Channel();
-                  PMW_AllClose_ABC_Channel();
-                  motor_ref.stop_numbers++;
-                  printf("PWMA_ALLClose_20 \r \n");
-              }
+                 SD315AI_Disable_Output();
+                 printf("Stop PWMA  \r \n");
             
            }
       
@@ -224,6 +216,9 @@ int main(void)
 				     else 
 				     {
                          A_POWER_OUTPUT =0; //shut down
+                         motor_ref.motor_run = 0;
+                         motor_ref.power_on =0;
+                         motor_ref.stop_numbers=1;
                          
                          abc_s =0;
                         
