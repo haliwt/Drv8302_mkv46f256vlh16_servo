@@ -44,6 +44,7 @@ typedef enum
 //#define AIR_GPIO_PIN             		29
 #define ABC_POWER_GPIO_PIN       		29//3
 
+
 #define BRAKE_KEY               PAin(1)   //刹车按键 - 按一次刹车，再按一次解除刹车
 #define START_KEY               PEin(25)  //起停按键，电机 //PEin(30)  //雨刷器按键，按一次一档，再按一次二档，再按一下关闭
 #define DIR_KEY                 PEin(24)  //方向按键，电机 DIR_KEY3
@@ -55,6 +56,9 @@ typedef enum
 #define WIPERS_KEY          	PEin(30)  //雨刷器按键，按一次一档，再按一次二档，再按一下关闭
 //#define AIR_KEY         		PEin(29)  //空调按键，按一次开，再按一次关闭//PAin(13)  
 #define ABC_POWER_KEY       	PEin(29)
+
+
+
 
 //#define BRAKE_PRES              1      //PTA1
 #define ABC_POWER_PRES          1      //
@@ -70,10 +74,10 @@ typedef enum
 
 
 #define BRAKE_KEY_IRQ           PORTA_IRQn  //interrupt number
-#define START_KEY_IRQ           PORTE_IRQn
+//#define START_KEY_IRQ           PORTE_IRQn
 
 #define BARKE_KEY_IRQ_HANDLER   PORTA_IRQHandler   //BCD;Pin detect (Port E)--'startup_MKV46F16.s'  
-#define START_KEY_IRQ_HANDLER   PORTE_IRQHandler   //DCD -PORTE_IRQHandler ;Pin detect (Port E)-'startup_MKV46F16.s' 
+//#define START_KEY_IRQ_HANDLER   PORTE_IRQHandler   //DCD -PORTE_IRQHandler ;Pin detect (Port E)-'startup_MKV46F16.s' 
 
 /*初始化按键*/
 void KEY_Init(void);

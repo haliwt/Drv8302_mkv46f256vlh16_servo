@@ -67,6 +67,9 @@ void PWMA_Select_AB_Channel(uint8_t s_pwmA);  //select one PWM A channel,H-bridg
 void PWMA_Select_BC_Channel(uint8_t s_pwmB);  //select one PWM B  channel,H-bridge second
 void PWMA_Select_CA_Channel(uint8_t s_pwmC); 
 void PMW_AllClose_ABC_Channel(void);
+void PMW_AllClose_ABC_Duty_10_Channel(void);
+void PMW_AllClose_ABC_Duty_20_Channel(void);
+
 
 
 

@@ -44,22 +44,6 @@
 
 output_t motor_ref;
 
-
-
-
-
-
-
-
-/*
-**********************************************************************************************************
-											变量声明
-**********************************************************************************************************
-*/
-
-
-
-
 /*******************************************************************************
  *
  * Code
@@ -74,10 +58,10 @@ int main(void)
      
      uint8_t printx1[]="Dir = 1 is OK !!!! CW \r\n";
      uint8_t printx2[]="Dir = 0 is OK #### CCW \r\n";
-   //  uint8_t printx3[]="Start key is run @@@@@@@@@@@@@@@@@ \r\n";
-   //  uint8_t printx4[]="Start key is stop !!!!\n";
+   uint8_t printx3[]="motor run is OK @@@@@@@@@ \r\n";
+   uint8_t printx4[]="motor stop !!!!!!!! \r\n";
      uint8_t ucKeyCode=0,abc_s=0;
-     uint8_t dir_s =0;
+     uint8_t dir_s =0,start_s = 0;
 
  
 
@@ -116,7 +100,7 @@ int main(void)
                    if(Dir==0)  
                    {
                         
-                  
+#if 1
                          
                         uwStep = HallSensor_GetPinState();
                         switch(uwStep)
@@ -148,12 +132,12 @@ int main(void)
                           
                      printf("Dir = %d\r \n",Dir); 
                      printf("PWM_Duty= %d\r \n",PWM_Duty);
-                         
+#endif                         
                  }
                  else //CW 
                  {
 
-
+#if 1
                     uwStep = HallSensor_GetPinState();
                         switch(uwStep)
                         {
@@ -183,17 +167,17 @@ int main(void)
                         }
 
                     printf("Dir = %d\r \n",Dir); 
-                 
+#endif                 
                  }
                }
               else 
               {
                   
-             
+                  PWM_Duty=40;
                   uwStep = HallSensor_GetPinState();
                                  
                   HALLSensor_Detected_BLDC();
-                  PWM_Duty = CADC_Read_ADC_Value();
+                 // PWM_Duty = CADC_Read_ADC_Value();
                   printf("PWM_Duty= %d\r \n",PWM_Duty);
                   SD315AI_Check_Fault();
                  
@@ -202,14 +186,21 @@ int main(void)
           
           else
           {
-              
-              GPIO_PinWrite(SD315AI_VL_A_GPIO,SD315AI_VL_A_PIN,1);
-              GPIO_PinWrite(SD315AI_VL_B_GPIO,SD315AI_VL_B_PIN,1);
-              GPIO_PinWrite(SD315AI_VL_C_GPIO,SD315AI_VL_C_PIN,1);
-              PMW_AllClose_ABC_Channel();
-              
-          
-          }
+              if(motor_ref.stop_numbers !=1)
+              {
+                 PMW_AllClose_ABC_Channel();
+                 printf("PWMA_ALLClose_0 \r \n");
+              }
+              else if(motor_ref.stop_numbers==1)
+              {
+                  PMW_AllClose_ABC_Duty_20_Channel();
+                  PMW_AllClose_ABC_Duty_10_Channel();
+                  PMW_AllClose_ABC_Channel();
+                  motor_ref.stop_numbers++;
+                  printf("PWMA_ALLClose_20 \r \n");
+              }
+            
+           }
       
        /*处理接收到的按键功能*/  
 		if(ucKeyCode !=KEY_UP) 
@@ -235,30 +226,32 @@ int main(void)
 				     }
                       
 				  	break;
-                 	#if 0		
-                   case START_PRES:
+                #if 1		
+                  case START_PRES:
                    PRINTF("START_PRES key \r\n");
 				    start_s ++;
 		          if( start_s== 1)
 		          {
-                      motor  = 1;
-                      power_on = 0;
-                    // printf("motor is one \n");
-                     UART_WriteBlocking(DEMO_UART, printx3, sizeof(printx3) - 1);
+                      motor_ref.motor_run =1 ;
+                      motor_ref.power_on = 1;
+                    UART_WriteBlocking(DEMO_UART, printx3, sizeof(printx3) - 1);
+                    // printf("START KEY is motor run \r\n");
                     
     			   }
 				  else 
 				  {
-                      motor = 0;
-                      power_on = 1;
+                     
 					 start_s =0;
+                      motor_ref.motor_run = 0;
+                     motor_ref.power_on =0;
+                       motor_ref.stop_numbers=1;
 					 
-					  //printf("START KEY IS STOP\n");
-					  UART_WriteBlocking(DEMO_UART, printx4, sizeof(printx4) - 1);
+					 // printf("START KEY IS STOP\r\n");
+					 UART_WriteBlocking(DEMO_UART, printx4, sizeof(printx4) - 1);
 				  }
                  
 				  break;
-				  #endif 
+			#endif 
 				 case DIR_PRES: //3
 
 			       dir_s ++ ;
@@ -288,33 +281,7 @@ int main(void)
         }
         
 	}
-#if 0
-        if(Start_Key_StateRead() == KEY_DOWN)
-        {
 
-           PRINTF("START_PRES key \r\n");
-				    start_s ++;
-		          if( start_s== 1)
-		          {
-                      motor  = 1;
-                      power_on = 0;
-                    // printf("motor is one \n");
-                     UART_WriteBlocking(DEMO_UART, printx3, sizeof(printx3) - 1);
-                    
-    			   }
-				  else 
-				  {
-                      motor = 0;
-                      power_on = 1;
-					 start_s =0;
-					 
-					  //printf("START KEY IS STOP\n");
-					  UART_WriteBlocking(DEMO_UART, printx4, sizeof(printx4) - 1);
-				  }
-
-
-        }
-#endif 
    }
 
 }
@@ -346,6 +313,8 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
 #endif
 }
 
+#endif 
+#if 0
 void START_KEY_IRQ_HANDLER(void )
 {
     uint8_t i;
@@ -365,13 +334,15 @@ void START_KEY_IRQ_HANDLER(void )
             }
         	else
         	{
+                
                 motor_ref.motor_run = 0;
                 motor_ref.power_on =0;
+                motor_ref.stop_numbers=1;
                 i=0;
         	}
         }
     }
-	PRINTF("motor_run is   \r\n");
+	PRINTF("motor_run or \r\n");
 	                  
 /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
   exception return operation might vector to incorrect interrupt */
@@ -382,6 +353,9 @@ void START_KEY_IRQ_HANDLER(void )
 
 
 #endif 
+
+
+
 /*******************************************************************************************/
 
 
