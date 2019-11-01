@@ -41,6 +41,7 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
+#define IRFP4768PbF  1
 
 output_t motor_ref;
 
@@ -61,7 +62,7 @@ int main(void)
    uint8_t printx3[]="motor run is OK @@@@@@@@@ \r\n";
    uint8_t printx4[]="motor stop !!!!!!!! \r\n";
      uint8_t ucKeyCode=0,abc_s=0;
-     uint8_t dir_s =0,start_s = 0;
+     uint8_t dir_s =0;
 
  
 
@@ -94,15 +95,15 @@ int main(void)
            {
                if(motor_ref.power_on == 1)
                {
-                   printf("************************************************************\r \n");
+                   
                    motor_ref.power_on ++ ;
                    SD315AI_Check_Fault();
+#ifdef IRFP4768PbF
+                   printf("************************************************************\r \n");
                    if(Dir==0)  
                    {
-                        
-#if 1
-                         
-                        uwStep = HallSensor_GetPinState();
+                      
+                       uwStep = HallSensor_GetPinState();
                         switch(uwStep)
                         {
                         case 5 :
@@ -132,12 +133,14 @@ int main(void)
                           
                      printf("Dir = %d\r \n",Dir); 
                      printf("PWM_Duty= %d\r \n",PWM_Duty);
-#endif                         
+                     
+                        
                  }
                  else //CW 
                  {
 
-#if 1
+ 
+
                     uwStep = HallSensor_GetPinState();
                         switch(uwStep)
                         {
@@ -167,13 +170,14 @@ int main(void)
                         }
 
                     printf("Dir = %d\r \n",Dir); 
-#endif                 
+                                   
                  }
+                #endif 
                }
               else 
               {
                   
-                  PWM_Duty=40;
+                  PWM_Duty = CADC_Read_ADC_Value();
                   uwStep = HallSensor_GetPinState();
                                  
                   HALLSensor_Detected_BLDC();
@@ -229,22 +233,22 @@ int main(void)
                 #if 1		
                   case START_PRES:
                    PRINTF("START_PRES key \r\n");
-				    start_s ++;
-		          if( start_s== 1)
-		          {
-                      motor_ref.motor_run =1 ;
-                      motor_ref.power_on = 1;
-                    UART_WriteBlocking(DEMO_UART, printx3, sizeof(printx3) - 1);
+				
+		          
+                      motor_ref.motor_run ++ ;
+                      motor_ref.power_on ++ ;
+                      UART_WriteBlocking(DEMO_UART, printx3, sizeof(printx3) - 1);
                     // printf("START KEY is motor run \r\n");
                     
-    			   }
+    			  if(motor_ref.motor_run == 1)
+                      motor_ref.power_on =1;
 				  else 
 				  {
                      
-					 start_s =0;
+					
                       motor_ref.motor_run = 0;
-                     motor_ref.power_on =0;
-                       motor_ref.stop_numbers=1;
+                      motor_ref.power_on =0;
+                      motor_ref.stop_numbers=1;
 					 
 					 // printf("START KEY IS STOP\r\n");
 					 UART_WriteBlocking(DEMO_UART, printx4, sizeof(printx4) - 1);
@@ -294,7 +298,6 @@ int main(void)
  * This function toggles the LED
  *
 ******************************************************************************/
-#if 1
 void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
 {
   
@@ -313,46 +316,8 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
 #endif
 }
 
-#endif 
-#if 0
-void START_KEY_IRQ_HANDLER(void )
-{
-    uint8_t i;
-    /* Clear external interrupt flag. */
-    GPIO_PortClearInterruptFlags(START_KEY_GPIO, 1U << START_KEY_GPIO_PIN );
-    /* Change state of button. */
-    if(GPIO_PinRead(START_KEY_GPIO,25)== 1)
-    {
-        DelayMs(5);
-        if(GPIO_PinRead(START_KEY_GPIO,25)== 1)
-        {
-            i++;
-            if(i == 1)
-            {
-              motor_ref.motor_run =1 ;
-              motor_ref.power_on = 1;
-            }
-        	else
-        	{
-                
-                motor_ref.motor_run = 0;
-                motor_ref.power_on =0;
-                motor_ref.stop_numbers=1;
-                i=0;
-        	}
-        }
-    }
-	PRINTF("motor_run or \r\n");
-	                  
-/* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
-  exception return operation might vector to incorrect interrupt */
-#if defined __CORTEX_M && (__CORTEX_M == 4U)
-    __DSB();
-#endif
-}
 
 
-#endif 
 
 
 

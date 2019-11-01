@@ -46,36 +46,35 @@ void KEY_Init(void)
         GPIO_PinInit(KEY7_GPIO,     	KEY7_GPIO_PIN, 		    	&key_config);
 		GPIO_PinInit(KEY8_GPIO,     	KEY8_GPIO_PIN, 		    	&key_config);
 		GPIO_PinInit(KEY9_GPIO,     	KEY9_GPIO_PIN,   	    	&key_config);
-		//GPIO_PinInit(AIR_GPIO,    	    AIR_GPIO_PIN, 	    	        &key_config);
-		GPIO_PinInit(ABC_POWER_GPIO,    	ABC_POWER_GPIO_PIN, 	    	        &key_config);
+		//GPIO_PinInit(AIR_GPIO,    	    AIR_GPIO_PIN, 	    	&key_config);
+		GPIO_PinInit(ABC_POWER_GPIO,    ABC_POWER_GPIO_PIN, 	    &key_config);
         
-        PORT_PinPullConfig(HW_GPIOE, 29, kPORT_PullDown);
-        PORT_PinPullConfig(HW_GPIOE, 30, kPORT_PullDown);
-        PORT_PinPullConfig(HW_GPIOE, 24, kPORT_PullDown);
-        PORT_PinPullConfig(HW_GPIOE, 25, kPORT_PullDown);
+        PORT_PinPullConfig(HW_GPIOE, 29,  kPORT_PullDown);
+        PORT_PinPullConfig(HW_GPIOE, 30,  kPORT_PullDown);
+        PORT_PinPullConfig(HW_GPIOE, 24,  kPORT_PullDown);
+        PORT_PinPullConfig(HW_GPIOE, 25,  kPORT_PullDown);
         
-        PORT_PinPullConfig(HW_GPIOA, 1,  kPORT_PullDown);
-        PORT_PinPullConfig(HW_GPIOA, 2,  kPORT_PullDown);
-        PORT_PinPullConfig(HW_GPIOA, 4,  kPORT_PullDown);
-        PORT_PinPullConfig(HW_GPIOA, 5,  kPORT_PullDown);
-        PORT_PinPullConfig(HW_GPIOA, 12, kPORT_PullDown);
-        PORT_PinPullConfig(HW_GPIOA, 13, kPORT_PullDown);
+        PORT_PinPullConfig(HW_GPIOA, 1,   kPORT_PullDown);
+        PORT_PinPullConfig(HW_GPIOA, 2,   kPORT_PullDown);
+        PORT_PinPullConfig(HW_GPIOA, 4,   kPORT_PullDown);
+        PORT_PinPullConfig(HW_GPIOA, 5,   kPORT_PullDown);
+        PORT_PinPullConfig(HW_GPIOA, 12,  kPORT_PullDown);
+        PORT_PinPullConfig(HW_GPIOA, 13,  kPORT_PullDown);
 
-		 PORT_PinPullConfig(HW_GPIOC, 3, kPORT_PullDown);
+		 PORT_PinPullConfig(HW_GPIOC, 3,  kPORT_PullDown);
 		
                 
      /* Brake_Key Init input interrupt switch GPIO. */
   #if (defined(FSL_FEATURE_PORT_HAS_NO_INTERRUPT) && FSL_FEATURE_PORT_HAS_NO_INTERRUPT)
    GPIO_SetPinInterruptConfig(BRAKE_KEY_GPIO , BRAKE_KEY_GPIO_PIN , kPORT_InterruptEitherEdge );
- //  GPIO_SetPinInterruptConfig(START_KEY_GPIO , START_KEY_GPIO_PIN,  kPORT_InterruptLogicOne);
+ 
   #else
     PORT_SetPinInterruptConfig(BRAKE_KEY_PORT, BRAKE_KEY_GPIO_PIN,  kPORT_InterruptEitherEdge);
- //   PORT_SetPinInterruptConfig(START_KEY_PORT , START_KEY_GPIO_PIN,  kPORT_InterruptLogicOne);
+
   #endif
     EnableIRQ(BRAKE_KEY_IRQ);
-//	EnableIRQ(START_KEY_IRQ);
     GPIO_PinInit(BRAKE_KEY_GPIO, BRAKE_KEY_GPIO_PIN, &key_config);
-  //  GPIO_PinInit(START_KEY_GPIO, START_KEY_GPIO_PIN, &key_config);
+
 
      
 
@@ -198,31 +197,9 @@ uint8_t KEY_Scan(uint8_t mode)
 	}
 
 
-/******************************************************************************
- *
- * Function Name: 
- * Function Active: Interrpt brake input key 
- * @brief Interrupt service fuction of switch.
- *
- * This function toggles the LED
- *
-******************************************************************************/
+
+
 #if 0
-void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
-{
-    /* Clear external interrupt flag. */
-    GPIO_PortClearInterruptFlags(BRAKE_KEY_GPIO, 1U << BRAKE_KEY_GPIO_PIN );
-    /* Change state of button. */
-     PMW_AllClose_ABC_Channel();
-     DelayMs(10U);
-     PMW_AllClose_ABC_Channel();
-/* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
-  exception return operation might vector to incorrect interrupt */
-#if defined __CORTEX_M && (__CORTEX_M == 4U)
-    __DSB();
-#endif
-}
-#endif 
 /***************************************************************
     *
     *Name:Start_key_stateRead(void)
@@ -244,5 +221,6 @@ KEYState_TypeDef Start_Key_StateRead(void)
 
 
 }
+#endif 
 
 
