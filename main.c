@@ -57,10 +57,11 @@ int main(void)
 
  
      
-     uint8_t printx1[]="Dir = 1 is OK !!!! CW \r\n";
-     uint8_t printx2[]="Dir = 0 is OK #### CCW \r\n";
-   uint8_t printx3[]="motor run is OK @@@@@@@@@ \r\n";
-   uint8_t printx4[]="motor stop !!!!!!!! \r\n";
+     uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
+     uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
+  //   uint8_t printx3[]="motor run is OK @@@@@@@@@ \r\n";
+     uint8_t printx4[]="key motor run = 0 ^^^^ \r\n";
+     uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
      uint8_t ucKeyCode=0,abc_s=0;
      uint8_t dir_s =0;
 
@@ -96,7 +97,7 @@ int main(void)
                if(motor_ref.power_on == 1)
                {
                    
-                   motor_ref.power_on ++ ;
+                   motor_ref.power_on ++;
                    SD315AI_Check_Fault();
 #ifdef IRFP4768PbF
                    printf("************************************************************\r \n");
@@ -139,7 +140,7 @@ int main(void)
                  else //CW 
                  {
 
- 
+                    
 
                     uwStep = HallSensor_GetPinState();
                         switch(uwStep)
@@ -218,7 +219,7 @@ int main(void)
                          A_POWER_OUTPUT =0; //shut down
                          motor_ref.motor_run = 0;
                          motor_ref.power_on =0;
-                         motor_ref.stop_numbers=1;
+                        
                          
                          abc_s =0;
                         
@@ -227,26 +228,19 @@ int main(void)
 				  	break;
                 #if 1		
                   case START_PRES:
-                   PRINTF("START_PRES key \r\n");
-				
-		          
-                      motor_ref.motor_run ++ ;
-                      motor_ref.power_on ++ ;
-                      UART_WriteBlocking(DEMO_UART, printx3, sizeof(printx3) - 1);
-                    // printf("START KEY is motor run \r\n");
-                    
-    			  if(motor_ref.motor_run == 1)
+                   
+				   motor_ref.motor_run ++ ;
+                   motor_ref.power_on ++ ;
+                 if(motor_ref.motor_run == 1)
+    			  {
                       motor_ref.power_on =1;
+                      UART_WriteBlocking(DEMO_UART, printx5, sizeof(printx5) - 1);
+    			  }
 				  else 
 				  {
-                     
-					
                       motor_ref.motor_run = 0;
                       motor_ref.power_on =0;
-                      motor_ref.stop_numbers=1;
-					 
-					 // printf("START KEY IS STOP\r\n");
-					 UART_WriteBlocking(DEMO_UART, printx4, sizeof(printx4) - 1);
+                      UART_WriteBlocking(DEMO_UART, printx4, sizeof(printx4) - 1);
 				  }
                  
 				  break;
@@ -254,22 +248,55 @@ int main(void)
 				 case DIR_PRES: //3
 
 			       dir_s ++ ;
-	  			 if(dir_s == 1)
+	  			 if(dir_s == 1) //Dir =1 ;  //顺时针旋转
 	   			 {
-                         Dir=1;
-                         motor_ref.power_on = 1;
-                       //  printf(" dir is  =1 \r\n");
+
+                        if(motor_ref.power_on ==2)
+                        {
+                            if(motor_ref.Dir_flag == 0)
+                            {
+                              PMW_AllClose_ABC_Channel();
+                              motor_ref.power_on = 1;
+                              motor_ref.Dir_flag =1;
+                              Dir =1;
+                            }
+                          
+                        }
+                        else
+                        {
+                          Dir=1;
+                          motor_ref.Dir_flag =1;
+                          motor_ref.power_on = 1;
+                        
+                        }
                          UART_WriteBlocking(DEMO_UART, printx1, sizeof(printx1) - 1);
 				  }
-				 else 
-				   {
-                       dir_s = 0;
-                       motor_ref.power_on = 1;
-                      //dirvalue =0; //逆时针旋转
-                        Dir = 0;
-					 // printf(" dir is  =0 \r\n");
-                       UART_WriteBlocking(DEMO_UART, printx2, sizeof(printx2) - 1);
-				   }
+			   else // Dir = 0; //逆时针旋转
+			   {
+                    dir_s = 0;
+                  if(motor_ref.power_on == 2) //motor is runing
+                 {
+                    if(motor_ref.Dir_flag ==1)
+                    {
+
+                        PMW_AllClose_ABC_Channel();
+                        motor_ref.power_on = 1;
+                        motor_ref.Dir_flag = 0;
+                        Dir =0;
+                    }
+                  
+                  }
+                  else
+                  {
+                     
+                     Dir = 0;
+                     motor_ref.Dir_flag = 0;
+                     motor_ref.power_on = 1;
+                     
+
+                  }
+                 UART_WriteBlocking(DEMO_UART, printx2, sizeof(printx2) - 1);
+			   }
 			
            		break;
             default :
