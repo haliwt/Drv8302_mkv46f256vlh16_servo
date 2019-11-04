@@ -94,6 +94,7 @@ int main(void)
           
           if(motor_ref.motor_run == 1 )
            {
+
                if(motor_ref.power_on == 1)
                {
                    
@@ -195,7 +196,10 @@ int main(void)
               
                  PMW_AllClose_ABC_Channel();
                  SD315AI_Disable_Output();
-                 printf("Stop PWMA  \r \n");
+                 GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
+                 DelayMs(100);
+               //  LED1 = !LED1; 
+               //  printf("Stop PWMA  \r \n");
             
            }
       
@@ -231,6 +235,7 @@ int main(void)
                    
 				   motor_ref.motor_run ++ ;
                    motor_ref.power_on ++ ;
+                   LED3 =1;
                  if(motor_ref.motor_run == 1)
     			  {
                       motor_ref.power_on =1;

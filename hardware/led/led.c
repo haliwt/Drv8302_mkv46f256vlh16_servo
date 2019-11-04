@@ -13,6 +13,8 @@ void LED_Init(void)
 
      GPIO_QuickInit(HW_GPIOD,  7, kGPIO_Mode_OPP);
 	 GPIO_QuickInit(HW_GPIOD,  6, kGPIO_Mode_OPP);
+     GPIO_QuickInit(HW_GPIOC,2,kGPIO_Mode_OPP);
+     
 #if 0
 
 /* Port D Clock Gate Control: Clock enabled */
