@@ -64,7 +64,7 @@ int main(void)
      uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
      uint8_t ucKeyCode=0,abc_s=0;
      uint8_t dir_s =0;
-
+     uint16_t pwm_duty;
  
 
     BOARD_InitPins();
@@ -82,6 +82,7 @@ int main(void)
     
     OUTPUT_Fucntion_Init();
     ADC_CADC_Init();
+    ADC_DMA_Init();
     ABC_POWER_OUTPUT_Init();
     /* Set the PWM Fault inputs to a low value */
     PWM_BLDC_Init();
@@ -94,8 +95,11 @@ int main(void)
           
           if(motor_ref.motor_run == 1 )
            {
-
+            // pwm_duty = ADC_DMA_ReadValue();
+             pwm_duty = CADC_Read_ADC_Value();
+            // printf("pwm_duty = %d\r \n",pwm_duty); 
                if(motor_ref.power_on == 1)
+
                {
                    
                    motor_ref.power_on ++;
@@ -180,15 +184,12 @@ int main(void)
               {
                   
                   SD315AI_Check_Fault();
-                  CADC_Read_ADC_Value();
+                 // CADC_Read_ADC_Value();
                   uwStep = HallSensor_GetPinState();
                                  
-                  HALLSensor_Detected_BLDC();
-                 // PWM_Duty = CADC_Read_ADC_Value();
-                  printf("PWM_Duty= %d\r \n",PWM_Duty);
-                  
+                  HALLSensor_Detected_BLDC(pwm_duty);
                  
-               }
+                }
              }
           
           else
@@ -197,8 +198,7 @@ int main(void)
               SD315AI_Disable_Output();
               GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
               DelayMs(100);
-               //  LED1 = !LED1; 
-               //  printf("Stop PWMA  \r \n");
+              
             
            }
       

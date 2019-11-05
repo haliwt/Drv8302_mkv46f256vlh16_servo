@@ -25,6 +25,7 @@ processor_version: 0.0.8
 
 
 
+
 /* clang-format off */
 /*
  * TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
@@ -78,6 +79,20 @@ void BOARD_InitPins(void)
     /* PORTE1 (pin 2) is configured as UART1_RX */
     PORT_SetPinMux(PORTE, 1U, kPORT_MuxAlt3);
 
+
+
+    #if 1  //WT.EDIT 20191105
+    SIM->ADCOPT = ((SIM->ADCOPT &
+                    /* Mask bits to zero which are setting */
+                    (~(SIM_ADCOPT_ADCACH6SEL_MASK | SIM_ADCOPT_ADCACH7SEL_MASK)))
+
+                   /* ADCB MUX1 selection for ADCB channel 6: ADCB MUX0's channel a. */
+                   | SIM_ADCOPT_ADCACH6SEL(ADCOPT_ADCACH6SEL_CH_C)
+
+                   /* ADCB MUX1 selection for ADCB channel 7: ADCB MUX1's channel e. */
+                   | SIM_ADCOPT_ADCACH7SEL(ADCOPT_ADCACH7SEL_CH_C));
+#endif
+
 	/*配置串口通信UART0_TX,UART0_RX*/
     SIM->SOPT5 = ((SIM->SOPT5 &
                    /* Mask bits to zero which are setting */
@@ -88,6 +103,8 @@ void BOARD_InitPins(void)
 
                   /* UART 1 receive data source select: UART1_RX pin. */
                   | SIM_SOPT5_UART1RXSRC(SOPT5_UART1RXSRC_UART_RX));
+
+                  
 }
 /***********************************************************************************************************************
  * EOF

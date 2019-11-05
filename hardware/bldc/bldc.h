@@ -58,14 +58,14 @@ void HALL_Init(void);
 
 uint32_t HallSensor_GetPinState(void);
 
-void HALLSensor_Detected_BLDC(void);
+void HALLSensor_Detected_BLDC(uint16_t duty);
 
 
 void PWM_BLDC_Init(void);   // initial pwm function
 
-void PWMA_Select_AB_Channel(uint8_t s_pwmA);  //select one PWM A channel,H-bridge first 
-void PWMA_Select_BC_Channel(uint8_t s_pwmB);  //select one PWM B  channel,H-bridge second
-void PWMA_Select_CA_Channel(uint8_t s_pwmC); 
+void PWMA_Select_AB_Channel(uint8_t s_pwmA,uint16_t duty);  //select one PWM A channel,H-bridge first 
+void PWMA_Select_BC_Channel(uint8_t s_pwmB,uint16_t duty);  //select one PWM B  channel,H-bridge second
+void PWMA_Select_CA_Channel(uint8_t s_pwmC,uint16_t duty); 
 void PMW_AllClose_ABC_Channel(void);
 void PMW_AllClose_ABC_Duty_10_Channel(void);
 void PMW_AllClose_ABC_Duty_20_Channel(void);
