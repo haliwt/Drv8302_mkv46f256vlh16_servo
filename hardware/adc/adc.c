@@ -96,7 +96,7 @@ void ADC_CADC_Init(void)
  *
  *
  ******************************************************************************/
-uint16_t CADC_Read_ADC_Value(void)
+void CADC_Read_ADC_Value(void)
 {
 
            uint16_t pwm_f;
@@ -104,20 +104,20 @@ uint16_t CADC_Read_ADC_Value(void)
 	             /* Wait the conversion to be done. */
 	         while (kCADC_ConverterAEndOfScanFlag !=
 	               (kCADC_ConverterAEndOfScanFlag & CADC_GetStatusFlags(CADC_BASEADDR)))
-	        {
-	        }
+    	        {
+    	        }
 
-	       
-            CADC_ClearStatusFlags(CADC_BASEADDR, kCADC_ConverterAEndOfScanFlag);
 
-     	    
+           /* Read the result value. */
+        if (PWM_Duty == (PWM_Duty & CADC_GetSampleReadyStatusFlags(CADC_BASEADDR)))
+        {
+            PRINTF("PWM_Duty = %d\r\n",(uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 1U))/ 330));
+            
+        }
+        PWM_Duty = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 1U))/ 330);
+        CADC_ClearStatusFlags(CADC_BASEADDR, kCADC_ConverterAEndOfScanFlag);
 
-           pwm_f = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 1U))/ 330);
          
-          
-           // PRINTF("PWM_Duty = %d\r\n",pwm_f);
-
-          return pwm_f;
 
 
 }

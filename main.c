@@ -180,7 +180,7 @@ int main(void)
               {
                   
                   SD315AI_Check_Fault();
-                  PWM_Duty = CADC_Read_ADC_Value();
+                  CADC_Read_ADC_Value();
                   uwStep = HallSensor_GetPinState();
                                  
                   HALLSensor_Detected_BLDC();

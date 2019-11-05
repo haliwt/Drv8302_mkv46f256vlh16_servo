@@ -30,7 +30,7 @@
 void ADC_CADC_Init(void);
 
 
-uint16_t CADC_Read_ADC_Value(void);
+void CADC_Read_ADC_Value(void);
 
 
 

@@ -203,7 +203,7 @@ static void PWM_DRV_Init3PhPwm(void)
     uint16_t deadTimeVal;
     pwm_signal_param_t pwmSignal[2];
     uint32_t pwmSourceClockInHz;
-    uint32_t pwmFrequencyInHz = 6000;//1300; //1.3KHZ
+    uint32_t pwmFrequencyInHz = 4000;//1300; //1.3KHZ
 
 
     pwmSourceClockInHz = PWM_SRC_CLK_FREQ;
@@ -267,7 +267,7 @@ void HALLSensor_Detected_BLDC()
   
   /*---- six step changed phase */
   /*---- 1(001,U),IC2(010,V),IC3(100,W) ----*/
-  PRINTF("uwStep = %d\n",uwStep);
+ // PRINTF("uwStep = %d\n",uwStep);
  switch(uwStep)//switch(BLDCMotor.uwStep)
  {
     case 5://stm32 B+ A-  // B+ C-
