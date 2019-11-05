@@ -41,7 +41,7 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define IRFP4768PbF  1
+//#define IRFP4768PbF  1
 
 output_t motor_ref;
 
@@ -193,11 +193,10 @@ int main(void)
           
           else
           {
-              
-                 PMW_AllClose_ABC_Channel();
-                 SD315AI_Disable_Output();
-                 GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
-                 DelayMs(100);
+              PMW_AllClose_ABC_Channel();
+              SD315AI_Disable_Output();
+              GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
+              DelayMs(100);
                //  LED1 = !LED1; 
                //  printf("Stop PWMA  \r \n");
             
@@ -212,10 +211,12 @@ int main(void)
                   case ABC_POWER_PRES :
                      PRINTF("ABC_PRES key  \r\n");
                      abc_s ++;
+                     LED2 = 1;
                     if((abc_s == 1)||(motor_ref.abc_numbers ==1))
 				    {
                        A_POWER_OUTPUT =1;
                        motor_ref.abc_numbers =0;
+                       LED2 = 0;
                  
                     }
 				     else 
@@ -223,9 +224,8 @@ int main(void)
                          A_POWER_OUTPUT =0; //shut down
                          motor_ref.motor_run = 0;
                          motor_ref.power_on =0;
-                        
-                         
                          abc_s =0;
+                         LED2 = 0;
                         
 				     }
                       

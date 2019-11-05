@@ -1,8 +1,7 @@
 /*
 ** ###################################################################
-**     Processors:          MKV44F128VLF16
-**                          MKV44F128VLH16
-**                          MKV44F128VLL16  BY changed MKV44F128VLH16
+**     Processors:          MKV46F256VLH16
+**                          MKV46F256VLL16
 **
 **     Compiler:            IAR ANSI C/C++ Compiler for ARM
 **     Reference manual:    KV4XP100M168RM Rev 3.2, 09/2015
@@ -54,9 +53,9 @@ define symbol m_flash_config_start     = 0x00000400;
 define symbol m_flash_config_end       = 0x0000040F;
 
 define symbol m_text_start             = 0x00000410;
-define symbol m_text_end               = 0x0001FFFF;
+define symbol m_text_end               = 0x0003FFFF;
 
-define symbol m_data_start             = 0x1FFFE000;
+define symbol m_data_start             = 0x1FFFC000;
 define symbol m_data_end               = 0x1FFFFFFF;
 
 define symbol m_data_2_start           = 0x20000000;

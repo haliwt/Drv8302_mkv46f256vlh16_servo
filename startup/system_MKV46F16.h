@@ -80,7 +80,7 @@ extern "C" {
 /* SMC_PMPROT: AHSRUN=1,?=0,AVLP=1,?=0,?=0,?=0,AVLLS=1,?=0 */
 #define SYSTEM_SMC_PMPROT_VALUE        SMC_PMPROT_AHSRUN_MASK | SMC_PMPROT_AVLP_MASK | SMC_PMPROT_AVLLS_MASK /* Mask of allowed low power modes used to initialize power modes protection register */
 
-#define DEFAULT_SYSTEM_CLOCK           20971520UL//168000000UL// WT.EDIT 20971520UL         /* Default System clock value */
+#define DEFAULT_SYSTEM_CLOCK            20971520UL         /* Default System clock value */
 
 
 /**

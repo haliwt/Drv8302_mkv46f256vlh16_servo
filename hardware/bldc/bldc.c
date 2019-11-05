@@ -259,7 +259,7 @@ void HALLSensor_Detected_BLDC()
   //uwStep = HallSensor_GetPinState();
  // PRINTF("uwStep = %d\n",uwStep);
   // __IO uint32_t tmp = 0; 
- if(Dir == 0)
+ if(Dir == 0) //逆时针方向 -0
   {
     uwStep = (uint32_t)7 - uwStep;        // 逆时针 CW = 7 - CCW;
   }
