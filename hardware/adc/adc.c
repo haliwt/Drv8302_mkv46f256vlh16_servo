@@ -60,7 +60,7 @@ void ADC_DMA_Init(void)
      * "kCADC_DualConverterWorkAsLoopSequential" work mode. */
     CADC_DoSoftwareTriggerConverter(DEMO_CADC_BASEADDR, kCADC_ConverterA);
 
-    PRINTF("Press any key to get user channel's ADC value ...\r\n");
+   // PRINTF("Press any key to get user channel's ADC value ...\r\n");
 
 
 
@@ -305,38 +305,28 @@ uint16_t CADC_Read_ADC_Value(void)
        static uint16_t pwm_duty= 5;
        CADC_DoSoftwareTriggerConverter(CADC_BASEADDR, kCADC_ConverterA);
 
-
-
-     
-      
-         /* Wait the conversion to be done. */
+	  /* Wait the conversion to be done. */
        while (kCADC_ConverterAEndOfScanFlag !=
                (kCADC_ConverterAEndOfScanFlag & CADC_GetStatusFlags(CADC_BASEADDR)))
         {
         }
+       /* Read the result value. */
+       // if (pwm_duty == (pwm_duty & CADC_GetSampleReadyStatusFlags(CADC_BASEADDR)))
+       // {
 
-   
-	     
-
-           /* Read the result value. */
-        if (pwm_duty == (pwm_duty & CADC_GetSampleReadyStatusFlags(CADC_BASEADDR)))
-        {
-
-            PRINTF("PWM_Duty2 = %d\r\n",(uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 0U))/ 330));
+         //   PRINTF("PWM_Duty2 = %d\r\n",(uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 0U))/ 330));
           //  PRINTF("PWM_Duty3 = %d\r\n",(uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 1U))/ 330));
            
             
-        }
+      //  }
         pwm_duty = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 0U))/ 330);
+	    if(pwm_duty > 98)
+			pwm_duty = 100;
         
         CADC_ClearStatusFlags(CADC_BASEADDR, kCADC_ConverterAEndOfScanFlag);//kCADC_ConverterAInProgressFlag
       //  CADC_ClearStatusFlags(CADC_BASEADDR, kCADC_ConverterAInProgressFlag);
        
-   
-        return pwm_duty;
+   		return pwm_duty;
      
-    
-
-
-}
+ }
 

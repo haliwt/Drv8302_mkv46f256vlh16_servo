@@ -115,7 +115,7 @@ uint8_t KEY_Scan(uint8_t mode)
 		 else if(START_KEY == 1)
 		 {
 			 /* 等待按键弹开，退出按键扫描函数 */
-			  while(START_KEY==1);
+			 // while(START_KEY==1); //WT.EDIT 2019-11-15
 			   /* 按键扫描完毕，确定按键按下 */
 			  return START_PRES;
 		  }
