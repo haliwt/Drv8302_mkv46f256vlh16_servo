@@ -107,7 +107,7 @@ uint8_t KEY_Scan(uint8_t mode)
 		 if(ABC_POWER_KEY ==1)
 		 {
 			/* 等待按键弹开，退出按键扫描函数 */
-			  while(ABC_POWER_KEY==1);
+			//  while(ABC_POWER_KEY==1); //WT.EDIT 2019-11-15
 			   /* 按键扫描完毕，确定按键按下 */
 			 return ABC_POWER_PRES;
 		 }
@@ -123,7 +123,7 @@ uint8_t KEY_Scan(uint8_t mode)
 		 else if(DIR_KEY==1)
 		 {
 			 /* 等待按键弹开，退出按键扫描函数 */
-			 while(DIR_KEY==1);
+			 //while(DIR_KEY==1);  WT.EDIT 2019-11-15
 			   /* 按键扫描完毕，确定按键按下 */
 	
 			 return DIR_PRES;

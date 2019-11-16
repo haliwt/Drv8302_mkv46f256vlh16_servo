@@ -266,20 +266,20 @@ void ADC_CADC_Init(void)
     cadcSampleConfigStruct.channelNumber          = CADC_CHANNEL2_NUMBER;
     cadcSampleConfigStruct.enableDifferentialPair = CADC_CHANNEL2_ENABLE_DIFF;
     CADC_SetSampleConfig(CADC_BASEADDR, 1U, &cadcSampleConfigStruct);
-#if 0
-    /* For converter B. */
+    
     cadcSampleConfigStruct.channelNumber          = CADC_CHANNEL3_NUMBER;
     cadcSampleConfigStruct.enableDifferentialPair = CADC_CHANNEL3_ENABLE_DIFF;
     CADC_SetSampleConfig(CADC_BASEADDR, 2U, &cadcSampleConfigStruct);
-    cadcSampleConfigStruct.channelNumber          = CADC_CHANNEL4_NUMBER;
+    
+     cadcSampleConfigStruct.channelNumber          = CADC_CHANNEL4_NUMBER;
     cadcSampleConfigStruct.enableDifferentialPair = CADC_CHANNEL4_ENABLE_DIFF;
     CADC_SetSampleConfig(CADC_BASEADDR, 3U, &cadcSampleConfigStruct);
-#endif 
+
     /* Enable the sample slot. */
     sampleMask = CADC_SAMPLE_MASK(0U)    /* For converter A. */
-                 | CADC_SAMPLE_MASK(1U);  /* For converter A. */
-                // | CADC_SAMPLE_MASK(2U)  /* For converter B. */
-                // | CADC_SAMPLE_MASK(3U); /* For converter B. */
+                 | CADC_SAMPLE_MASK(1U)  /* For converter A. */
+                 | CADC_SAMPLE_MASK(2U)  /* For converter B. */
+                 | CADC_SAMPLE_MASK(3U); /* For converter B. */
     CADC_EnableSample(CADC_BASEADDR, sampleMask, true);
     CADC_EnableSample(CADC_BASEADDR, (uint16_t)(~sampleMask), false); /* Disable other sample slot. */
 
@@ -302,7 +302,16 @@ uint16_t CADC_Read_ADC_Value(void)
 {
 
          
-       static uint16_t pwm_duty= 5;
+      uint16_t pwm_duty= 5;
+       
+
+        /* Enable the sample slot. */
+    pwm_duty = CADC_SAMPLE_MASK(0U)    /* For converter A. */
+                 | CADC_SAMPLE_MASK(1U)  /* For converter A. */
+                 | CADC_SAMPLE_MASK(2U)  /* For converter B. */
+                 | CADC_SAMPLE_MASK(3U); /* For converter B. */
+    CADC_EnableSample(CADC_BASEADDR, pwm_duty, true);
+    CADC_EnableSample(CADC_BASEADDR, (uint16_t)(~pwm_duty), false); /* Disable other sample slot. */
        CADC_DoSoftwareTriggerConverter(CADC_BASEADDR, kCADC_ConverterA);
 
 	  /* Wait the conversion to be done. */
@@ -319,7 +328,7 @@ uint16_t CADC_Read_ADC_Value(void)
            
             
       //  }
-        pwm_duty = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 0U))/ 330);
+        pwm_duty = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 3U))/ 330);
 	    if(pwm_duty > 98)
 			pwm_duty = 100;
         

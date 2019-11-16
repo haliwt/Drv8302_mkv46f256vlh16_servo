@@ -8,11 +8,11 @@
 
 /*System includes.*/
 #include <stdio.h>
-#include "amclib_FP.h"
-#include "mlib_FP.h"
-#include "gflib_FP.h"
-#include "gdflib_FP.h"
-#include "gmclib_FP.h"
+//#include "amclib_FP.h"
+//#include "mlib_FP.h"
+//#include "gflib_FP.h"
+//#include "gdflib_FP.h"
+//#include "gmclib_FP.h"
 
 /* Kernel includes. */
 //#include "FreeRTOS.h"
@@ -99,11 +99,10 @@ int main(void)
             // pwm_duty = ADC_DMA_ReadValue();
              pwm_duty = CADC_Read_ADC_Value();
 #ifdef DEBUG_PRINT 
-          //   printf("pwm_duty = %d\r \n",pwm_duty); 
+             printf("pwm_duty = %d\r \n",pwm_duty); 
 #endif 
                if(motor_ref.power_on == 1)
-
-               {
+              {
                    
                    motor_ref.power_on ++;
                    SD315AI_Check_Fault();
