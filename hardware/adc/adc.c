@@ -302,7 +302,7 @@ uint16_t CADC_Read_ADC_Value(void)
 {
 
          
-      uint16_t pwm_duty= 5;
+      uint16_t pwm_duty=5;
        
 
         /* Enable the sample slot. */

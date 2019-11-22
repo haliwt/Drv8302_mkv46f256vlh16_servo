@@ -97,7 +97,7 @@ int main(void)
           if(motor_ref.motor_run == 1 )
            {
             // pwm_duty = ADC_DMA_ReadValue();
-             pwm_duty = CADC_Read_ADC_Value();
+            // pwm_duty = CADC_Read_ADC_Value();
 #ifdef DEBUG_PRINT 
              printf("pwm_duty = %d\r \n",pwm_duty); 
 #endif 
@@ -185,15 +185,16 @@ int main(void)
               else 
               {
                   
-                  SD315AI_Check_Fault();
+                  
                  // CADC_Read_ADC_Value();
                  uwStep = HallSensor_GetPinState();
-               #ifdef DEBUG_PRINT
-			     // printf("uwStep = %d\r \n",uwStep); 
-			   #endif 
-                                 
+               
                   HALLSensor_Detected_BLDC(pwm_duty);
-				 
+                  SD315AI_Check_Fault();
+				  pwm_duty = CADC_Read_ADC_Value();
+                  #ifdef DEBUG_PRINT
+			      printf("uwStep = %d\r \n",uwStep); 
+			   #endif 
                  
                 }
              }

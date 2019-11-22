@@ -36,8 +36,8 @@
 
 #define  PWMA_INIT_ON                    1
 
-//#define IRFP4768PbF          1
-#define DEBUG_PRINT          2
+#define IRFP4768PbF          1
+//#define DEBUG_PRINT          2
 
 
 
