@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2015, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ *  Inc.
+ * Copyright 2019 KST
  * All rights reserved.
  *
- * SPDX-License-Identifier: BSD-3-Clause  MKV46F256VLH16
+ * No Hall soft  BSD-3-Clause  MKV46F256VLH16
  */
 
 /*System includes.*/
@@ -37,6 +37,8 @@
 #include "pollingusart.h"
 #include "output.h"
 #include "input.h"
+#include "hall.h"
+
 //#include "usart_edma_rb.h"
 /*******************************************************************************
  * Definitions
@@ -44,7 +46,9 @@
 
 
 
+
 output_t motor_ref;
+
 
 /*******************************************************************************
  *
@@ -60,13 +64,14 @@ int main(void)
      
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
-  //   uint8_t printx3[]="motor run is OK @@@@@@@@@ \r\n";
      uint8_t printx4[]="key motor run = 0 ^^^^ \r\n";
      uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
      uint8_t ucKeyCode=0,abc_s=0;
-     uint8_t dir_s =0;
+     uint8_t dir_s =0,step,power=0;
      uint16_t pwm_duty;
- 
+	
+	
+     
 
     BOARD_InitPins();
     BOARD_BootClockRUN();
@@ -77,6 +82,7 @@ int main(void)
     KEY_Init();
     DelayInit();
     HALL_Init();
+    NO_HALL_GPIO_Init(); 
     
     SD315AI_SO12_Input_Init();
     
@@ -97,12 +103,17 @@ int main(void)
           if(motor_ref.motor_run == 1 )
            {
             // pwm_duty = ADC_DMA_ReadValue();
-            // pwm_duty = CADC_Read_ADC_Value();
+             pwm_duty = CADC_Read_ADC_Value();
+             
 #ifdef DEBUG_PRINT 
-             printf("pwm_duty = %d\r \n",pwm_duty); 
+             printf("pw = %d\r \n",pwm_duty); 
+         
 #endif 
+              //  step = ADC_NO_HALL_Value();
+              //  CADC_Read_ADC_Value();
                if(motor_ref.power_on == 1)
-              {
+
+               {
                    
                    motor_ref.power_on ++;
                    SD315AI_Check_Fault();
@@ -111,31 +122,39 @@ int main(void)
                    if(Dir==0)  
                    {
                       
-                       uwStep = HallSensor_GetPinState();
+                      // uwStep = HallSensor_GetPinState();
+                       //uwStep= NO_HallSensor_GetPinState();
+                       uwStep =2;
                         switch(uwStep)
                         {
                         case 5 :
-                         BLDC_CCW_SIX_5_Run();
+                         BLDC_CCW_SIX_5_Run(uwStep);
+                         DelayMs(5);
                           break;
                         case 4:
                           
-                          BLDC_CCW_SIX_4_Run();
+                          BLDC_CCW_SIX_4_Run(uwStep);
+                          DelayMs(5);
                          break;
                         
                         case 6:
-                          BLDC_CCW_SIX_6_Run();
+                          BLDC_CCW_SIX_6_Run(uwStep);
+                          DelayMs(5);
                         break;
                           
                          case 2:
-                           BLDC_CCW_SIX_2_Run();
+                           BLDC_CCW_SIX_2_Run(uwStep);
+                           DelayMs(5);
                          break;
                          
                          case 3:
-                           BLDC_CCW_SIX_3_Run();
+                           BLDC_CCW_SIX_3_Run(uwStep);
+                           DelayMs(5);
                          break;
                          
                          case 1:
-                            BLDC_CCW_SIX_1_Run();
+                            BLDC_CCW_SIX_1_Run(uwStep);
+                            DelayMs(5);
                          break;
                         }
                           
@@ -145,35 +164,38 @@ int main(void)
                         
                  }
                  else //CW 
-                 {
-
-                    
-
-                    uwStep = HallSensor_GetPinState();
+                 {      
+                        uwStep=5; 
                         switch(uwStep)
                         {
                         case 5 :
-                         BLDC_CW_Six_5_Run();
+                         BLDC_CW_Six_5_Run(uwStep);
+                         DelayMs(5);
                           break;
                         case 4:
                           
-                          BLDC_CW_Six_4_Run();
+                          BLDC_CW_Six_4_Run(uwStep);
+                          DelayMs(5);
                          break;
                         
                         case 6:
-                          BLDC_CW_Six_6_Run();
+                          BLDC_CW_Six_6_Run(uwStep);
+                          DelayMs(5);
                         break;
                           
                          case 2:
-                           BLDC_CW_Six_2_Run();
+                           BLDC_CW_Six_2_Run(uwStep);
+                           DelayMs(5);
                          break;
                          
                          case 3:
-                           BLDC_CW_Six_3_Run();
+                           BLDC_CW_Six_3_Run(uwStep);
+                           DelayMs(5);
                          break;
                          
                          case 1:
-                            BLDC_CW_Six_1_Run();
+                            BLDC_CW_Six_1_Run(uwStep);
+                            DelayMs(5);
                          break;
                         }
 
@@ -182,59 +204,78 @@ int main(void)
                  }
                 #endif 
                }
-              else 
+              else
               {
-                  
-                  
-                 // CADC_Read_ADC_Value();
-                 uwStep = HallSensor_GetPinState();
-               
-                  HALLSensor_Detected_BLDC(pwm_duty);
-                  SD315AI_Check_Fault();
-				  pwm_duty = CADC_Read_ADC_Value();
-                  #ifdef DEBUG_PRINT
-			      printf("uwStep = %d\r \n",uwStep); 
-			   #endif 
+             
+                uwStep = NO_HallSensor_Hex();
                  
-                }
-             }
-          
+              }
+                 HALLSensor_Detected_BLDC(pwm_duty, uwStep);
+                 ADC_NO_HALL_Value(pwm_duty);
+				  SD315AI_Check_Fault();
+             
+             
+                 #ifdef DEBUG_PRINT
+                  
+             
+                //printf("Phase = %d\r \n", Phase);
+                 
+                    printf("------------\r \n");
+                 #endif 
+                 
+                
+            
+          }
           else
           {
 
              if(motor_ref.power_on==2||motor_ref.motor_run==1)
              	{
+				  pwm_duty = 40;
+				  //uwStep = HallSensor_GetPinState();
+                 // uwStep= NO_HallSensor_Hex();
+				  HALLSensor_Detected_BLDC(pwm_duty,uwStep);
 				  
+				  pwm_duty = 35;
+				 // uwStep = HallSensor_GetPinState();
+                //  uwStep= NO_HallSensor_Hex();
+	              HALLSensor_Detected_BLDC(pwm_duty,uwStep);
+				  
+				  pwm_duty = 30;
+				  //uwStep = HallSensor_GetPinState();
+                 // uwStep= NO_HallSensor_Hex();
+	              HALLSensor_Detected_BLDC(pwm_duty,uwStep);
+				  
+				  pwm_duty = 25;
+				  //uwStep = HallSensor_GetPinState();
+                //  uwStep= NO_HallSensor_Hex();
+	              HALLSensor_Detected_BLDC(pwm_duty,uwStep);
 				  
 				  pwm_duty = 20;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC(pwm_duty);
-				  DelayMs(50);
-                  
-                  pwm_duty = 10;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC(pwm_duty);
-				  DelayMs(50);
-				 
+				 // uwStep = HallSensor_GetPinState();
+                 //  uwStep= NO_HallSensor_Hex();
+	              HALLSensor_Detected_BLDC(pwm_duty,uwStep);
+				  
+				  pwm_duty = 10;
+				 // uwStep = HallSensor_GetPinState();
+                 // uwStep= NO_HallSensor_Hex();
+	              HALLSensor_Detected_BLDC(pwm_duty,uwStep);
+				  
 				  pwm_duty = 5;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC(pwm_duty);
-				  DelayMs(50);
-				 
+				  //uwStep = HallSensor_GetPinState();
+                 // uwStep= NO_HallSensor_Hex();
+				  HALLSensor_Detected_BLDC(pwm_duty,uwStep);
              	}
               
-                 
-             
 			  PMW_AllClose_ABC_Channel();
-              DelayMs(50);
               SD315AI_Disable_Output();
               GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
-              DelayMs(50);
+              DelayMs(100);
               
             
            }
       
-       /*´¦Àí½ÓÊÕµ½µÄ°´¼ü¹¦ÄÜ*/  
+       /*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õµï¿½ï¿½Ä°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/  
 		if(ucKeyCode !=KEY_UP) 
 		{
            switch(ucKeyCode)
@@ -285,7 +326,7 @@ int main(void)
 				 case DIR_PRES: //3
 
 			       dir_s ++ ;
-	  			 if(dir_s == 1) //Dir =1 ;  //Ë³Ê±ÕëÐý×ª
+	  			 if(dir_s == 1) //Dir =1 ;  //Ë³Ê±ï¿½ï¿½ï¿½ï¿½×ª
 	   			 {
 
                         if(motor_ref.power_on ==2)//motor is runing
@@ -293,11 +334,13 @@ int main(void)
                             if(motor_ref.Dir_flag == 0)
                             {
                               pwm_duty = 10;
-							  uwStep = HallSensor_GetPinState();
-				              HALLSensor_Detected_BLDC(pwm_duty);
+							  //uwStep = HallSensor_GetPinState();
+                            //  uwStep= NO_HallSensor_Hex();
+				              HALLSensor_Detected_BLDC(pwm_duty,uwStep);
 							  pwm_duty = 5;
-							  uwStep = HallSensor_GetPinState();
-							  HALLSensor_Detected_BLDC(pwm_duty);
+							  //uwStep = HallSensor_GetPinState();
+                           //   uwStep= NO_HallSensor_Hex();
+							  HALLSensor_Detected_BLDC(pwm_duty,uwStep);
                               motor_ref.power_on = 1;
                               motor_ref.Dir_flag =1;
                               Dir =1;
@@ -313,20 +356,22 @@ int main(void)
                         }
                          UART_WriteBlocking(DEMO_UART, printx1, sizeof(printx1) - 1);
 				  }
-			   else // Dir = 0; //ÄæÊ±ÕëÐý×ª
+			   else // Dir = 0; //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª
 			   {
-                 dir_s=0;
+                  dir_s=0;
                   if(motor_ref.power_on == 2) //motor is runing
                  {
                     if(motor_ref.Dir_flag ==1)
                     {
 
                       pwm_duty = 10;
-					  uwStep = HallSensor_GetPinState();
-		              HALLSensor_Detected_BLDC(pwm_duty);
+					  //uwStep = HallSensor_GetPinState();
+                     // uwStep= NO_HallSensor_Hex();
+		              HALLSensor_Detected_BLDC(pwm_duty,uwStep);
 					  pwm_duty = 5;
-					  uwStep = HallSensor_GetPinState();
-					  HALLSensor_Detected_BLDC(pwm_duty);
+					  //uwStep = HallSensor_GetPinState();
+                     // uwStep= NO_HallSensor_Hex();
+					  HALLSensor_Detected_BLDC(pwm_duty,uwStep);
                       motor_ref.power_on = 1;
                       motor_ref.Dir_flag = 0;
                       Dir =0;

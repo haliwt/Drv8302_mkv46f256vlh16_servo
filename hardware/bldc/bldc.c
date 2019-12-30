@@ -124,7 +124,7 @@ void PWM_BLDC_Init(void)
    
 	pwmConfig.enableDebugMode = true;  //WT.EDIT 2019-07-13
     /* Use full cycle reload */
-    pwmConfig.reloadLogic =kPWM_ReloadPwmHalfCycle;//kPWM_ReloadPwmFullCycle;//kPWM_ReloadPwmHalfCycle; //WT.EDIT 2019-07-13 //kPWM_ReloadPwmFullCycle;
+    pwmConfig.reloadLogic =kPWM_ReloadPwmFullCycle;//WT.EDIT 2019-07-13 //kPWM_ReloadPwmFullCycle;
     /* PWM A & PWM B form a complementary PWM pair */
     pwmConfig.pairOperation   = kPWM_Independent; //WT.EDIT kPWM_ComplementaryPwmA;
     pwmConfig.enableDebugMode = true;
@@ -139,7 +139,6 @@ void PWM_BLDC_Init(void)
     }
 
    /* Initialize submodule 1 */
-    //pwmConfig.clockSource           = kPWM_Submodule0Clock;
     pwmConfig.clockSource           =  kPWM_BusClock; //WT.EDIT 2019-06-29
     //pwmConfig.initializationControl = kPWM_Initialize_MasterSync;
     pwmConfig.initializationControl = kPWM_Initialize_LocalSync;//WT.EDIT 2019-06-29
@@ -201,7 +200,7 @@ static void PWM_DRV_Init3PhPwm(void)
     uint16_t deadTimeVal;
     pwm_signal_param_t pwmSignal[2];
     uint32_t pwmSourceClockInHz;
-    uint32_t pwmFrequencyInHz = 10000;//1300; //1.3KHZ
+    uint32_t pwmFrequencyInHz = 60000;//1300; //1.3KHZ
 
 
     pwmSourceClockInHz = PWM_SRC_CLK_FREQ;
@@ -220,9 +219,7 @@ static void PWM_DRV_Init3PhPwm(void)
     pwmSignal[1].dutyCyclePercent = 50;
     pwmSignal[1].deadtimeValue    = deadTimeVal;
 
-   // PWM_SetupSwCtrlOut(BOARD_PWM_BASEADDR, kPWM_Module_0, kPWM_PwmA|kPWM_PwmB, false);
-   // PWM_SetupSwCtrlOut(BOARD_PWM_BASEADDR, kPWM_Module_1, kPWM_PwmA|kPWM_PwmB, false);
-   // PWM_SetupSwCtrlOut(BOARD_PWM_BASEADDR, kPWM_Module_2, kPWM_PwmA|kPWM_PwmB, false);
+
 
     /*********** PWMA_SM0 - phase A, configuration, setup 2 channel as an example ************/
     PWM_SetupPwm(BOARD_PWM_BASEADDR, kPWM_Module_0, pwmSignal, 2, kPWM_SignedEdgeAligned , pwmFrequencyInHz,
@@ -250,14 +247,9 @@ static void PWM_DRV_Init3PhPwm(void)
  *
  *
 *********************************************************/
-void HALLSensor_Detected_BLDC(uint16_t duty)
+void HALLSensor_Detected_BLDC(uint16_t duty,uint8_t uwStep)
 {
-      
-
- // uwStep = HallSensor_GetPinState();
- // PRINTF("uwStep = %d\n",uwStep);
-  // __IO uint32_t tmp = 0; 
- if(Dir == 0) //逆时针方向 -0
+      if(Dir == 0) //逆时针方向 -0
   {
     uwStep = (uint32_t)7 - uwStep;        // 逆时针 CW = 7 - CCW;
   }
@@ -332,20 +324,12 @@ void HALLSensor_Detected_BLDC(uint16_t duty)
     
  default :
         break;
-  }
- 
-  
-  /* 立刻触发换向*/
- // HAL_TIM_GenerateEvent(&htimx_BLDC, TIM_EVENTSOURCE_COM);
- // __HAL_TIM_CLEAR_IT(htim, TIM_FLAG_COM);
+  }    
+
+
   
 
- }
-
-
-
-
-
+}
 /**************************************************************
  *
  *Function Name: PWMA_A_Selection 
@@ -639,7 +623,7 @@ void PMW_AllClose_ABC_Duty_20_Channel(void)
 *********************************************************************************************************/
 #ifdef IRFP4768PbF
 
-void BLDC_CCW_SIX_1_Run(void)
+void BLDC_CCW_SIX_1_Run(uint8_t mstep)
 {
     uint8_t i ;
     for(i = 0;i<3 ;i++)
@@ -648,23 +632,23 @@ void BLDC_CCW_SIX_1_Run(void)
           else if(i==1)PWM_Duty = 70;
           else if(i==2)PWM_Duty = 80;
     
-      uwStep = 1;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 1;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
       DelayMs(8);
-      uwStep = 5;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 5;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
       DelayMs(8);
-      uwStep = 4 ;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 4 ;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
       DelayMs(8);
-      uwStep = 6 ;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 6 ;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
       DelayMs(8);
-      uwStep = 2 ;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 2 ;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
       DelayMs(8);
-      uwStep = 3 ;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 3 ;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
       DelayMs(8);
   }
 
@@ -680,7 +664,7 @@ void BLDC_CCW_SIX_1_Run(void)
     *
 
 *********************************************************************************************************/
-void BLDC_CCW_SIX_2_Run(void)
+void BLDC_CCW_SIX_2_Run(uint8_t mstep)
 {
     uint8_t i;
     for(i = 0;i<3 ;i++)
@@ -689,23 +673,23 @@ void BLDC_CCW_SIX_2_Run(void)
           else if(i==1)PWM_Duty = 70;
           else if(i==2)PWM_Duty = 80;
         
-          uwStep = 2;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 2;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 3;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 3;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 1 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 1 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 5 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 5 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 4 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 4 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 6 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 6 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
     }
 
@@ -720,7 +704,7 @@ void BLDC_CCW_SIX_2_Run(void)
     *
 
 *********************************************************************************************************/
-void BLDC_CCW_SIX_3_Run(void)
+void BLDC_CCW_SIX_3_Run(uint8_t mstep)
 {
     uint8_t i;
   for(i = 0;i<3 ;i++)
@@ -729,23 +713,23 @@ void BLDC_CCW_SIX_3_Run(void)
           else if(i==1)PWM_Duty = 70;
           else if(i==2)PWM_Duty = 80;
       
-      uwStep = 3;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 3;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
       DelayMs(8);
-      uwStep = 1;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 1;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
       DelayMs(8);
-      uwStep = 5 ;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 5 ;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
        DelayMs(8);
-      uwStep = 4 ;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 4 ;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
        DelayMs(8);
-      uwStep = 6 ;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 6 ;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
        DelayMs(8);
-      uwStep = 2 ;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 2 ;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
        DelayMs(8);
     }
 
@@ -759,7 +743,7 @@ void BLDC_CCW_SIX_3_Run(void)
     *
 
 *********************************************************************************************************/
-void BLDC_CCW_SIX_4_Run(void)
+void BLDC_CCW_SIX_4_Run(uint8_t mstep)
 {
    uint8_t i;
     for(i = 0;i<3 ;i++)
@@ -767,23 +751,23 @@ void BLDC_CCW_SIX_4_Run(void)
       if(i == 0) PWM_Duty = 60;
           else if(i==1)PWM_Duty = 70;
           else if(i==2)PWM_Duty = 80;;
-        uwStep = 4;
-        HALLSensor_Detected_BLDC(PWM_Duty);
+         mstep = 4;
+        HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-        uwStep = 6;
-        HALLSensor_Detected_BLDC(PWM_Duty);
+         mstep = 6;
+        HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-        uwStep = 2 ;
-        HALLSensor_Detected_BLDC(PWM_Duty);
+         mstep = 2 ;
+        HALLSensor_Detected_BLDC(PWM_Duty,mstep);
          DelayMs(8);
-        uwStep = 3 ;
-        HALLSensor_Detected_BLDC(PWM_Duty);
+         mstep = 3 ;
+        HALLSensor_Detected_BLDC(PWM_Duty,mstep);
         DelayMs(8);
-        uwStep = 1 ;
-        HALLSensor_Detected_BLDC(PWM_Duty);
+         mstep = 1 ;
+        HALLSensor_Detected_BLDC(PWM_Duty,mstep);
        DelayMs(8);
-        uwStep = 5 ;
-        HALLSensor_Detected_BLDC(PWM_Duty);
+         mstep = 5 ;
+        HALLSensor_Detected_BLDC(PWM_Duty,mstep);
         DelayMs(8);
     }
 
@@ -797,7 +781,7 @@ void BLDC_CCW_SIX_4_Run(void)
     *
 
 *********************************************************************************************************/
-void BLDC_CCW_SIX_5_Run(void)
+void BLDC_CCW_SIX_5_Run(uint8_t mstep)
 {
      uint8_t i;
      for(i = 0; i<3;i++)
@@ -806,23 +790,23 @@ void BLDC_CCW_SIX_5_Run(void)
           if(i == 0) PWM_Duty = 60;
           else if(i==1)PWM_Duty = 70;
           else if(i==2)PWM_Duty = 80;
-          uwStep = 5;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+          mstep = 5;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
          DelayMs(8);
-          uwStep = 4;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+          mstep = 4;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 6 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+          mstep = 6 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
          DelayMs(8);
-          uwStep = 2 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+          mstep = 2 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 3 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
-        DelayMs(8);
-          uwStep = 1 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+          mstep = 3 ;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
+          DelayMs(8);
+          mstep = 1 ;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
       }
 
@@ -837,7 +821,7 @@ void BLDC_CCW_SIX_5_Run(void)
     *
 
 *********************************************************************************************************/
-void BLDC_CCW_SIX_6_Run(void)
+void BLDC_CCW_SIX_6_Run(uint8_t mstep)
 {
     uint8_t i;
     for(i = 0;i<3 ;i++)
@@ -846,23 +830,23 @@ void BLDC_CCW_SIX_6_Run(void)
           if(i == 0) PWM_Duty = 60;
           else if(i==1)PWM_Duty = 70;
           else if(i==2)PWM_Duty = 80;
-          uwStep = 6;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+          mstep = 6;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 2;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+          mstep = 2;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 3 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+          mstep = 3 ;
+        HALLSensor_Detected_BLDC(PWM_Duty,mstep);
            DelayMs(8);
-          uwStep = 1 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+         mstep = 1 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 5 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 5 ;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 4 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 4 ;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
       }
 
@@ -877,7 +861,7 @@ void BLDC_CCW_SIX_6_Run(void)
     *
 
 *********************************************************************************************************/
-void BLDC_CW_Six_1_Run(void)
+void BLDC_CW_Six_1_Run(uint8_t  mstep)
 {
    uint8_t i ;
     for(i = 0;i<3 ;i++)
@@ -886,23 +870,23 @@ void BLDC_CW_Six_1_Run(void)
           else if(i==1)PWM_Duty = 70;
           else if(i==2)PWM_Duty = 80;
     
-      uwStep = 1;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 1;
+     HALLSensor_Detected_BLDC(PWM_Duty,mstep);
       DelayMs(8);
-      uwStep = 3;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 3;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
       DelayMs(8);
-      uwStep = 2 ;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 2 ;
+     HALLSensor_Detected_BLDC(PWM_Duty,mstep);
      DelayMs(8);
-      uwStep = 6 ;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 6 ;
+     HALLSensor_Detected_BLDC(PWM_Duty,mstep);
       DelayMs(8);
-      uwStep = 4 ;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+      mstep = 4 ;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
       DelayMs(8);
-      uwStep = 5 ;
-      HALLSensor_Detected_BLDC(PWM_Duty);
+       mstep = 5 ;
+      HALLSensor_Detected_BLDC(PWM_Duty,mstep);
       DelayMs(8);
   }
 
@@ -919,7 +903,7 @@ void BLDC_CW_Six_1_Run(void)
     *
 
 *********************************************************************************************************/
-void BLDC_CW_Six_2_Run(void)
+void BLDC_CW_Six_2_Run(uint8_t  mstep)
 {
     uint8_t i;
     for(i = 0;i<3 ;i++)
@@ -928,23 +912,23 @@ void BLDC_CW_Six_2_Run(void)
           else if(i==1)PWM_Duty = 70;
           else if(i==2)PWM_Duty = 80;
         
-          uwStep = 2;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 2;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 6;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 6;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 4 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 4 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 5 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 5 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 1 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 1 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 3 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 3 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
     }
 
@@ -961,7 +945,7 @@ void BLDC_CW_Six_2_Run(void)
     *
 
 *********************************************************************************************************/
-void BLDC_CW_Six_3_Run(void)
+void BLDC_CW_Six_3_Run(uint8_t  mstep)
 {
     
 uint8_t i;
@@ -971,23 +955,23 @@ uint8_t i;
           else if(i==1)PWM_Duty = 70;
           else if(i==2)PWM_Duty = 80;
         
-          uwStep = 3;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+          mstep = 3;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 2;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 2;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 6 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 6 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 4 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 4 ;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 5 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 5 ;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 1 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 1 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
     }
 
@@ -1001,7 +985,7 @@ uint8_t i;
     *
 
 *********************************************************************************************************/
-void BLDC_CW_Six_4_Run(void)
+void BLDC_CW_Six_4_Run(uint8_t  mstep)
 {
     
 uint8_t i;
@@ -1010,23 +994,23 @@ uint8_t i;
          if(i == 0) PWM_Duty = 60;
           else if(i==1)PWM_Duty = 70;
           else if(i==2)PWM_Duty = 80;
-          uwStep = 4;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 4;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 5;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 5;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 1 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 1 ;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 3 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 3 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
         DelayMs(8);
-          uwStep = 2 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 2 ;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 6 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 6 ;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
     }
 
@@ -1040,7 +1024,7 @@ uint8_t i;
     *
 
 *********************************************************************************************************/
-void BLDC_CW_Six_5_Run(void)
+void BLDC_CW_Six_5_Run(uint8_t  mstep)
 {
     
 uint8_t i;
@@ -1050,23 +1034,23 @@ uint8_t i;
           else if(i==1)PWM_Duty = 70;
           else if(i==2)PWM_Duty = 80;
         
-          uwStep = 5;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 5;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 1;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 1;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 3 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 3 ;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
            DelayMs(8);
-          uwStep = 2 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 2 ;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 6 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 6 ;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 4 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 4 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
     }
 
@@ -1080,7 +1064,7 @@ uint8_t i;
     *
 
 *********************************************************************************************************/
-void BLDC_CW_Six_6_Run(void)
+void BLDC_CW_Six_6_Run(uint8_t  mstep)
 {
 
     
@@ -1091,23 +1075,23 @@ uint8_t i;
           else if(i==1)PWM_Duty = 70;
           else if(i==2)PWM_Duty = 80;
         
-          uwStep = 6;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 6;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 4;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 4;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 5 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 5 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 1 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 1 ;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 3 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 3 ;
+         HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
-          uwStep = 2 ;
-          HALLSensor_Detected_BLDC(PWM_Duty);
+           mstep = 2 ;
+          HALLSensor_Detected_BLDC(PWM_Duty,mstep);
           DelayMs(8);
     }
 
