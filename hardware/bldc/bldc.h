@@ -6,7 +6,7 @@
 #include "board.h"
 #include "fsl_debug_console.h"
 #include "fsl_gpio.h"
-#include "adc.h"
+
 
 
 
@@ -34,24 +34,21 @@
 
 
 
-#define  PWMA_INIT_ON           1
+#define  PWMA_INIT_ON                    1
 
-#define IRFP4768PbF           1
-#define DEBUG_PRINT             2
-
-
+#define IRFP4768PbF          1
+//#define DEBUG_PRINT          2
 
 
 
-extern __IO int32_t   uwStep ;
+
+
+extern __IO int32_t  uwStep ;
 
 extern __IO uint32_t Lock_Time; // 堵转时间
 extern __IO uint16_t   PWM_Duty;   //占空比
 extern __IO int8_t Dir;
 extern uint16_t SPEED_VALUE ;   //速度值
-extern __IO uint16_t uSaHall;
-extern __IO uint16_t vSaHall;
-extern __IO uint16_t wSaHall; //电机 W相，采样电压值
 
 
 
@@ -65,7 +62,7 @@ void HALL_Init(void);
 
 uint32_t HallSensor_GetPinState(void);
 
-void HALLSensor_Detected_BLDC(uint16_t duty,uint8_t motorStep);
+void HALLSensor_Detected_BLDC(uint16_t duty);
 
 
 void PWM_BLDC_Init(void);   // initial pwm function
@@ -82,20 +79,20 @@ void PMW_AllClose_ABC_Duty_20_Channel(void);
 
 void PWMA_Close_ABC_Channel(uint8_t f_pwma);
 
-void BLDC_CCW_SIX_1_Run(uint8_t mstep);
-void BLDC_CCW_SIX_2_Run(uint8_t mstep);
-void BLDC_CCW_SIX_3_Run(uint8_t mstep);
-void BLDC_CCW_SIX_4_Run(uint8_t mstep);
-void BLDC_CCW_SIX_5_Run(uint8_t mstep);
-void BLDC_CCW_SIX_6_Run(uint8_t mstep);
+void BLDC_CCW_SIX_1_Run(void);
+void BLDC_CCW_SIX_2_Run(void);
+void BLDC_CCW_SIX_3_Run(void);
+void BLDC_CCW_SIX_4_Run(void);
+void BLDC_CCW_SIX_5_Run(void);
+void BLDC_CCW_SIX_6_Run(void);
 
 
-void BLDC_CW_Six_1_Run(uint8_t mstep);
-void BLDC_CW_Six_2_Run(uint8_t mstep);
-void BLDC_CW_Six_3_Run(uint8_t mstep);
-void BLDC_CW_Six_4_Run(uint8_t mstep);
-void BLDC_CW_Six_5_Run(uint8_t mstep);
-void BLDC_CW_Six_6_Run(uint8_t mstep);
+void BLDC_CW_Six_1_Run(void);
+void BLDC_CW_Six_2_Run(void);
+void BLDC_CW_Six_3_Run(void);
+void BLDC_CW_Six_4_Run(void);
+void BLDC_CW_Six_5_Run(void);
+void BLDC_CW_Six_6_Run(void);
 
 
 

@@ -86,12 +86,10 @@ void BOARD_InitPins(void)
                     /* Mask bits to zero which are setting */
                     (~(SIM_ADCOPT_ADCACH6SEL_MASK | SIM_ADCOPT_ADCACH7SEL_MASK)))
 
-                   /* ADCB MUX1 selection for ADCB channel 6: ADCB MUX0's 
-channel a. */
+                   /* ADCB MUX1 selection for ADCB channel 6: ADCB MUX0's channel a. */
                    | SIM_ADCOPT_ADCACH6SEL(ADCOPT_ADCACH6SEL_CH_C)
-                     
-                   /* ADCB MUX1 selection for ADCB channel 7: ADCB MUX1's 
-channel e. */
+
+                   /* ADCB MUX1 selection for ADCB channel 7: ADCB MUX1's channel e. */
                    | SIM_ADCOPT_ADCACH7SEL(ADCOPT_ADCACH7SEL_CH_C));
 #endif
 

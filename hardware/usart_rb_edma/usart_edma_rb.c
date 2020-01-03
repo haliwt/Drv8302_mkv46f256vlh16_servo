@@ -27,6 +27,7 @@ void UART_UserCallback(UART_Type *base, uart_edma_handle_t *handle, status_t sta
     *
     *
 **************************************************/
+#if 0
 void UART_EDMA_RB_Init(void)
 {
 
@@ -79,6 +80,7 @@ void UART_EDMA_RB_Init(void)
         receiveXfer.dataSize = ECHO_BUFFER_LENGTH;
 
 }
+#endif 
 /************************************************
  *
  * @brief Main function
