@@ -63,7 +63,7 @@ int main(void)
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
      uint8_t printx4[]="key motor run = 0 ^^^^ \r\n";
      uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
-     uint8_t ucKeyCode=0,abc_s=0;
+     uint8_t ucKeyCode=0;
      uint8_t dir_s =0;
      uint16_t pwm_duty;
  
@@ -95,8 +95,8 @@ int main(void)
           
           if(motor_ref.motor_run == 1 )
            {
-   				pwm_duty=60;
-				GPIO_PinWrite(GPIOE,18,1);
+   				pwm_duty=80;
+				GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 		   // pwm_duty = ADC_DMA_ReadValue();
           
 #ifdef DEBUG_PRINT 
@@ -190,11 +190,10 @@ int main(void)
                  uwStep = HallSensor_GetPinState();
                
                   HALLSensor_Detected_BLDC(pwm_duty);
-                 // SD315AI_Check_Fault();
-				 // pwm_duty = CADC_Read_ADC_Value();
+                
                   #ifdef DEBUG_PRINT
-			      printf("uwStep = %d\r \n",uwStep); 
-			   #endif 
+			      	printf("uwStep = %d\r \n",uwStep); 
+			   	  #endif 
                  
                 }
              }
@@ -227,7 +226,6 @@ int main(void)
              
 			  PMW_AllClose_ABC_Channel();
               DelayMs(50);
-              //SD315AI_Disable_Output();
               GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
               DelayMs(50);
               
@@ -241,25 +239,7 @@ int main(void)
             { 
                  
                   case ABC_POWER_PRES :
-                     PRINTF("ABC_PRES key  \r\n");
-                     abc_s ++;
-                     LED2 = 1;
-                    if((abc_s == 1)||(motor_ref.abc_numbers ==1))
-				    {
-                       A_POWER_OUTPUT =1;
-                       motor_ref.abc_numbers =0;
-                       LED2 = 0;
-                 
-                    }
-				     else 
-				     {
-                         A_POWER_OUTPUT =0; //shut down
-                         motor_ref.motor_run = 0;
-                         motor_ref.power_on =0;
-                         abc_s =0;
-                         LED2 = 0;
-                        
-				     }
+                    
                       
 				  	break;
         		
@@ -376,6 +356,7 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
     A_POWER_OUTPUT =0;
 	motor_ref.abc_numbers = 1;
     motor_ref.motor_run = 0;
+    GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
 	PRINTF("interrupte has happed  \r\n");
 	                  
 /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping

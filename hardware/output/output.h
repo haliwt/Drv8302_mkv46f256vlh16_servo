@@ -45,6 +45,10 @@
 #define SD315AI_VL_B_PIN      6//18U
 #define SD315AI_VL_C_PIN      4//17U
 
+
+#define DRV8302_EN_GATE_GPIO 		GPIOE 
+#define DRV8302_EN_GATE_GPIO_PIN   	18
+
 typedef struct _output_t_
 {
 

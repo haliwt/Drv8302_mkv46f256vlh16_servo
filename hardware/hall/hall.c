@@ -1,17 +1,6 @@
 #include "hall.h"
 
-/***************************************************
-	*function Name:void ENCODER_Init(void)
-	*
-	*
-	*
-***************************************************/
-void DRV8302_Control_Init(void)
-{
-   GPIO_QuickInit(HW_GPIOE,18,kGPIO_Mode_OPP);
 
-
-}
 /***************************************************
 	*function Name:void ENCODER_Init(void)
 	*
@@ -48,7 +37,7 @@ void ENCODER_Init(void)
 	 PORT_SetPinConfig(PORTB,2U,&pd_config);
 	 PORT_SetPinConfig(PORTB,3U,&pd_config);
 	 #endif 
-	 #if 1
+	 #if 0
      /*GPIO input pullup or pulldown or disable*/
 	 PORT_PinPullConfig(HW_GPIOC, 1, kPORT_PullUp);
 	 PORT_PinPullConfig(HW_GPIOC, 2, kPORT_PullUp);
@@ -71,7 +60,7 @@ void IncPIDInit(void)
     sPID.Proportion=P_DATA;      // 比列常数 Proportional Const
     sPID.Integral=I_DATA;        // 积分常数  Integral Const
     sPID.Derivative=D_DATA;      // 微分常数 Derivative Const
-   // sPID.SetPoint=TARGET_PULSE;            // 设定目标Desired Value
+    sPID.SetPoint=TARGET_PULSE;            // 设定目标Desired Value
 }
 /*******************************************************
   *
@@ -90,7 +79,7 @@ int32_t LocPIDCalc(int32_t NextPoint)
   /* 积分分离 */
   if((iError<200 )&& (iError>-200))
   { 
-    sPID.SumError += iError; //积分
+    sPID.SumError += iError; //积分-累积误差
     /* 积分上限 */
     if(sPID.SetPoint>0)
     {

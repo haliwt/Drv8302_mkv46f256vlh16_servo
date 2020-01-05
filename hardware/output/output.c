@@ -23,11 +23,15 @@ void OUTPUT_Fucntion_Init(void)
    /* Port D Clock Gate Control: Clock enabled */
     CLOCK_EnableClock(kCLOCK_PortC);
     CLOCK_EnableClock(kCLOCK_PortA);
-    CLOCK_EnableClock(kCLOCK_PortB);
+    CLOCK_EnableClock(kCLOCK_PortE);
     
 	//PORT_SetMultiplePinsConfig();
     
- 
+        PORT_SetPinMux(PORTE, DRV8302_EN_GATE_GPIO_PIN, kPORT_MuxAsGpio );
+
+		GPIO_PinInit(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,&led_config );
+
+		
         PORT_SetPinMux(PORTC, 7U, kPORT_MuxAsGpio );
 		PORT_SetPinMux(PORTC, 6U, kPORT_MuxAsGpio );
 		PORT_SetPinMux(PORTC, 4U, kPORT_MuxAsGpio );
@@ -48,7 +52,7 @@ void OUTPUT_Fucntion_Init(void)
         
         GPIO_PinInit(GPIOA,    19, &led_config );
 
-   #if 1
+   #if 0
       //  config.pullSelect= kPORT_PullDown;
         PORT_PinPullConfig(HW_GPIOC, 7, kPORT_PullDown);
         PORT_PinPullConfig(HW_GPIOC, 6, kPORT_PullDown);
