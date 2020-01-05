@@ -1,7 +1,17 @@
 #include "hall.h"
 
+/***************************************************
+	*function Name:void ENCODER_Init(void)
+	*
+	*
+	*
+***************************************************/
+void DRV8302_Control_Init(void)
+{
+   GPIO_QuickInit(HW_GPIOE,18,kGPIO_Mode_OPP);
 
 
+}
 /***************************************************
 	*function Name:void ENCODER_Init(void)
 	*
@@ -61,7 +71,7 @@ void IncPIDInit(void)
     sPID.Proportion=P_DATA;      // 比列常数 Proportional Const
     sPID.Integral=I_DATA;        // 积分常数  Integral Const
     sPID.Derivative=D_DATA;      // 微分常数 Derivative Const
-    sPID.SetPoint=TARGET_PULSE;            // 设定目标Desired Value
+   // sPID.SetPoint=TARGET_PULSE;            // 设定目标Desired Value
 }
 /*******************************************************
   *

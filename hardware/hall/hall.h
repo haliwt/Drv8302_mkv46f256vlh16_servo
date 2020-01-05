@@ -12,6 +12,9 @@
 #define ENCODER_B_GPIO_PIN	2
 #define ENCODER_Z_GPIO_PIN	3
 
+#define EN_GATE_GPIO GPIOE 
+#define EN_GATE_GPIO_PIN   18
+
 /* 电机参数结构体 ------------------------------------------------------------------*/
 typedef struct {
   __IO int32_t  uvwStep ;  	      // 电机旋转状态
@@ -62,6 +65,8 @@ void IncPIDInit(void) ;    //PID 初始化函数
 
 int32_t LocPIDCalc(int32_t NextPoint);  //位置PID计算
 int32_t AanglePIDCalc(int32_t NextAngle); //角度PID计算
+
+void DRV8302_Control_Init(void);
 
 
 

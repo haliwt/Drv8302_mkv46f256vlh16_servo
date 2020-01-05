@@ -78,8 +78,8 @@ int main(void)
     DelayInit();
     HALL_Init();
     ENCODER_Init();
-    SD315AI_SO12_Input_Init();
-    
+
+  
     OUTPUT_Fucntion_Init();
     ADC_CADC_Init();
     ADC_DMA_Init();
@@ -95,8 +95,10 @@ int main(void)
           
           if(motor_ref.motor_run == 1 )
            {
-            // pwm_duty = ADC_DMA_ReadValue();
-            // pwm_duty = CADC_Read_ADC_Value();
+   				pwm_duty=60;
+				GPIO_PinWrite(GPIOE,18,1);
+		   // pwm_duty = ADC_DMA_ReadValue();
+          
 #ifdef DEBUG_PRINT 
              printf("pwm_duty = %d\r \n",pwm_duty); 
 #endif 
@@ -104,7 +106,7 @@ int main(void)
               {
                    
                    motor_ref.power_on ++;
-                   SD315AI_Check_Fault();
+                  
 #ifdef IRFP4768PbF
                    printf("************************************************************\r \n");
                    if(Dir==0)  
@@ -188,8 +190,8 @@ int main(void)
                  uwStep = HallSensor_GetPinState();
                
                   HALLSensor_Detected_BLDC(pwm_duty);
-                  SD315AI_Check_Fault();
-				  pwm_duty = CADC_Read_ADC_Value();
+                 // SD315AI_Check_Fault();
+				 // pwm_duty = CADC_Read_ADC_Value();
                   #ifdef DEBUG_PRINT
 			      printf("uwStep = %d\r \n",uwStep); 
 			   #endif 
@@ -225,7 +227,7 @@ int main(void)
              
 			  PMW_AllClose_ABC_Channel();
               DelayMs(50);
-              SD315AI_Disable_Output();
+              //SD315AI_Disable_Output();
               GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
               DelayMs(50);
               
