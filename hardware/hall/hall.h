@@ -4,13 +4,7 @@
 #include "fsl_gpio.h"
 #include "fsl_port.h"
 
-#define ENCODER_A_GPIO  GPIOC //PTC1
-#define ENCODER_B_GPIO  GPIOC //PTC2
-#define ENCODER_Z_GPIO  GPIOC //PTC3
 
-#define ENCODER_A_GPIO_PIN	1
-#define ENCODER_B_GPIO_PIN	2
-#define ENCODER_Z_GPIO_PIN	3
 
 
 

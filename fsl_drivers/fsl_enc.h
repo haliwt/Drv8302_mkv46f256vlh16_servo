@@ -384,7 +384,7 @@ uint32_t ENC_GetPositionValue(ENC_Type *base);
  *
  * When any of the counter registers is read, the contents of each counter register is written to the corresponding hold
  * register. Taking a snapshot of the counters' values provides a consistent view of a system position and a velocity to
- * be attained.
+ * be attained. 对计数器进行快照可以提供系统位置和速度的一致视图
  *
  * @param  base ENC peripheral base address.
  *
@@ -409,7 +409,7 @@ static inline uint16_t ENC_GetPositionDifferenceValue(ENC_Type *base)
  *
  * When any of the counter registers is read, the contents of each counter register is written to the corresponding hold
  * register. Taking a snapshot of the counters' values provides a consistent view of a system position and a velocity to
- * be attained.
+ * be attained. 速度（力）
  *
  * @param  base ENC peripheral base address.
  *

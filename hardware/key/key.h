@@ -29,7 +29,6 @@ typedef enum
 #define KEY7_GPIO             		GPIOA
 #define KEY8_GPIO             		GPIOA
 #define KEY9_GPIO             		GPIOE
-//#define AIR_GPIO            		GPIOE
 #define ABC_POWER_GPIO              GPIOE//GPIOC
 
 #define BRAKE_KEY_GPIO_PIN              1//29
@@ -53,8 +52,7 @@ typedef enum
 #define DOOR_KEY          		PAin(2)   //车门按键，
 #define HALL_SWITCH_KEY         PAin(4)   //有无霍尔切换，按键
 #define WHEEL_KEY          		PAin(5)   //车轮探测按键
-#define WIPERS_KEY          	PEin(30)  //雨刷器按键，按一次一档，再按一次二档，再按一下关闭
-//#define AIR_KEY         		PEin(29)  //空调按键，按一次开，再按一次关闭//PAin(13)  
+#define WIPERS_KEY          	PEin(30)  //雨刷器按键，按一次一档，再按一次二档，再按一下关闭  
 #define ABC_POWER_KEY       	PEin(29)
 
 

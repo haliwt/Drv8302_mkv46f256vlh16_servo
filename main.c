@@ -38,6 +38,9 @@
 #include "output.h"
 #include "input.h"
 #include "hall.h"
+#include "encoder.h"
+#include "fsl_xbara.h"
+#include "fsl_enc.h"
 
 /*******************************************************************************
  * Definitions
@@ -45,7 +48,15 @@
 
 
 
+
+volatile uint32_t g_EncIndexCounter = 0U;
+
+
 output_t motor_ref;
+
+/*******************************************************************************
+ * Code
+ ******************************************************************************/
 
 /*******************************************************************************
  *
@@ -58,7 +69,10 @@ int main(void)
 {
 
  
-     
+     enc_config_t mEncConfigStruct;
+     uint32_t mCurPosValue;
+	 uint16_t mCurVelValue;
+	 uint16_t mCurRevValue;
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
      uint8_t printx4[]="key motor run = 0 ^^^^ \r\n";
@@ -66,38 +80,50 @@ int main(void)
      uint8_t ucKeyCode=0;
      uint8_t dir_s =0;
      uint16_t pwm_duty;
+	
  
-
+	XBARA_Init(XBARA);
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
     
-   
+    
     LED_Init();
-    KEY_Init();
-    DelayInit();
-    HALL_Init();
-    ENCODER_Init();
+     KEY_Init();
+     DelayInit();
+     HALL_Init();
+     Encoder_Init();
 
-  
+   
     OUTPUT_Fucntion_Init();
     ADC_CADC_Init();
-    ADC_DMA_Init();
-    ABC_POWER_OUTPUT_Init();
+  
+	
     /* Set the PWM Fault inputs to a low value */
     PWM_BLDC_Init();
-    USART_POLLING_Init();
-     
+  //  USART_POLLING_Init();
+     #if 1  //no interrupt
+    /* Initialize the ENC module. */
+    ENC_GetDefaultConfig(&mEncConfigStruct);
+    ENC_Init(DEMO_ENC_BASEADDR, &mEncConfigStruct);
+    ENC_DoSoftwareLoadInitialPositionValue(DEMO_ENC_BASEADDR); /* Update the position counter with initial value. */
+    #endif
+	
+
    while(1)
    {
 
-          ucKeyCode = KEY_Scan(0);
-          
+       
+        
+           ucKeyCode = KEY_Scan(0);
+
+#if 1
           if(motor_ref.motor_run == 1 )
            {
-   				pwm_duty=80;
+   				pwm_duty=60;
 				GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
-		   // pwm_duty = ADC_DMA_ReadValue();
+                
+               
           
 #ifdef DEBUG_PRINT 
              printf("pwm_duty = %d\r \n",pwm_duty); 
@@ -189,10 +215,22 @@ int main(void)
                  
                  uwStep = HallSensor_GetPinState();
                
-                  HALLSensor_Detected_BLDC(pwm_duty);
-                
+                 HALLSensor_Detected_BLDC(pwm_duty);
+
+				 
+          /* This read operation would capture all the position counter to responding hold registers. */
+        mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+
+        /* Read the position values. */
+        PRINTF("Current position value: %d\r\n", mCurPosValue);
+        PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
+        PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
                   #ifdef DEBUG_PRINT
-			      	printf("uwStep = %d\r \n",uwStep); 
+			     // PRINTF("uwStep = %d\r \n",uwStep); 
+				  PRINTF("Current position value: %d\r\n", mCurPosValue);
+                  PRINTF("Position differential value: %d\r\n",mCurVelValue );
+                  PRINTF("Position revolution value: %d\r\n",mCurRevValue );
+				  PRINTF("......................\r \n"); 
 			   	  #endif 
                  
                 }
@@ -229,6 +267,8 @@ int main(void)
               GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
               DelayMs(50);
               
+		
+              
             
            }
       
@@ -247,7 +287,7 @@ int main(void)
                    
 				   motor_ref.motor_run ++ ;
                    motor_ref.power_on ++ ;
-                   LED3 =1;
+              
                  if(motor_ref.motor_run == 1)
     			  {
                       motor_ref.power_on =1;
@@ -334,6 +374,7 @@ int main(void)
         }
         
 	}
+		#endif 
 
    }
 
@@ -353,7 +394,7 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
     /* Clear external interrupt flag. */
     GPIO_PortClearInterruptFlags(BRAKE_KEY_GPIO, 1U << BRAKE_KEY_GPIO_PIN );
     /* Change state of button. */
-    A_POWER_OUTPUT =0;
+    //A_POWER_OUTPUT =0;
 	motor_ref.abc_numbers = 1;
     motor_ref.motor_run = 0;
     GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
@@ -366,8 +407,22 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
 #endif
 }
 
-
-
+#if 0
+/*!
+ * @brief ISR for INDEX event
+ */
+void ENC_INDEX_IRQHandler(void)
+{
+    g_EncIndexCounter++;
+    ENC_ClearStatusFlags(DEMO_ENC_BASEADDR, kENC_INDEXPulseFlag);
+   // PRINTF("g_en = %d \r\n",g_EncIndexCounter);
+    /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
+      exception return operation might vector to incorrect interrupt */
+#if defined __CORTEX_M && (__CORTEX_M == 4U)
+    __DSB();
+#endif
+}
+#endif 
 
 
 

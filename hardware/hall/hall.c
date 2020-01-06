@@ -7,46 +7,7 @@
 	*
 	*
 ***************************************************/
-void ENCODER_Init(void)
-{
-   gpio_pin_config_t hall_config = {
-	  kGPIO_DigitalInput ,
-	  0,
-    };
 
-   //  port_pin_config_t pd_config;
-	 
-
-   /* Port B Clock Gate Control: Clock enabled */
-    CLOCK_EnableClock(kCLOCK_PortC);
-    
-    /* PORTC is configured as PTC1, */
-     PORT_SetPinMux(PORTC, 1U, kPORT_MuxAsGpio);
-     PORT_SetPinMux(PORTC, 2U, kPORT_MuxAsGpio);
-	 PORT_SetPinMux(PORTC, 3U, kPORT_MuxAsGpio);
-
-	 GPIO_PinInit(ENCODER_A_GPIO, ENCODER_A_GPIO_PIN, &hall_config);
-	 GPIO_PinInit(ENCODER_B_GPIO, ENCODER_B_GPIO_PIN, &hall_config);
-	 GPIO_PinInit(ENCODER_Z_GPIO, ENCODER_Z_GPIO_PIN, &hall_config);
-    #if 0
-	 pd_config.pullSelect =  kPORT_PullUp;//kPORT_PullDisable ;
-	// pd_config.slewRate = kPORT_FastSlewRate ;
-
-
-	 PORT_SetPinConfig(PORTB,1U,&pd_config);
-	 PORT_SetPinConfig(PORTB,2U,&pd_config);
-	 PORT_SetPinConfig(PORTB,3U,&pd_config);
-	 #endif 
-	 #if 0
-     /*GPIO input pullup or pulldown or disable*/
-	 PORT_PinPullConfig(HW_GPIOC, 1, kPORT_PullUp);
-	 PORT_PinPullConfig(HW_GPIOC, 2, kPORT_PullUp);
-	 PORT_PinPullConfig(HW_GPIOC, 3, kPORT_PullUp);
-
-	
-     #endif 
-
-}
 /*************************************************
   * Function Name: void IncPIDInit()
   * Function: PID参数初始化
