@@ -239,7 +239,15 @@ int main(void)
 			    en_t.capture_width =(int16_t)(en_t.captureVal_1- en_t.captureVal_2);
 			    if(en_t.capture_width > 0)
 			    	{
-			    		
+			    		if((en_t.firstPowerOn ==0)||(en_t.firstPowerOn==1))
+			    		{
+							en_t.firstPowerOn ++ ;
+							if(Dir == 0)
+							  en_t.setHome = en_t.capture_width;
+							else
+							 en_t.setEnd = en_t.capture_width;
+						}
+						else
 						en_t.en_add_value =en_t.capture_width;
 						#ifdef DEBUG_PRINT
 						//PRINTF("\r\nWidth= %d \r\n",en_t.en_add_value);
@@ -247,7 +255,16 @@ int main(void)
 			    	}
 			    else
 			    	{
-                         en_t.en_reduce_value =en_t.capture_width;
+						if((en_t.firstPowerOn ==0)||(en_t.firstPowerOn==1))
+			    		{
+							en_t.firstPowerOn ++ ;
+							if(Dir ==0)
+								en_t.setEnd =en_t.capture_width;
+							else
+								en_t.setHome = en_t.capture_width;
+						}
+						else
+						 en_t.en_reduce_value =en_t.capture_width;
 						 
 						 
 						 #ifdef DEBUG_PRINT

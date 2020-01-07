@@ -23,6 +23,11 @@ typedef struct _encoder_t_
   uint16_t mCurVelValue;
   uint16_t mCurRevValue;
 
+  int16_t setHome;
+  int16_t setEnd;
+
+  uint8_t firstPowerOn;
+
 }encoder_t;
 
 #define abs(x)    ((x)>0?(x):-(x))
