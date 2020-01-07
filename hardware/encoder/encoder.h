@@ -10,6 +10,18 @@
 #include "clock_config.h"
 
 
+typedef struct _encoder_t_
+{
+  volatile int16_t  en_add_value;
+  volatile int16_t  en_reduce_value;
+  volatile int16_t  capture_width;
+
+  volatile int16_t captureVal_1;
+  volatile int16_t captureVal_2;
+
+}encoder_t;
+
+
 #define DEMO_ENC_BASEADDR ENC
 #define DEMO_ENC_INDEX_IRQ_ID ENC_INDEX_IRQn
 

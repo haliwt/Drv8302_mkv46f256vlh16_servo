@@ -52,7 +52,9 @@
 volatile uint32_t g_EncIndexCounter = 0U;
 
 
-output_t motor_ref;
+output_t  motor_ref;
+encoder_t en_t;
+
 
 /*******************************************************************************
  * Code
@@ -73,9 +75,8 @@ int main(void)
      uint32_t mCurPosValue;
 	 uint16_t mCurVelValue;
 	 uint16_t mCurRevValue;
-	 int16_t captureVal_1;
-     int16_t captureVal_2;
-     int16_t  capture_width;
+	 
+   
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
      uint8_t printx4[]="key motor run = 0 ^^^^ \r\n";
@@ -229,29 +230,22 @@ int main(void)
 		         // PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
 		      
 
-			   	captureVal_1 = BOARD_FTM_BASEADDR->CONTROLS[BOARD_FTM_INPUT_CAPTURE_CHANNEL_1].CnV-16;
-    			captureVal_2 = BOARD_FTM_BASEADDR->CONTROLS[BOARD_FTM_INPUT_CAPTURE_CHANNEL_2].CnV-16;
-			    PRINTF("\r\nCapture value_1 C(n)V= %d \r\n", captureVal_1);
-			    PRINTF("\r\nCapture value_2 C(n)V= %d \r\n", captureVal_2);
-			    capture_width =(int16_t)(captureVal_1- captureVal_2);
-			    if(capture_width > 0)
+			   	en_t.captureVal_1 = BOARD_FTM_BASEADDR->CONTROLS[BOARD_FTM_INPUT_CAPTURE_CHANNEL_1].CnV-16;
+    			en_t.captureVal_2 = BOARD_FTM_BASEADDR->CONTROLS[BOARD_FTM_INPUT_CAPTURE_CHANNEL_2].CnV-16;
+			    PRINTF("\r\nCapture value_1 C(n)V= %d \r\n", en_t.captureVal_1);
+			    PRINTF("\r\nCapture value_2 C(n)V= %d \r\n", en_t.captureVal_2);
+			    en_t.capture_width =(int16_t)(en_t.captureVal_1- en_t.captureVal_2);
+			    if(en_t.capture_width > 0)
 			    	{
-			    		PRINTF("\r\nWidth= %d \r\n",(int16_t)capture_width);
-						
+			    		
+						en_t.en_add_value =en_t.capture_width;
+						PRINTF("\r\nWidth= %d \r\n",en_t.en_add_value);
 			    	}
 			    else
 			    	{
+                         en_t.en_reduce_value =en_t.capture_width;
+						 PRINTF("\r\nWidth - = %d \r\n",en_t.en_reduce_value);
                          
-						 PRINTF("\r\nWidth - = %d \r\n",(int16_t)capture_width);
-                        
-                         {
-                          // ENC_SetPositionZero(DEMO_ENC_BASEADDR, 0);
-                          // ENC_SetInitialPositionValue(DEMO_ENC_BASEADDR, 0);
-                          //  mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-              
-                          /* Read the position values. */
-                        //  PRINTF("Current position value: %d\r\n", mCurPosValue);
-                         }
 			    	}
 			    
                 
