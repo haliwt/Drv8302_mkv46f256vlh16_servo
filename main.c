@@ -73,6 +73,9 @@ int main(void)
      uint32_t mCurPosValue;
 	 uint16_t mCurVelValue;
 	 uint16_t mCurRevValue;
+	 int16_t captureVal_1;
+     int16_t captureVal_2;
+     int16_t  capture_width;
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
      uint8_t printx4[]="key motor run = 0 ^^^^ \r\n";
@@ -88,11 +91,11 @@ int main(void)
     BOARD_InitDebugConsole();
     
     
-    LED_Init();
+     LED_Init();
      KEY_Init();
      DelayInit();
      HALL_Init();
-     Encoder_Init();
+     Encoder_Input_Init();
 
    
     OUTPUT_Fucntion_Init();
@@ -120,7 +123,7 @@ int main(void)
 #if 1
           if(motor_ref.motor_run == 1 )
            {
-   				pwm_duty=60;
+   				
 				GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
                 
                
@@ -209,30 +212,60 @@ int main(void)
                  }
                 #endif 
                }
-              else 
-              {
+              else {
                   
                  
                  uwStep = HallSensor_GetPinState();
                
                  HALLSensor_Detected_BLDC(pwm_duty);
 
-				 
-          /* This read operation would capture all the position counter to responding hold registers. */
-        mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+				  mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+			
+				        /* Read the position values. */
+				   PRINTF("Current position value: %d\r\n", mCurPosValue);
+				  /* This read operation would capture all the position counter to responding hold registers. */
+		       
+		        PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
+		         // PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
+		      
 
-        /* Read the position values. */
-        PRINTF("Current position value: %d\r\n", mCurPosValue);
-        PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
-        PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
-                  #ifdef DEBUG_PRINT
-			     // PRINTF("uwStep = %d\r \n",uwStep); 
-				  PRINTF("Current position value: %d\r\n", mCurPosValue);
-                  PRINTF("Position differential value: %d\r\n",mCurVelValue );
-                  PRINTF("Position revolution value: %d\r\n",mCurRevValue );
-				  PRINTF("......................\r \n"); 
+			   	captureVal_1 = BOARD_FTM_BASEADDR->CONTROLS[BOARD_FTM_INPUT_CAPTURE_CHANNEL_1].CnV-16;
+    			captureVal_2 = BOARD_FTM_BASEADDR->CONTROLS[BOARD_FTM_INPUT_CAPTURE_CHANNEL_2].CnV-16;
+			    PRINTF("\r\nCapture value_1 C(n)V= %d \r\n", captureVal_1);
+			    PRINTF("\r\nCapture value_2 C(n)V= %d \r\n", captureVal_2);
+			    capture_width =(int16_t)(captureVal_1- captureVal_2);
+			    if(capture_width > 0)
+			    	{
+			    		PRINTF("\r\nWidth= %d \r\n",(int16_t)capture_width);
+						
+			    	}
+			    else
+			    	{
+                         
+						 PRINTF("\r\nWidth - = %d \r\n",(int16_t)capture_width);
+                        
+                         {
+                          // ENC_SetPositionZero(DEMO_ENC_BASEADDR, 0);
+                          // ENC_SetInitialPositionValue(DEMO_ENC_BASEADDR, 0);
+                          //  mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+              
+                          /* Read the position values. */
+                        //  PRINTF("Current position value: %d\r\n", mCurPosValue);
+                         }
+			    	}
+			    
+                
+                
+				 PRINTF("......................\r \n");
+                 pwm_duty=60;
+
+				  #ifdef DEBUG_PRINT
+				     // PRINTF("uwStep = %d\r \n",uwStep); 
+					  PRINTF("Current position value: %d\r\n", mCurPosValue);
+	                  PRINTF("Position differential value: %d\r\n",mCurVelValue );
+	                  PRINTF("Position revolution value: %d\r\n",mCurRevValue );
+					  PRINTF("......................\r \n"); 
 			   	  #endif 
-                 
                 }
              }
           
