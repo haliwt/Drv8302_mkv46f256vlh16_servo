@@ -72,9 +72,7 @@ int main(void)
 
  
      enc_config_t mEncConfigStruct;
-     uint32_t mCurPosValue;
-	 uint16_t mCurVelValue;
-	 uint16_t mCurRevValue;
+   
 	 
    
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
@@ -96,7 +94,7 @@ int main(void)
      KEY_Init();
      DelayInit();
      HALL_Init();
-     Encoder_Input_Init();
+     Capture_Input_Init();
 
    
     OUTPUT_Fucntion_Init();
@@ -219,38 +217,48 @@ int main(void)
                  uwStep = HallSensor_GetPinState();
                
                  HALLSensor_Detected_BLDC(pwm_duty);
-
-				  mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-			
-				        /* Read the position values. */
-				   PRINTF("Current position value: %d\r\n", mCurPosValue);
+				#if 1
+				  en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+				  en_t.mCurVelValue=(int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
+				  
+                  #ifdef DEBUG_PRINT
+				  /* Read the position values. */
+				 PRINTF("Current position value: %d\r\n", mCurPosValue);
 				  /* This read operation would capture all the position counter to responding hold registers. */
 		       
 		        PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
 		         // PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
-		      
-
+		        #endif
+				//start up position
 			   	en_t.captureVal_1 = BOARD_FTM_BASEADDR->CONTROLS[BOARD_FTM_INPUT_CAPTURE_CHANNEL_1].CnV-16;
     			en_t.captureVal_2 = BOARD_FTM_BASEADDR->CONTROLS[BOARD_FTM_INPUT_CAPTURE_CHANNEL_2].CnV-16;
-			    PRINTF("\r\nCapture value_1 C(n)V= %d \r\n", en_t.captureVal_1);
-			    PRINTF("\r\nCapture value_2 C(n)V= %d \r\n", en_t.captureVal_2);
+				#ifdef DEBUG_PRINT
+			   // PRINTF("\r\nCapture value_1 C(n)V= %d \r\n", en_t.captureVal_1);
+			   // PRINTF("\r\nCapture value_2 C(n)V= %d \r\n", en_t.captureVal_2);
+			   #endif 
 			    en_t.capture_width =(int16_t)(en_t.captureVal_1- en_t.captureVal_2);
 			    if(en_t.capture_width > 0)
 			    	{
 			    		
 						en_t.en_add_value =en_t.capture_width;
-						PRINTF("\r\nWidth= %d \r\n",en_t.en_add_value);
+						#ifdef DEBUG_PRINT
+						//PRINTF("\r\nWidth= %d \r\n",en_t.en_add_value);
+						  #endif
 			    	}
 			    else
 			    	{
                          en_t.en_reduce_value =en_t.capture_width;
-						 PRINTF("\r\nWidth - = %d \r\n",en_t.en_reduce_value);
+						 
+						 
+						 #ifdef DEBUG_PRINT
+						// PRINTF("\r\nWidth - = %d \r\n",en_t.en_reduce_value);
+						  #endif
                          
 			    	}
-			    
-                
-                
-				 PRINTF("......................\r \n");
+			     #ifdef DEBUG_PRINT
+                  // PRINTF("......................\r \n");
+                 #endif 
+				 #endif 
                  pwm_duty=60;
 
 				  #ifdef DEBUG_PRINT

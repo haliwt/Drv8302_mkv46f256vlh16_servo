@@ -19,8 +19,13 @@ typedef struct _encoder_t_
   volatile int16_t captureVal_1;
   volatile int16_t captureVal_2;
 
+  uint32_t mCurPosValue;
+  uint16_t mCurVelValue;
+  uint16_t mCurRevValue;
+
 }encoder_t;
 
+#define abs(x)    ((x)>0?(x):-(x))
 
 #define DEMO_ENC_BASEADDR ENC
 #define DEMO_ENC_INDEX_IRQ_ID ENC_INDEX_IRQn
@@ -47,7 +52,7 @@ typedef struct _encoder_t_
 
 
 
-void Encoder_Input_Init(void);
+void Capture_Input_Init(void);
 void ENC_SetPositionZero(ENC_Type *base, uint32_t value);
 
 

@@ -9,7 +9,7 @@
 
 	*
 ************************************************/
-void Encoder_Input_Init(void)
+void Capture_Input_Init(void)
 
 {
 	ftm_config_t ftmInfo;
