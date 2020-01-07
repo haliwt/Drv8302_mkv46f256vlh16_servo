@@ -50,6 +50,7 @@
 
 
 volatile uint32_t g_EncIndexCounter = 0U;
+uint32_t pulseWidth;
 
 
 output_t  motor_ref;
@@ -72,8 +73,8 @@ int main(void)
 
  
      enc_config_t mEncConfigStruct;
-   
-	 
+    
+	
    
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
@@ -82,6 +83,7 @@ int main(void)
      uint8_t ucKeyCode=0;
      uint8_t dir_s =0;
      uint16_t pwm_duty;
+	 uint32_t temp;
 	
  
 	XBARA_Init(XBARA);
@@ -118,7 +120,79 @@ int main(void)
        
         
            ucKeyCode = KEY_Scan(0);
+           en_t.PulseWidth= Capture_ReadPulse_Value();
+           PRINTF("capture_width = %d \r\n",en_t.PulseWidth ); 
+		   PRINTF("setEnd= %d \r\n",temp);
+		   PRINTF("setHome= %d \r\n",temp);
+           
+            if(((en_t.firstPowerOn ==0)||(en_t.firstPowerOn < 3))&&(motor_ref.power_on == 2 ))
+			{
+				PRINTF("--------------------------------------\r\n" ); 	
+				
+								if(Dir == 1)  //顺时针
+								{ 
+								   if((en_t.L_flag ==1)&&(en_t.R_flag == 0))
+								   {
+									      temp = en_t.PulseWidth;
+										en_t.setEnd = temp;
+										PRINTF("setEnd= %d \r\n",temp);
+								   }
+								   else if((en_t.R_flag == 1)&&(en_t.L_flag ==0))
+								   {
+                                         temp = en_t.PulseWidth;
+								       en_t.setHome = temp;
+									   PRINTF("setHome= %d \r\n",temp);
+								   }
+								   else if((en_t.R_flag ==0) &&(en_t.L_flag == 0))
+								   {
+										temp = en_t.PulseWidth;
+									   en_t.R_flag =1;
+								       en_t.setHome = temp;
+									   PRINTF("setHome= %d \r\n",temp);
+								   }
 
+								   en_t.firstPowerOn++;
+									   
+								}
+
+								if(Dir == 0)  //顺时针
+								{ 
+								   if((en_t.R_flag ==1)&&(en_t.L_flag == 0))
+								   {
+										temp = en_t.PulseWidth;
+										en_t.setEnd = temp;
+										PRINTF("setEnd= %d \r\n",temp);
+								   }
+								   else if((en_t.L_flag == 1)&&(en_t.R_flag ==0))
+								   {
+                                       
+										temp = en_t.PulseWidth;
+									   en_t.setHome = temp;
+									   PRINTF("setHome= %d \r\n",temp);
+								   }
+								   else if((en_t.R_flag ==0) &&(en_t.L_flag == 0))
+								   {
+										temp = en_t.PulseWidth;
+									   en_t.L_flag =1;
+								       en_t.setHome = temp;
+									   PRINTF("setHome= %d \r\n",temp);
+								   }
+								   
+								   en_t.firstPowerOn++;
+								   
+								}
+
+								
+							
+							
+							#ifdef DEBUG_PRINT
+							//PRINTF("\r\nWidth= %d \r\n",en_t.en_add_value);
+							  #endif
+			 }
+			
+			
+						
+		     	
 #if 1
           if(motor_ref.motor_run == 1 )
            {
@@ -130,7 +204,7 @@ int main(void)
 #ifdef DEBUG_PRINT 
              printf("pwm_duty = %d\r \n",pwm_duty); 
 #endif 
-               if(motor_ref.power_on == 1)
+              if(motor_ref.power_on == 1)
               {
                    
                    motor_ref.power_on ++;
@@ -211,85 +285,95 @@ int main(void)
                  }
                 #endif 
                }
-              else {
+              else
+			  {
                   
-                 
-                 uwStep = HallSensor_GetPinState();
-               
-                 HALLSensor_Detected_BLDC(pwm_duty);
-				#if 1
-				  en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-				  en_t.mCurVelValue=(int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
-				  
-                  #ifdef DEBUG_PRINT
-				  /* Read the position values. */
-				 PRINTF("Current position value: %d\r\n", mCurPosValue);
-				  /* This read operation would capture all the position counter to responding hold registers. */
-		       
-		        PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
-		         // PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
-		        #endif
-				//start up position
-			   	en_t.captureVal_1 = BOARD_FTM_BASEADDR->CONTROLS[BOARD_FTM_INPUT_CAPTURE_CHANNEL_1].CnV-16;
-    			en_t.captureVal_2 = BOARD_FTM_BASEADDR->CONTROLS[BOARD_FTM_INPUT_CAPTURE_CHANNEL_2].CnV-16;
-				#ifdef DEBUG_PRINT
-			   // PRINTF("\r\nCapture value_1 C(n)V= %d \r\n", en_t.captureVal_1);
-			   // PRINTF("\r\nCapture value_2 C(n)V= %d \r\n", en_t.captureVal_2);
-			   #endif 
-			    en_t.capture_width =(int16_t)(en_t.captureVal_1- en_t.captureVal_2);
-			    if(en_t.capture_width > 0)
-			    	{
-			    		if((en_t.firstPowerOn ==0)||(en_t.firstPowerOn==1))
-			    		{
-							en_t.firstPowerOn ++ ;
-							if(Dir == 0)
-							  en_t.setHome = en_t.capture_width;
-							else
-							 en_t.setEnd = en_t.capture_width;
-						}
-						else
-						en_t.en_add_value =en_t.capture_width;
-						#ifdef DEBUG_PRINT
-						//PRINTF("\r\nWidth= %d \r\n",en_t.en_add_value);
-						  #endif
+	                 uwStep = HallSensor_GetPinState();
+	               
+	                 HALLSensor_Detected_BLDC(pwm_duty);
+					#if 0
+				      en_t.PulseWidth= Capture_ReadPulse_Value();
+				       if((en_t.firstPowerOn ==0)||(en_t.firstPowerOn==1))
+				    	{
+								
+								if(Dir == 1)  //顺时针
+								{ 
+								   if((en_t.L_flag ==1)&&(en_t.R_flag == 0))
+								   {
+										en_t.setEnd = en_t.PulseWidth;
+										PRINTF("setEnd= %d \r\n",en_t.PulseWidth);
+								   }
+								   else if((en_t.R_flag == 1)&&(en_t.L_flag ==0))
+								   {
+                                       
+								       en_t.setHome = en_t.PulseWidth;
+									   PRINTF("setHome= %d \r\n",en_t.PulseWidth);
+								   }
+								   else if((en_t.R_flag ==0) &&(en_t.L_flag == 0))
+								   {
+                                       en_t.R_flag =1;
+								       en_t.setHome = en_t.PulseWidth;
+									   PRINTF("setHome= %d \r\n",en_t.PulseWidth);
+								   }
+
+								   en_t.firstPowerOn++;
+									   
+								}
+								
+						
+							
+							#ifdef DEBUG_PRINT
+							//PRINTF("\r\nWidth= %d \r\n",en_t.en_add_value);
+							  #endif
 			    	}
-			    else
-			    	{
-						if((en_t.firstPowerOn ==0)||(en_t.firstPowerOn==1))
-			    		{
-							en_t.firstPowerOn ++ ;
-							if(Dir ==0)
-								en_t.setEnd =en_t.capture_width;
-							else
-								en_t.setHome = en_t.capture_width;
-						}
-						else
-						 en_t.en_reduce_value =en_t.capture_width;
-						 
-						 
-						 #ifdef DEBUG_PRINT
-						// PRINTF("\r\nWidth - = %d \r\n",en_t.en_reduce_value);
-						  #endif
-                         
-			    	}
-			     #ifdef DEBUG_PRINT
-                  // PRINTF("......................\r \n");
-                 #endif 
-				 #endif 
+			        else 
+					{ // 顺时针
+							if((en_t.firstPowerOn ==0)||(en_t.firstPowerOn==1))
+				    		{
+								
+								if(Dir == 0)  //顺时针
+								{ 
+								   if((en_t.R_flag ==1)&&(en_t.L_flag == 0))
+								   {
+										en_t.setEnd = en_t.PulseWidth;
+										PRINTF("setEnd= %d \r\n",en_t.PulseWidth);
+								   }
+								   else if((en_t.L_flag == 1)&&(en_t.R_flag ==0))
+								   {
+                                       
+								       en_t.setHome = en_t.PulseWidth;
+									   PRINTF("setHome= %d \r\n",en_t.PulseWidth);
+								   }
+								   else if((en_t.R_flag ==0) &&(en_t.L_flag == 0))
+								   {
+                                       en_t.L_flag =1;
+								       en_t.setHome = en_t.PulseWidth;
+									   PRINTF("setHome= %d \r\n",en_t.PulseWidth);
+								   }
+								   
+								   en_t.firstPowerOn++;
+								   
+								}
+								
+							}
+							
+		     		}
+                #endif 
                  pwm_duty=60;
 
-				  #ifdef DEBUG_PRINT
-				     // PRINTF("uwStep = %d\r \n",uwStep); 
-					  PRINTF("Current position value: %d\r\n", mCurPosValue);
-	                  PRINTF("Position differential value: %d\r\n",mCurVelValue );
-	                  PRINTF("Position revolution value: %d\r\n",mCurRevValue );
-					  PRINTF("......................\r \n"); 
-			   	  #endif 
-                }
-             }
-          
+					  #ifdef DEBUG_PRINT
+					     // PRINTF("uwStep = %d\r \n",uwStep); 
+						  PRINTF("Current position value: %d\r\n", mCurPosValue);
+		                  PRINTF("Position differential value: %d\r\n",mCurVelValue );
+		                  PRINTF("Position revolution value: %d\r\n",mCurRevValue );
+						  PRINTF("......................\r \n"); 
+				   	  #endif 
+				 #endif 
+              }
+          }
+         
           else
-          {
+		  {
 
              if(motor_ref.power_on==2||motor_ref.motor_run==1)
              	{
@@ -320,10 +404,9 @@ int main(void)
               DelayMs(50);
               
 		
-              
-            
-           }
-      
+             }
+        
+   
        /*处理接收到的按键功能*/  
 		if(ucKeyCode !=KEY_UP) 
 		{
@@ -360,7 +443,7 @@ int main(void)
 	  			 if(dir_s == 1) //Dir =1 ;  //顺时针旋转
 	   			 {
 
-                        if(motor_ref.power_on ==2)//motor is runing
+                        if((motor_ref.power_on ==2)||(motor_ref.motor_run == 1))//motor is runing
                         {
                             if(motor_ref.Dir_flag == 0)
                             {
@@ -370,6 +453,7 @@ int main(void)
 							  pwm_duty = 5;
 							  uwStep = HallSensor_GetPinState();
 							  HALLSensor_Detected_BLDC(pwm_duty);
+                              GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
                               motor_ref.power_on = 1;
                               motor_ref.Dir_flag =1;
                               Dir =1;
@@ -388,7 +472,7 @@ int main(void)
 			   else // Dir = 0; //逆时针旋转
 			   {
                  dir_s=0;
-                  if(motor_ref.power_on == 2) //motor is runing
+                 if((motor_ref.power_on == 2)||(motor_ref.motor_run == 1)) //motor is runing
                  {
                     if(motor_ref.Dir_flag ==1)
                     {
@@ -399,6 +483,7 @@ int main(void)
 					  pwm_duty = 5;
 					  uwStep = HallSensor_GetPinState();
 					  HALLSensor_Detected_BLDC(pwm_duty);
+                      GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
                       motor_ref.power_on = 1;
                       motor_ref.Dir_flag = 0;
                       Dir =0;
@@ -409,6 +494,7 @@ int main(void)
                   {
                      
                      Dir = 0;
+                    
                      motor_ref.Dir_flag = 0;
                      motor_ref.power_on = 1;
                      
@@ -426,7 +512,7 @@ int main(void)
         }
         
 	}
-		#endif 
+		
 
    }
 

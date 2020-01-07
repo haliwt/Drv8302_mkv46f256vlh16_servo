@@ -95,7 +95,7 @@ void BOARD_InitPins(void)
 
 
 
-    #if 1  //WT.EDIT 20191105
+    #if 0  //WT.EDIT 20191105
     SIM->ADCOPT = ((SIM->ADCOPT &
                     /* Mask bits to zero which are setting */
                     (~(SIM_ADCOPT_ADCACH6SEL_MASK | SIM_ADCOPT_ADCACH7SEL_MASK)))

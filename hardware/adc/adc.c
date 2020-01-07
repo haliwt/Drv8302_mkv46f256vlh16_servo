@@ -302,11 +302,11 @@ uint16_t CADC_Read_ADC_Value(void)
 {
 
          
-      uint16_t pwm_duty=5;
+      uint16_t pwm_duty=0;
        
 
         /* Enable the sample slot. */
-    pwm_duty = CADC_SAMPLE_MASK(0U)    /* For converter A. */
+      pwm_duty =   CADC_SAMPLE_MASK(0U)   /* For converter A. */
                  | CADC_SAMPLE_MASK(1U)  /* For converter A. */
                  | CADC_SAMPLE_MASK(2U)  /* For converter B. */
                  | CADC_SAMPLE_MASK(3U); /* For converter B. */
@@ -328,10 +328,9 @@ uint16_t CADC_Read_ADC_Value(void)
            
             
       //  }
-        pwm_duty = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 3U))/ 330);
-	    if(pwm_duty > 98)
-			pwm_duty = 100;
-        
+       // pwm_duty = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 3U))/ 330);
+			pwm_duty= (int16_t)CADC_GetSampleResultValue(DEMO_CADC_BASEADDR, 2U);
+	   
         CADC_ClearStatusFlags(CADC_BASEADDR, kCADC_ConverterAEndOfScanFlag);//kCADC_ConverterAInProgressFlag
       //  CADC_ClearStatusFlags(CADC_BASEADDR, kCADC_ConverterAInProgressFlag);
        
