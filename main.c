@@ -55,6 +55,8 @@ uint32_t pulseWidth;
 
 output_t  motor_ref;
 encoder_t en_t;
+int16_t setHome;
+int16_t setEnd;
 
 
 /*******************************************************************************
@@ -83,6 +85,7 @@ int main(void)
      uint8_t ucKeyCode=0;
      uint8_t dir_s =0;
      uint16_t pwm_duty;
+	 uint16_t adcr;
     
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -99,11 +102,11 @@ int main(void)
    
     OUTPUT_Fucntion_Init();
     ADC_CADC_Init();
-  
+   
 	
     /* Set the PWM Fault inputs to a low value */
     PWM_BLDC_Init();
-  //  USART_POLLING_Init();
+   // USART_POLLING_Init();
      #if 1  //no interrupt
     /* Initialize the ENC module. */
     ENC_GetDefaultConfig(&mEncConfigStruct);
@@ -114,50 +117,68 @@ int main(void)
 
    while(1)
    {
-      ucKeyCode = KEY_Scan(0);
-	          
-                
+         ucKeyCode = KEY_Scan(0);
+		adcr = CADC_Read_ADC_Value();
+	    PRINTF("ADC: %d\r\n", adcr);
+		 en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+           
+        /* Read the position values. */
+        PRINTF("Current position value: %d\r\n", en_t.mCurPosValue);
+		 if(setHome ==  en_t.mCurPosValue)
+		 	{
+		       PRINTF("setHome is ok \r\n");
+		 	}
+		 else if(setEnd == en_t.mCurPosValue)
+		 	{
+		      PRINTF("setEnd is OK !!!!!!!\r\n");
+		 	}
+
+		
+        /*************************setHome and *********************************/         
         if(((en_t.firstPowerOn ==0)||(en_t.firstPowerOn <4))&&(en_t.en_interrupt_flag == 1 ))
 		{
 			   PRINTF("--------------------------------------\r\n" ); 
 			   en_t.en_interrupt_flag=0;
 			   en_t.firstPowerOn++;
 			   en_t.PulseWidth= Capture_ReadPulse_Value();
-	           PRINTF("capture_width = %d \r\n",en_t.PulseWidth ); 
+	           PRINTF("step_ = %d \r\n",en_t.mCurPosValue); 
 			   
 			   PRINTF("firstOn= %d \r\n",en_t.firstPowerOn);
 				
 			   if(en_t.firstPowerOn ==2)
 			   	{
-				   en_t.setHome = en_t.PulseWidth;
-				   PRINTF("setHome= %d \r\n",en_t.PulseWidth);
+				   //setHome = en_t.PulseWidth;
+				   setHome = en_t.mCurPosValue;
+				   PRINTF("setHome= %d \r\n",en_t.mCurPosValue);
 								  
 			   	}
 			    if(en_t.firstPowerOn ==3)
 			   {
 
-				   en_t.setEnd = en_t.PulseWidth;
-				   PRINTF("setEnd= %d \r\n",en_t.PulseWidth);
+				   setEnd = en_t.mCurPosValue;
+				   PRINTF("setEnd= %d \r\n",en_t.mCurPosValue);
 			   }
 			  
-			   PRINTF("setHome= %d \r\n",en_t.setHome);
-			   PRINTF("setEnd= %d \r\n",en_t.setEnd);
+			   PRINTF("setHome= %d \r\n",setHome);
+			   PRINTF("setEnd= %d \r\n",setEnd);
 								
 		}
-          
-      #if 1
-      if(motor_ref.motor_run == 1 )
+       /*******************************************************************************/  
+     
+      if(motor_ref.motor_run == 1)
       {
    				
-			   GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
+			        GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
+					  
+				
 			  
-          
+             pwm_duty=60;
 	#ifdef DEBUG_PRINT 
              printf("pwm_duty = %d\r \n",pwm_duty); 
 	#endif 
               if(motor_ref.power_on == 1)
               {
-                   
+                   motor_ref.en_on=0;
                    motor_ref.power_on ++;
                   
 	#ifdef IRFP4768PbF
@@ -236,12 +257,12 @@ int main(void)
               else
 			  {
                   
-	                 uwStep = HallSensor_GetPinState();
+                     
+					 uwStep = HallSensor_GetPinState();
 	               
 	                 HALLSensor_Detected_BLDC(pwm_duty);
 					
-                 pwm_duty=60;
-
+                     
 					  #ifdef DEBUG_PRINT
 					     // PRINTF("uwStep = %d\r \n",uwStep); 
 						  PRINTF("Current position value: %d\r\n", mCurPosValue);
@@ -251,8 +272,8 @@ int main(void)
 				   	  #endif 
 				  
               }
-          }/*end if motor_ref.motor_run == 1*/
-         
+           }/*end if motor_ref.motor_run == 1*/
+          
           else
 		  {
 
@@ -285,7 +306,7 @@ int main(void)
               DelayMs(50);
               
 		
-             }
+            }
         
    
        /*处理接收到的按键功能*/  
@@ -303,7 +324,7 @@ int main(void)
                    
 				   motor_ref.motor_run ++ ;
                    motor_ref.power_on ++ ;
-              
+                   en_t.setStop_flag = 0;
                  if(motor_ref.motor_run == 1)
     			  {
                       motor_ref.power_on =1;
@@ -321,6 +342,7 @@ int main(void)
 				 case DIR_PRES: //3
 
 			       dir_s ++ ;
+                   en_t.setStop_flag = 0;
 	  			 if(dir_s == 1) //Dir =1 ;  //顺时针旋转
 	   			 {
 
@@ -334,7 +356,7 @@ int main(void)
 							  pwm_duty = 5;
 							  uwStep = HallSensor_GetPinState();
 							  HALLSensor_Detected_BLDC(pwm_duty);
-                              
+                            
                               motor_ref.power_on = 1;
                               motor_ref.Dir_flag =1;
                               Dir =1;
@@ -346,6 +368,7 @@ int main(void)
                           Dir=1;
                           motor_ref.Dir_flag =1;
                           motor_ref.power_on = 1;
+						
                         
                         }
                          UART_WriteBlocking(DEMO_UART, printx1, sizeof(printx1) - 1);
@@ -393,10 +416,8 @@ int main(void)
         }
         
 	   }
-		
-     #endif 
-   }
 
+   }//end while(1)
 }
 /******************************************************************************
  *
@@ -442,8 +463,38 @@ void ENC_INDEX_IRQHandler(void)
 #endif
 }
 #endif 
-
-
+#if 0
+void FTM_INPUT_CAPTURE_HANDLER(void)
+{
+    if ((FTM_GetStatusFlags(DEMO_FTM_BASEADDR) & kFTM_TimeOverflowFlag) == kFTM_TimeOverflowFlag)
+    {
+        /* Clear overflow interrupt flag.*/
+        FTM_ClearStatusFlags(DEMO_FTM_BASEADDR, kFTM_TimeOverflowFlag);
+        g_timerOverflowInterruptCount++;
+    }
+    else if (((FTM_GetStatusFlags(DEMO_FTM_BASEADDR) & FTM_FIRST_CHANNEL_FLAG) == FTM_FIRST_CHANNEL_FLAG) &&
+             (ftmFirstChannelInterruptFlag == false))
+    {
+        /* Disable first channel interrupt.*/
+        FTM_DisableInterrupts(DEMO_FTM_BASEADDR, FTM_FIRST_CHANNEL_INTERRUPT_ENABLE);
+        g_firstChannelOverflowCount  = g_timerOverflowInterruptCount;
+        ftmFirstChannelInterruptFlag = true;
+    }
+    else if ((FTM_GetStatusFlags(DEMO_FTM_BASEADDR) & FTM_SECOND_CHANNEL_FLAG) == FTM_SECOND_CHANNEL_FLAG)
+    {
+        /* Clear second channel interrupt flag.*/
+        FTM_ClearStatusFlags(DEMO_FTM_BASEADDR, FTM_SECOND_CHANNEL_FLAG);
+        /* Disable second channel interrupt.*/
+        FTM_DisableInterrupts(DEMO_FTM_BASEADDR, FTM_SECOND_CHANNEL_INTERRUPT_ENABLE);
+        g_secondChannelOverflowCount  = g_timerOverflowInterruptCount;
+        ftmSecondChannelInterruptFlag = true;
+    }
+    else
+    {
+    }
+    __DSB();
+}
+#endif 
 
 /*******************************************************************************************/
 

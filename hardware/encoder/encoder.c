@@ -1,6 +1,7 @@
 #include "encoder.h"
 
 
+encoder_t encap_t;
 
 /***********************************************
 	*
@@ -14,6 +15,8 @@ void Capture_Input_Init(void)
 {
 
 	ftm_config_t ftmInfo;
+	
+		   ftm_dual_edge_capture_param_t edgeParam;
 
 
     /* Port E Clock Gate Control: Clock enabled */
@@ -30,11 +33,14 @@ void Capture_Input_Init(void)
 	FTM_GetDefaultConfig(&ftmInfo);
     /* Initialize FTM module */
     FTM_Init(DEMO_FTM_BASEADDR, &ftmInfo);
-    //edgeParam.mode = kFTM_OneShot;
-   //  edgeParam.mode=kFTM_Continuous;
-    /* Set capture edges to calculate the pulse width of input signal */
-   // edgeParam.currChanEdgeMode = kFTM_RisingEdge;
-   // edgeParam.nextChanEdgeMode = kFTM_FallingEdge;
+    
+        edgeParam.mode=kFTM_Continuous;
+        edgeParam.currChanEdgeMode = kFTM_RisingEdge;
+        edgeParam.nextChanEdgeMode = kFTM_FallingEdge;
+       /* Setup dual-edge capture on a FTM channel pair */
+		FTM_SetupDualEdgeCapture(DEMO_FTM_BASEADDR, BOARD_FTM_INPUT_CAPTURE_CHANNEL_PAIR, &edgeParam, 0);
+
+	
 
   
 }
@@ -48,31 +54,24 @@ void Capture_Input_Init(void)
 uint16_t Capture_ReadPulse_Value(void)
 {
 		
-		volatile uint32_t g_firstChannelOverflowCount   = 0u;
-        volatile uint32_t g_secondChannelOverflowCount  = 0u;
+		 volatile uint32_t g_firstChannelOverflowCount	 = 0u;
+		 volatile uint32_t g_secondChannelOverflowCount  = 0u;
 
-		 ftm_dual_edge_capture_param_t edgeParam;
+		
 		 uint32_t capture1Val;
          uint32_t capture2Val;
 
-        uint32_t pulseWidth;
-
-		 
-        edgeParam.mode=kFTM_Continuous;
-        edgeParam.currChanEdgeMode = kFTM_RisingEdge;
-        edgeParam.nextChanEdgeMode = kFTM_FallingEdge;
-       /* Setup dual-edge capture on a FTM channel pair */
-		FTM_SetupDualEdgeCapture(DEMO_FTM_BASEADDR, BOARD_FTM_INPUT_CAPTURE_CHANNEL_PAIR, &edgeParam, 0);
+      
+		uint32_t pulseWidth;
+       
 	
-		/* Set the timer to be in free-running mode */
-		DEMO_FTM_BASEADDR->MOD = 0xFFFF;
+		  /* Set the timer to be in free-running mode */
+		  DEMO_FTM_BASEADDR->MOD = 0xFFFF;
 		  FTM_StartTimer(DEMO_FTM_BASEADDR, kFTM_SystemClock);
 	
-	
-		  
-		
-		  capture1Val = DEMO_FTM_BASEADDR->CONTROLS[BOARD_FTM_INPUT_CAPTURE_CHANNEL_PAIR * 2].CnV;
+	      capture1Val = DEMO_FTM_BASEADDR->CONTROLS[BOARD_FTM_INPUT_CAPTURE_CHANNEL_PAIR * 2].CnV;
 		  capture2Val = DEMO_FTM_BASEADDR->CONTROLS[(BOARD_FTM_INPUT_CAPTURE_CHANNEL_PAIR * 2) + 1].CnV;
+		 
 		//  PRINTF("\r\nCapture value C(n)V=%x\r\n", capture1Val);
 		//  PRINTF("\r\nCapture value C(n+1)V=%x\r\n", capture2Val);
 	
@@ -80,26 +79,11 @@ uint16_t Capture_ReadPulse_Value(void)
 		   * divided by 1000000 as the output is printed in microseconds
 		   */
 		  pulseWidth =
-			  (((g_secondChannelOverflowCount - g_firstChannelOverflowCount) * 65536 + capture2Val - capture1Val) + 1) /
-			  (FTM_SOURCE_CLOCK / 1000000);
-		  
-		 
-			
-		  if(pulseWidth > 31100000)
-		  {
-			//pulseWidth =
-			  //(((g_secondChannelOverflowCount - g_firstChannelOverflowCount) * 65536 + capture2Val - capture1Val) + 1) /
-			 // (FTM_SOURCE_CLOCK); 
-			  pulseWidth=0xff;
-			  //PRINTF("\r\nInput signals pulse width=%d us\r\n", pulseWidth);
-			   return pulseWidth;
-		  }
-		  else 
-	       return pulseWidth;
-		  //PRINTF("\r\nInput signals pulse width=%d us\r\n", pulseWidth);
-		  
-	   
-		}
+			 (int32_t)(((g_secondChannelOverflowCount - g_firstChannelOverflowCount) * 65536 + capture2Val - capture1Val) + 1) /
+			 (FTM_SOURCE_CLOCK / 1000000);
+
+	   return pulseWidth;
+	}
 	
 
 

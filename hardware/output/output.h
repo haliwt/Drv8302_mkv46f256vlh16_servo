@@ -49,6 +49,7 @@ typedef struct _output_t_
    uint8_t power_on ;
    uint8_t abc_numbers;
    uint8_t Dir_flag;
+   uint8_t en_on;
 
   
 

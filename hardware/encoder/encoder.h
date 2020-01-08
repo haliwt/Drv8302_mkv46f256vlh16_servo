@@ -26,8 +26,7 @@ typedef struct _encoder_t_
    uint16_t mCurRevValue;
   
 
-  int16_t setHome;
-  int16_t setEnd;
+  
 
   uint8_t arr[2];
 
@@ -38,8 +37,9 @@ typedef struct _encoder_t_
   uint8_t L_flag;
   uint8_t R_flag;
   uint8_t en_interrupt_flag;
+  uint8_t setStop_flag;
 
-  }encoder_t;
+ }encoder_t;
 
 #define abs(x)    ((x)>0?(x):-(x))
 
@@ -68,12 +68,8 @@ typedef struct _encoder_t_
 /* Get source clock for FTM driver */
 #define FTM_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_FastPeriphClk)
 
-//volatile bool ftmFirstChannelInterruptFlag  = false;
-//volatile bool ftmSecondChannelInterruptFlag = false;
-/* Record FTM TOF interrupt times */
-//volatile uint32_t g_timerOverflowInterruptCount = 0u;
-//volatile uint32_t g_firstChannelOverflowCount   = 0u;
-//volatile uint32_t g_secondChannelOverflowCount  = 0u;
+extern int16_t setHome;
+extern int16_t setEnd;
 
 
   
