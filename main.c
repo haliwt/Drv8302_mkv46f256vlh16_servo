@@ -118,12 +118,45 @@ int main(void)
    while(1)
    {
          ucKeyCode = KEY_Scan(0);
-		adcr = CADC_Read_ADC_Value();
-	    PRINTF("ADC: %d\r\n", adcr);
-		 en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+		//adcr = CADC_Read_ADC_Value();
+	   // PRINTF("ADC: %d\r\n", adcr);
+	    en_t.capture_width =Capture_ReadPulse_Value();
+		 PRINTF("Cpw = %d\r\n", en_t.capture_width);
+		
+		
+		//en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+		/* Read the position values. */
+        //PRINTF("Current position value: %d\r\n", en_t.mCurPosValue);
+      
+	   if(((en_t.firstPowerOn ==0)||(en_t.firstPowerOn <4))&&(en_t.en_interrupt_flag == 1 ))
+		{
+			   PRINTF("--------------------------------------\r\n" ); 
+			   en_t.en_interrupt_flag=0;
+			   en_t.firstPowerOn++;
+			   en_t.PulseWidth= Capture_ReadPulse_Value();
+	           PRINTF("capture_width = %d \r\n",en_t.PulseWidth ); 
+			   
+			   PRINTF("firstOn= %d \r\n",en_t.firstPowerOn);
+				
+			   if(en_t.firstPowerOn ==2)
+			   	{
+				   setHome = en_t.PulseWidth;
+				   PRINTF("setHome= %d \r\n",en_t.PulseWidth);
+								  
+			   	}
+			    if(en_t.firstPowerOn ==3)
+			   {
+
+				   setEnd = en_t.PulseWidth;
+				   PRINTF("setEnd= %d \r\n",en_t.PulseWidth);
+			   }
+			  
+			   PRINTF("setHome= %d \r\n",setHome);
+			   PRINTF("setEnd= %d \r\n",setEnd);
+								
+		}
            
-        /* Read the position values. */
-        PRINTF("Current position value: %d\r\n", en_t.mCurPosValue);
+      
 		 if(setHome ==  en_t.mCurPosValue)
 		 	{
 		       PRINTF("setHome is ok \r\n");
