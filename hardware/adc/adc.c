@@ -301,16 +301,16 @@ void ADC_CADC_Init(void)
 uint16_t CADC_Read_ADC_Value(void)
 {
 
-         
+      uint16_t sampleMask =0;   
       uint16_t pwm_duty;
 
         /* Enable the sample slot. */
-    pwm_duty = CADC_SAMPLE_MASK(0U)    /* For converter A. */
+    sampleMask = CADC_SAMPLE_MASK(0U)    /* For converter A. */
                  | CADC_SAMPLE_MASK(1U)  /* For converter A. */
                  | CADC_SAMPLE_MASK(2U)  /* For converter A. */
                  | CADC_SAMPLE_MASK(3U);  /* For converter A. */
-    CADC_EnableSample(CADC_BASEADDR, pwm_duty, true);
-    CADC_EnableSample(CADC_BASEADDR, (uint16_t)(~pwm_duty), false); /* Disable other sample slot. */
+    CADC_EnableSample(CADC_BASEADDR, sampleMask, true);
+    CADC_EnableSample(CADC_BASEADDR, (uint16_t)(~sampleMask), false); /* Disable other sample slot. */
        CADC_DoSoftwareTriggerConverter(CADC_BASEADDR, kCADC_ConverterA);
 
 	  /* Wait the conversion to be done. */
@@ -319,16 +319,15 @@ uint16_t CADC_Read_ADC_Value(void)
         {
         }
        /* Read the result value. */
-       // if (pwm_duty == (pwm_duty & CADC_GetSampleReadyStatusFlags(CADC_BASEADDR)))
-       // {
+        if (sampleMask == (sampleMask& CADC_GetSampleReadyStatusFlags(CADC_BASEADDR)))
+       {
 
-         //   PRINTF("PWM_Duty2 = %d\r\n",(uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 0U))/ 330));
-          //  PRINTF("PWM_Duty3 = %d\r\n",(uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 1U))/ 330));
-           
+         
+            pwm_duty = (uint16_t)(CADC_GetSampleResultValue(CADC_BASEADDR, 3U));//ADCA_CH2-9PIN
             
-      //  }
+        }
       //  pwm_duty = (uint16_t)((CADC_GetSampleResultValue(CADC_BASEADDR, 3U))/ 330);//ADCA_CH2-9PIN
-        pwm_duty = (uint16_t)(CADC_GetSampleResultValue(CADC_BASEADDR, 3U));//ADCA_CH2-9PIN
+       
 	   
         
         CADC_ClearStatusFlags(CADC_BASEADDR, kCADC_ConverterAEndOfScanFlag);//kCADC_ConverterAInProgressFlag
