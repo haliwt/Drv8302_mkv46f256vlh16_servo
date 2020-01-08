@@ -121,6 +121,8 @@ int main(void)
          ucKeyCode = KEY_Scan(0);
 		//adcr = CADC_Read_ADC_Value();
 	   // PRINTF("ADC: %d\r\n", adcr);
+          PRINTF("setHome= %d \r\n",setHome);
+		  PRINTF("setEnd= %d \r\n",setEnd);
 	     en_t.capture_width =Capture_ReadPulse_Value();
 		 PRINTF("Cpw = %d\r\n", en_t.capture_width);
 		
@@ -155,8 +157,8 @@ int main(void)
 								
 		}
            
-      
-		 if(setHome  ==  en_t.capture_width)
+     /******************************************************************************/ 
+		 if((setHome  ==  en_t.capture_width)||(setEnd == en_t.capture_width))
 		 {
                if(Dir == 1)
                {
@@ -174,8 +176,9 @@ int main(void)
 			   }
 			   else
 			   	{
-			       PRINTF("setHome is ok \r\n");
-				   PRINTF("setHome = %d \r\n",setHome);
+			       PRINTF("Home or END is ok \r\n");
+				   PRINTF("Home = %d \r\n",setHome);
+                   PRINTF("END  = %d \r\n",setEnd);
 				   pwm_duty = 20;
 				  uwStep = HallSensor_GetPinState();
 	              HALLSensor_Detected_BLDC(pwm_duty);
@@ -194,45 +197,9 @@ int main(void)
 				   i=0;
 			   	}
 		 }
-		 else if(setEnd == en_t.capture_width)
-		 {
-			  if(Dir == 1)
-               {
-					if((setHome == en_t.capture_width)||(setEnd ==en_t.capture_width))
-					PRINTF("Repeat****************\r\n");
-			   }
-			   else if((Dir==0)&&(i==0)) //ÄæÊ±ÕëÐý×ª
-			   {
-                
-				 if((setHome == en_t.capture_width)||(setEnd ==en_t.capture_width))
-				 	{
-					   i++;
-					   PRINTF("****************Repeat\r\n");
-				 	}
-			   }
-			  else
-			  	{
-			      PRINTF("setEnd is OK *********\r\n");
-                   PRINTF("setEnd = %d \r\n",setEnd);
-				   pwm_duty = 20;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC(pwm_duty);
-				  DelayMs(50);
-                  
-                  pwm_duty = 10;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC(pwm_duty);
-				  DelayMs(50);
-				 
-				  pwm_duty = 5;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC(pwm_duty);
-				  DelayMs(50);
-				   PMW_AllClose_ABC_Channel();
-			  	}
-		 }
-
 		
+
+		/************************************************************************************/
         
      
       if(motor_ref.motor_run == 1)
