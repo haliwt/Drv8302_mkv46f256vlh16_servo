@@ -83,10 +83,8 @@ int main(void)
      uint8_t ucKeyCode=0;
      uint8_t dir_s =0;
      uint16_t pwm_duty;
-	 uint32_t temp;
-	
- 
-	XBARA_Init(XBARA);
+    
+    XBARA_Init(XBARA);
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
@@ -116,100 +114,53 @@ int main(void)
 
    while(1)
    {
-
-       
-        
-           ucKeyCode = KEY_Scan(0);
-           en_t.PulseWidth= Capture_ReadPulse_Value();
-           PRINTF("capture_width = %d \r\n",en_t.PulseWidth ); 
-		   PRINTF("setEnd= %d \r\n",temp);
-		   PRINTF("setHome= %d \r\n",temp);
-           
-            if(((en_t.firstPowerOn ==0)||(en_t.firstPowerOn < 3))&&(motor_ref.power_on == 2 ))
-			{
-				PRINTF("--------------------------------------\r\n" ); 	
-				
-								if(Dir == 1)  //Ë³Ê±Õë
-								{ 
-								   if((en_t.L_flag ==1)&&(en_t.R_flag == 0))
-								   {
-									      temp = en_t.PulseWidth;
-										en_t.setEnd = temp;
-										PRINTF("setEnd= %d \r\n",temp);
-								   }
-								   else if((en_t.R_flag == 1)&&(en_t.L_flag ==0))
-								   {
-                                         temp = en_t.PulseWidth;
-								       en_t.setHome = temp;
-									   PRINTF("setHome= %d \r\n",temp);
-								   }
-								   else if((en_t.R_flag ==0) &&(en_t.L_flag == 0))
-								   {
-										temp = en_t.PulseWidth;
-									   en_t.R_flag =1;
-								       en_t.setHome = temp;
-									   PRINTF("setHome= %d \r\n",temp);
-								   }
-
-								   en_t.firstPowerOn++;
-									   
-								}
-
-								if(Dir == 0)  //Ë³Ê±Õë
-								{ 
-								   if((en_t.R_flag ==1)&&(en_t.L_flag == 0))
-								   {
-										temp = en_t.PulseWidth;
-										en_t.setEnd = temp;
-										PRINTF("setEnd= %d \r\n",temp);
-								   }
-								   else if((en_t.L_flag == 1)&&(en_t.R_flag ==0))
-								   {
-                                       
-										temp = en_t.PulseWidth;
-									   en_t.setHome = temp;
-									   PRINTF("setHome= %d \r\n",temp);
-								   }
-								   else if((en_t.R_flag ==0) &&(en_t.L_flag == 0))
-								   {
-										temp = en_t.PulseWidth;
-									   en_t.L_flag =1;
-								       en_t.setHome = temp;
-									   PRINTF("setHome= %d \r\n",temp);
-								   }
-								   
-								   en_t.firstPowerOn++;
-								   
-								}
-
-								
-							
-							
-							#ifdef DEBUG_PRINT
-							//PRINTF("\r\nWidth= %d \r\n",en_t.en_add_value);
-							  #endif
-			 }
-			
-			
-						
-		     	
-#if 1
-          if(motor_ref.motor_run == 1 )
-           {
-   				
-				GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
+      ucKeyCode = KEY_Scan(0);
+	          
                 
-               
+        if(((en_t.firstPowerOn ==0)||(en_t.firstPowerOn <4))&&(en_t.en_interrupt_flag == 1 ))
+		{
+			   PRINTF("--------------------------------------\r\n" ); 
+			   en_t.en_interrupt_flag=0;
+			   en_t.firstPowerOn++;
+			   en_t.PulseWidth= Capture_ReadPulse_Value();
+	           PRINTF("capture_width = %d \r\n",en_t.PulseWidth ); 
+			   
+			   PRINTF("firstOn= %d \r\n",en_t.firstPowerOn);
+				
+			   if(en_t.firstPowerOn ==2)
+			   	{
+				   en_t.setHome = en_t.PulseWidth;
+				   PRINTF("setHome= %d \r\n",en_t.PulseWidth);
+								  
+			   	}
+			    if(en_t.firstPowerOn ==3)
+			   {
+
+				   en_t.setEnd = en_t.PulseWidth;
+				   PRINTF("setEnd= %d \r\n",en_t.PulseWidth);
+			   }
+			  
+			   PRINTF("setHome= %d \r\n",en_t.setHome);
+			   PRINTF("setEnd= %d \r\n",en_t.setEnd);
+								
+		}
           
-#ifdef DEBUG_PRINT 
+      #if 0
+      if(motor_ref.motor_run == 1 )
+      {
+   				
+			   GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
+			  
+          
+	#ifdef DEBUG_PRINT 
              printf("pwm_duty = %d\r \n",pwm_duty); 
-#endif 
+	#endif 
               if(motor_ref.power_on == 1)
               {
                    
                    motor_ref.power_on ++;
                   
-#ifdef IRFP4768PbF
+	#ifdef IRFP4768PbF
                    printf("************************************************************\r \n");
                    if(Dir==0)  
                    {
@@ -249,10 +200,7 @@ int main(void)
                  }
                  else //CW 
                  {
-
-                    
-
-                    uwStep = HallSensor_GetPinState();
+					uwStep = HallSensor_GetPinState();
                         switch(uwStep)
                         {
                         case 5 :
@@ -368,7 +316,7 @@ int main(void)
 		                  PRINTF("Position revolution value: %d\r\n",mCurRevValue );
 						  PRINTF("......................\r \n"); 
 				   	  #endif 
-				 #endif 
+				  
               }
           }
          
@@ -418,7 +366,7 @@ int main(void)
                       
 				  	break;
         		
-                  case START_PRES:
+                 case START_PRES:
                    
 				   motor_ref.motor_run ++ ;
                    motor_ref.power_on ++ ;
@@ -453,7 +401,7 @@ int main(void)
 							  pwm_duty = 5;
 							  uwStep = HallSensor_GetPinState();
 							  HALLSensor_Detected_BLDC(pwm_duty);
-                              GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
+                              
                               motor_ref.power_on = 1;
                               motor_ref.Dir_flag =1;
                               Dir =1;
@@ -483,7 +431,7 @@ int main(void)
 					  pwm_duty = 5;
 					  uwStep = HallSensor_GetPinState();
 					  HALLSensor_Detected_BLDC(pwm_duty);
-                      GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
+                     
                       motor_ref.power_on = 1;
                       motor_ref.Dir_flag = 0;
                       Dir =0;
@@ -511,9 +459,9 @@ int main(void)
 			
         }
         
-	}
+	   }
 		
-
+     #endif 
    }
 
 }
@@ -532,8 +480,8 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
     /* Clear external interrupt flag. */
     GPIO_PortClearInterruptFlags(BRAKE_KEY_GPIO, 1U << BRAKE_KEY_GPIO_PIN );
     /* Change state of button. */
-    //A_POWER_OUTPUT =0;
-	motor_ref.abc_numbers = 1;
+   
+	en_t.en_interrupt_flag=1;
     motor_ref.motor_run = 0;
     GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
 	PRINTF("interrupte has happed  \r\n");

@@ -29,12 +29,15 @@ typedef struct _encoder_t_
   int16_t setHome;
   int16_t setEnd;
 
+  uint8_t arr[2];
+
   uint8_t firstPowerOn;
 
   uint32_t PulseWidth;
 
   uint8_t L_flag;
   uint8_t R_flag;
+  uint8_t en_interrupt_flag;
 
   }encoder_t;
 
