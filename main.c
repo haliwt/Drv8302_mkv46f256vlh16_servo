@@ -145,7 +145,7 @@ int main(void)
 								
 		}
           
-      #if 0
+      #if 1
       if(motor_ref.motor_run == 1 )
       {
    				
@@ -239,74 +239,7 @@ int main(void)
 	                 uwStep = HallSensor_GetPinState();
 	               
 	                 HALLSensor_Detected_BLDC(pwm_duty);
-					#if 0
-				      en_t.PulseWidth= Capture_ReadPulse_Value();
-				       if((en_t.firstPowerOn ==0)||(en_t.firstPowerOn==1))
-				    	{
-								
-								if(Dir == 1)  //À≥ ±’Î
-								{ 
-								   if((en_t.L_flag ==1)&&(en_t.R_flag == 0))
-								   {
-										en_t.setEnd = en_t.PulseWidth;
-										PRINTF("setEnd= %d \r\n",en_t.PulseWidth);
-								   }
-								   else if((en_t.R_flag == 1)&&(en_t.L_flag ==0))
-								   {
-                                       
-								       en_t.setHome = en_t.PulseWidth;
-									   PRINTF("setHome= %d \r\n",en_t.PulseWidth);
-								   }
-								   else if((en_t.R_flag ==0) &&(en_t.L_flag == 0))
-								   {
-                                       en_t.R_flag =1;
-								       en_t.setHome = en_t.PulseWidth;
-									   PRINTF("setHome= %d \r\n",en_t.PulseWidth);
-								   }
-
-								   en_t.firstPowerOn++;
-									   
-								}
-								
-						
-							
-							#ifdef DEBUG_PRINT
-							//PRINTF("\r\nWidth= %d \r\n",en_t.en_add_value);
-							  #endif
-			    	}
-			        else 
-					{ // À≥ ±’Î
-							if((en_t.firstPowerOn ==0)||(en_t.firstPowerOn==1))
-				    		{
-								
-								if(Dir == 0)  //À≥ ±’Î
-								{ 
-								   if((en_t.R_flag ==1)&&(en_t.L_flag == 0))
-								   {
-										en_t.setEnd = en_t.PulseWidth;
-										PRINTF("setEnd= %d \r\n",en_t.PulseWidth);
-								   }
-								   else if((en_t.L_flag == 1)&&(en_t.R_flag ==0))
-								   {
-                                       
-								       en_t.setHome = en_t.PulseWidth;
-									   PRINTF("setHome= %d \r\n",en_t.PulseWidth);
-								   }
-								   else if((en_t.R_flag ==0) &&(en_t.L_flag == 0))
-								   {
-                                       en_t.L_flag =1;
-								       en_t.setHome = en_t.PulseWidth;
-									   PRINTF("setHome= %d \r\n",en_t.PulseWidth);
-								   }
-								   
-								   en_t.firstPowerOn++;
-								   
-								}
-								
-							}
-							
-		     		}
-                #endif 
+					
                  pwm_duty=60;
 
 					  #ifdef DEBUG_PRINT
@@ -318,7 +251,7 @@ int main(void)
 				   	  #endif 
 				  
               }
-          }
+          }/*end if motor_ref.motor_run == 1*/
          
           else
 		  {
