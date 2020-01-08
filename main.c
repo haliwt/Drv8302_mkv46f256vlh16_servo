@@ -55,8 +55,8 @@ uint32_t pulseWidth;
 
 output_t  motor_ref;
 encoder_t en_t;
-int16_t setHome;
-int16_t setEnd;
+int16_t setHome=0xffff;
+int16_t setEnd=0xffff;
 
 
 /*******************************************************************************
@@ -120,7 +120,7 @@ int main(void)
          ucKeyCode = KEY_Scan(0);
 		//adcr = CADC_Read_ADC_Value();
 	   // PRINTF("ADC: %d\r\n", adcr);
-	    en_t.capture_width =Capture_ReadPulse_Value();
+	     en_t.capture_width =Capture_ReadPulse_Value();
 		 PRINTF("Cpw = %d\r\n", en_t.capture_width);
 		
 		
@@ -157,14 +157,62 @@ int main(void)
 		}
            
       
-		 if(setHome ==  en_t.mCurPosValue)
-		 	{
-		       PRINTF("setHome is ok \r\n");
-		 	}
-		 else if(setEnd == en_t.mCurPosValue)
-		 	{
-		      PRINTF("setEnd is OK !!!!!!!\r\n");
-		 	}
+		 if(setHome  ==  en_t.capture_width)
+		 {
+               if(Dir == 1)
+               {
+					setHome == setEnd;
+					PRINTF("!!!!!!!Repeat\r\n");
+			   }
+			   else
+			   	{
+			       PRINTF("setHome is ok \r\n");
+				   PRINTF("setHome = %d \r\n",setHome);
+				   pwm_duty = 20;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+                  
+                  pwm_duty = 10;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+				 
+				  pwm_duty = 5;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+				   PMW_AllClose_ABC_Channel();
+			   	}
+		 }
+		 else if(setEnd == en_t.capture_width)
+		 {
+			  if(Dir ==1)
+			  {
+				 setEnd = setHome;
+				 PRINTF("Repeat!!!!!!!\r\n");
+			  }
+			  else
+			  	{
+			      PRINTF("setEnd is OK !!!!!!!\r\n");
+                   PRINTF("setEnd = %d \r\n",setEnd);
+				   pwm_duty = 20;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+                  
+                  pwm_duty = 10;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+				 
+				  pwm_duty = 5;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+				   PMW_AllClose_ABC_Channel();
+			  	}
+		 }
 
 		
         /*************************setHome and *********************************/         
