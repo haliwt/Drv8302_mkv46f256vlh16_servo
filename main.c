@@ -158,17 +158,17 @@ int main(void)
 		}
            
      /******************************************************************************/ 
-		 if((setHome  ==  en_t.capture_width)||(setEnd == en_t.capture_width))
+		 if(setHome  ==  en_t.capture_width)
 		 {
                if(Dir == 1)
                {
-					if((setHome == en_t.capture_width)||(setEnd ==en_t.capture_width))
+					if(setHome == en_t.capture_width)
 					PRINTF("Repeat!!!!!!!\r\n");
 			   }
 			   else if((Dir==0)&&(i==0)) //ÄæÊ±ÕëÐý×ª
 			   {
                 
-				 if((setHome == en_t.capture_width)||(setEnd ==en_t.capture_width))
+				 if(setHome == en_t.capture_width)
 				 	{
 					   i++;
 					   PRINTF("!!!!!!Repeat\r\n");
@@ -176,9 +176,9 @@ int main(void)
 			   }
 			   else
 			   	{
-			       PRINTF("Home or END is ok \r\n");
+			       PRINTF("Home ok \r\n");
 				   PRINTF("Home = %d \r\n",setHome);
-                   PRINTF("END  = %d \r\n",setEnd);
+                   
 				   pwm_duty = 20;
 				  uwStep = HallSensor_GetPinState();
 	              HALLSensor_Detected_BLDC(pwm_duty);
@@ -193,11 +193,32 @@ int main(void)
 				  uwStep = HallSensor_GetPinState();
 	              HALLSensor_Detected_BLDC(pwm_duty);
 				  DelayMs(50);
-				   PMW_AllClose_ABC_Channel();
+				  // PMW_AllClose_ABC_Channel();
 				   i=0;
 			   	}
 		 }
-		
+		  if(setEnd  ==  en_t.capture_width)
+          {
+                  PRINTF("END  OK ");
+                  PRINTF("END  = %d \r\n",setEnd);
+				   pwm_duty = 20;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+                  
+                  pwm_duty = 10;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+				 
+				  pwm_duty = 5;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+				  // PMW_AllClose_ABC_Channel();
+				   
+          
+          }
 
 		/************************************************************************************/
         
