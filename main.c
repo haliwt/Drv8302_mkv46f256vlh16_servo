@@ -55,8 +55,8 @@ uint32_t pulseWidth;
 
 output_t  motor_ref;
 encoder_t en_t;
-int16_t setHome=0xffff;
-int16_t setEnd=0xffff;
+int16_t setHome=0xfff;
+int16_t setEnd=0xfff;
 
 
 /*******************************************************************************
@@ -86,6 +86,7 @@ int main(void)
      uint8_t dir_s =0;
      uint16_t pwm_duty;
 	 uint16_t adcr;
+	 uint8_t i=0;
     
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -133,22 +134,20 @@ int main(void)
 			   PRINTF("--------------------------------------\r\n" ); 
 			   en_t.en_interrupt_flag=0;
 			   en_t.firstPowerOn++;
-			   en_t.PulseWidth= Capture_ReadPulse_Value();
-	           PRINTF("capture_width = %d \r\n",en_t.PulseWidth ); 
-			   
+	          
 			   PRINTF("firstOn= %d \r\n",en_t.firstPowerOn);
 				
 			   if(en_t.firstPowerOn ==2)
 			   	{
-				   setHome = en_t.PulseWidth;
-				   PRINTF("setHome= %d \r\n",en_t.PulseWidth);
+				   setHome = en_t.capture_width;
+				   PRINTF("setHome= %d \r\n",setHome);
 								  
 			   	}
 			    if(en_t.firstPowerOn ==3)
 			   {
 
-				   setEnd = en_t.PulseWidth;
-				   PRINTF("setEnd= %d \r\n",en_t.PulseWidth);
+				   setEnd = en_t.capture_width;
+				   PRINTF("setEnd= %d \r\n",setEnd);
 			   }
 			  
 			   PRINTF("setHome= %d \r\n",setHome);
@@ -161,8 +160,17 @@ int main(void)
 		 {
                if(Dir == 1)
                {
-					setHome == setEnd;
-					PRINTF("!!!!!!!Repeat\r\n");
+					if((setHome == en_t.capture_width)||(setEnd ==en_t.capture_width))
+					PRINTF("Repeat!!!!!!!\r\n");
+			   }
+			   else if((Dir==0)&&(i==0)) //ÄæÊ±ÕëÐý×ª
+			   {
+                
+				 if((setHome == en_t.capture_width)||(setEnd ==en_t.capture_width))
+				 	{
+					   i++;
+					   PRINTF("!!!!!!Repeat\r\n");
+				 	}
 			   }
 			   else
 			   	{
@@ -183,18 +191,28 @@ int main(void)
 	              HALLSensor_Detected_BLDC(pwm_duty);
 				  DelayMs(50);
 				   PMW_AllClose_ABC_Channel();
+				   i=0;
 			   	}
 		 }
 		 else if(setEnd == en_t.capture_width)
 		 {
-			  if(Dir ==1)
-			  {
-				 setEnd = setHome;
-				 PRINTF("Repeat!!!!!!!\r\n");
-			  }
+			  if(Dir == 1)
+               {
+					if((setHome == en_t.capture_width)||(setEnd ==en_t.capture_width))
+					PRINTF("Repeat****************\r\n");
+			   }
+			   else if((Dir==0)&&(i==0)) //ÄæÊ±ÕëÐý×ª
+			   {
+                
+				 if((setHome == en_t.capture_width)||(setEnd ==en_t.capture_width))
+				 	{
+					   i++;
+					   PRINTF("****************Repeat\r\n");
+				 	}
+			   }
 			  else
 			  	{
-			      PRINTF("setEnd is OK !!!!!!!\r\n");
+			      PRINTF("setEnd is OK *********\r\n");
                    PRINTF("setEnd = %d \r\n",setEnd);
 				   pwm_duty = 20;
 				  uwStep = HallSensor_GetPinState();
@@ -215,36 +233,7 @@ int main(void)
 		 }
 
 		
-        /*************************setHome and *********************************/         
-        if(((en_t.firstPowerOn ==0)||(en_t.firstPowerOn <4))&&(en_t.en_interrupt_flag == 1 ))
-		{
-			   PRINTF("--------------------------------------\r\n" ); 
-			   en_t.en_interrupt_flag=0;
-			   en_t.firstPowerOn++;
-			   en_t.PulseWidth= Capture_ReadPulse_Value();
-	           PRINTF("step_ = %d \r\n",en_t.mCurPosValue); 
-			   
-			   PRINTF("firstOn= %d \r\n",en_t.firstPowerOn);
-				
-			   if(en_t.firstPowerOn ==2)
-			   	{
-				   //setHome = en_t.PulseWidth;
-				   setHome = en_t.mCurPosValue;
-				   PRINTF("setHome= %d \r\n",en_t.mCurPosValue);
-								  
-			   	}
-			    if(en_t.firstPowerOn ==3)
-			   {
-
-				   setEnd = en_t.mCurPosValue;
-				   PRINTF("setEnd= %d \r\n",en_t.mCurPosValue);
-			   }
-			  
-			   PRINTF("setHome= %d \r\n",setHome);
-			   PRINTF("setEnd= %d \r\n",setEnd);
-								
-		}
-       /*******************************************************************************/  
+        
      
       if(motor_ref.motor_run == 1)
       {
