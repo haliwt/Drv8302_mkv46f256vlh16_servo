@@ -57,6 +57,8 @@ output_t  motor_ref;
 encoder_t en_t;
 int16_t setHome=0xfff;
 int16_t setEnd=0xfff;
+int16_t setPositionHome;
+int16_t setPositionEnd;
 
 
 /*******************************************************************************
@@ -83,7 +85,7 @@ int main(void)
      uint8_t ucKeyCode=0;
      uint8_t dir_s =0;
      uint16_t pwm_duty;
-	 uint16_t adcr;
+	// uint16_t adcr;
 	 uint8_t i=0;
     
     XBARA_Init(XBARA);
@@ -121,13 +123,15 @@ int main(void)
 	   // PRINTF("ADC: %d\r\n", adcr);
           PRINTF("setHome= %d \r\n",setHome);
 		  PRINTF("setEnd= %d \r\n",setEnd);
-	     en_t.capture_width =Capture_ReadPulse_Value();
-		 PRINTF("Cpw = %d\r\n", en_t.capture_width);
+		  PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
+		   PRINTF("setPositionEnd@@@@@@= %d \r\n",setPositionEnd);
+	      en_t.capture_width =Capture_ReadPulse_Value();
+		  PRINTF("Cpw = %d\r\n", en_t.capture_width);
 		
 		
-		//en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+		en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 		/* Read the position values. */
-        //PRINTF("Current position value: %d\r\n", en_t.mCurPosValue);
+        PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
       /******************************************************************************************/
 	   if(((en_t.firstPowerOn ==0)||(en_t.firstPowerOn <4))&&(en_t.en_interrupt_flag == 1 ))
 		{
@@ -140,133 +144,85 @@ int main(void)
 			   if(en_t.firstPowerOn ==2)
 			   	{
 				   setHome = en_t.capture_width;
+				   setPositionHome = en_t.mCurPosValue;
 				   PRINTF("setHome= %d \r\n",setHome);
+				   PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
 								  
 			   	}
 			    if(en_t.firstPowerOn ==3)
 			   {
 
 				   setEnd = en_t.capture_width;
-				   PRINTF("setEnd= %d \r\n",setEnd);
+				   setPositionEnd = en_t.mCurPosValue;
+				   PRINTF("setPositionEnd@@@= %d \r\n",setPositionEnd);
 			   }
 			  
 			   PRINTF("setHome= %d \r\n",setHome);
 			   PRINTF("setEnd= %d \r\n",setEnd);
+			   PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
+			   PRINTF("setPositionEnd@@@@@@= %d \r\n",setPositionEnd);
 								
 		}
            
      /*********************************检测信号************************************************************************/ 
-		 if((setHome  == (en_t.capture_width -2 )||setHome  == (en_t.capture_width +2 )||setHome  == en_t.capture_width)&&(setHome < setEnd))
+		 if(setPositionHome  == en_t.mCurPosValue||setPositionHome == (en_t.mCurPosValue +1 )||setPositionHome == en_t.mCurPosValue-1)
 		 {
-               if(Dir == 1)//顺时针
-               {
-					
-			   }
-			  else
-			   {
+              
                    
-				   PRINTF("setHome ok \r\n");
-				   PRINTF("setHome = %d \r\n",setHome);
+				   PRINTF("setPositionHome ok \r\n");
+				   PRINTF("setPositionHome = %d \r\n",setPositionHome);
 				   en_t.sethome_flag=1; 
-			  }
+				  
+                   
+                        pwm_duty = 20;
+                        uwStep = HallSensor_GetPinState();
+                        HALLSensor_Detected_BLDC(pwm_duty);
+                        DelayMs(50);
+                        
+                        pwm_duty = 10;
+                        uwStep = HallSensor_GetPinState();
+                        HALLSensor_Detected_BLDC(pwm_duty);
+                        DelayMs(50);
+                       
+                        pwm_duty = 5;
+                        uwStep = HallSensor_GetPinState();
+                        HALLSensor_Detected_BLDC(pwm_duty);
+                        DelayMs(50);
+                        PMW_AllClose_ABC_Channel();
+                        DelayMs(50);
+			  
 		  }
-          else  if(((setEnd  == en_t.capture_width-2)||setEnd  == en_t.capture_width+2||setEnd  == en_t.capture_width)&&(setHome > setEnd))//绝对位置是不变的，setHome 软件指定的
+         else  if((setPositionEnd == en_t.mCurPosValue-1)||setPositionEnd  == en_t.mCurPosValue+1||setPositionEnd  == en_t.mCurPosValue)//绝对位置是不变的，setHome 软件指定的
           {
-			  if(Dir == 1)//顺时针
-               {
-					
-			   }
-			   else if((Dir==0)&&(i==0)) //逆时针旋转
-			   {
-                    i++;
-					
-			   }
-			   else
-			   	{
-			   	   if(i==1)
-			   	   	{
-				       PRINTF("setEnd ok \r\n");
-					   PRINTF("setEnd = %d \r\n",setEnd);
+			 
+				       PRINTF("setPositionEnd ok \r\n");
+					   PRINTF("setPositionEnd = %d \r\n",setPositionEnd);
 	                   
 					   en_t.setend_flag = 1;
-					   i=0;
-			   	   	}
-			   	}
-			}
 
-         if(((setEnd  ==  en_t.capture_width-2)||setEnd == en_t.capture_width+2||setEnd == en_t.capture_width)&&(setHome < setEnd))
-          {
-                  PRINTF("END  OK ");
-                  PRINTF("END  = %d \r\n",setEnd);
-				  en_t.setend_flag =1;
-				   
-          }
-          else if(((setHome  ==  en_t.capture_width-2)||setHome==en_t.capture_width+2||setHome==en_t.capture_width)&&(setHome > setEnd))
-           {
-				  PRINTF("Home  OK \r\n");
-                  PRINTF("Home  = %d \r\n",setHome);
-				  en_t.sethome_flag =1;
-				   
-          }
+					  
+                        pwm_duty = 20;
+                        uwStep = HallSensor_GetPinState();
+                        HALLSensor_Detected_BLDC(pwm_duty);
+                        DelayMs(50);
+                        
+                        pwm_duty = 10;
+                        uwStep = HallSensor_GetPinState();
+                        HALLSensor_Detected_BLDC(pwm_duty);
+                        DelayMs(50);
+                       
+                        pwm_duty = 5;
+                        uwStep = HallSensor_GetPinState();
+                        HALLSensor_Detected_BLDC(pwm_duty);
+                        DelayMs(50);
+                        PMW_AllClose_ABC_Channel();
+                        DelayMs(50);
+					
+		 }
 
-         /******************检测zero AND end 信号处理***********************************/
-		  if(((en_t.sethome_flag ==1)&&(en_t.setend_flag !=1))||((en_t.setend_flag ==1)&&(en_t.sethome_flag !=1)))
-		  {
+         
 
-                  if((Dir ==0)&&( en_t.sethome_flag==1))
-                  {
-                      i++;
-					  if(i==1)
-					  {
-                        en_t.sethome_flag =0;
-					  }
-					  else if(i==2)
-					  {
-                         
-					  en_t.sethome_flag =0;
-					  en_t.setend_flag = 0;
-					  pwm_duty = 20;
-					  uwStep = HallSensor_GetPinState();
-		              HALLSensor_Detected_BLDC(pwm_duty);
-					  DelayMs(50);
-	                  
-	                  pwm_duty = 10;
-					  uwStep = HallSensor_GetPinState();
-		              HALLSensor_Detected_BLDC(pwm_duty);
-					  DelayMs(50);
-					 
-					  pwm_duty = 5;
-					  uwStep = HallSensor_GetPinState();
-		              HALLSensor_Detected_BLDC(pwm_duty);
-					  DelayMs(50);
-					  PMW_AllClose_ABC_Channel();
-	                  DelayMs(50);
-					  	
-					  }
-				  }
-				  else
-				  {
-					  en_t.sethome_flag =0;
-					  en_t.setend_flag = 0;
-					  pwm_duty = 20;
-					  uwStep = HallSensor_GetPinState();
-		              HALLSensor_Detected_BLDC(pwm_duty);
-					  DelayMs(50);
-	                  
-	                  pwm_duty = 10;
-					  uwStep = HallSensor_GetPinState();
-		              HALLSensor_Detected_BLDC(pwm_duty);
-					  DelayMs(50);
-					 
-					  pwm_duty = 5;
-					  uwStep = HallSensor_GetPinState();
-		              HALLSensor_Detected_BLDC(pwm_duty);
-					  DelayMs(50);
-					  PMW_AllClose_ABC_Channel();
-	                  DelayMs(50);
-				  	}
 
-		  }
 
 		/**************************************************************************************************************************************/
         

@@ -62,7 +62,7 @@ uint16_t Capture_ReadPulse_Value(void)
          uint32_t capture2Val;
 
       
-		uint32_t pulseWidth;
+	      int32_t pulseWidth;
        
 	
 		  /* Set the timer to be in free-running mode */

@@ -24,6 +24,7 @@ typedef struct _encoder_t_
    uint32_t mCurPosValue;
    uint16_t mCurVelValue;
    uint16_t mCurRevValue;
+   
   
    uint8_t arrayPos[2];
 
@@ -70,6 +71,9 @@ typedef struct _encoder_t_
 
 extern int16_t setHome;
 extern int16_t setEnd;
+
+extern int16_t setPositionHome;
+extern int16_t setPositionEnd;
 
 
   
