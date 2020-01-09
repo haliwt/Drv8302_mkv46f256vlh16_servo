@@ -57,8 +57,8 @@ output_t  motor_ref;
 encoder_t en_t;
 int16_t setHome=0xfff;
 int16_t setEnd=0xfff;
-int16_t setPositionHome;
-int16_t setPositionEnd;
+int16_t setPositionHome=0xfff;
+int16_t setPositionEnd=0xfff;
 
 
 /*******************************************************************************
@@ -121,17 +121,17 @@ int main(void)
          ucKeyCode = KEY_Scan(0);
 		//adcr = CADC_Read_ADC_Value();
 	   // PRINTF("ADC: %d\r\n", adcr);
-          PRINTF("setHome= %d \r\n",setHome);
-		  PRINTF("setEnd= %d \r\n",setEnd);
-		  PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
-		   PRINTF("setPositionEnd@@@@@@= %d \r\n",setPositionEnd);
+        //  PRINTF("setHome= %d \r\n",setHome);
+		 // PRINTF("setEnd= %d \r\n",setEnd);
+		 // PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
+		 //  PRINTF("setPositionEnd@@@@@@= %d \r\n",setPositionEnd);
 	      en_t.capture_width =Capture_ReadPulse_Value();
 		  PRINTF("Cpw = %d\r\n", en_t.capture_width);
 		
 		
 		en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 		/* Read the position values. */
-        PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
+      //  PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
       /******************************************************************************************/
 	   if(((en_t.firstPowerOn ==0)||(en_t.firstPowerOn <4))&&(en_t.en_interrupt_flag == 1 ))
 		{
