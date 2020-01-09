@@ -356,8 +356,39 @@ int main(void)
            switch(ucKeyCode)
             { 
                  
-                  case ABC_POWER_PRES :
-                    
+                  case ABC_POWER_PRES ://Ë³Ê±Õë
+				  	//  Dir = 1;
+					  setRun_flag = 1;
+                    if(Dir == 0) //Dir =1 ;  //Ë³Ê±ÕëÐý×ª
+	   			    {
+
+                        if((motor_ref.power_on ==2)||(motor_ref.motor_run == 1))//motor is runing
+                        {
+                            if(motor_ref.Dir_flag == 0)
+                            {
+                              pwm_duty = 10;
+							  uwStep = HallSensor_GetPinState();
+				              HALLSensor_Detected_BLDC(pwm_duty);
+							  pwm_duty = 5;
+							  uwStep = HallSensor_GetPinState();
+							  HALLSensor_Detected_BLDC(pwm_duty);
+                            
+                              motor_ref.power_on = 1;
+                              motor_ref.Dir_flag =1;
+                              Dir =1;
+                            }
+                          
+                        }
+                        else
+                        {
+                          Dir=1;
+                          motor_ref.Dir_flag =1;
+                          motor_ref.power_on = 1;
+						 
+                        
+                        }
+                         UART_WriteBlocking(DEMO_UART, printx1, sizeof(printx1) - 1);
+				    }
                       
 				  	break;
         		
@@ -382,71 +413,42 @@ int main(void)
                  
 				  break;
 		
-				 case DIR_PRES: //3
-
+				 case DIR_PRES: //ÄæÊ±ÕëÐý×ª
+				  // Dir = 0 ; //ÄæÊ±Õë
 			       dir_s ++ ;
                    setRun_flag = 1;
-	  			 if(dir_s == 1) //Dir =1 ;  //Ë³Ê±ÕëÐý×ª
-	   			 {
+	  			
+			     if(Dir==1) // Dir = 0; //ÄæÊ±ÕëÐý×ª
+				   {
+	                 dir_s=0;
+	                 if((motor_ref.power_on == 2)||(motor_ref.motor_run == 1)) //motor is runing
+	                 {
+	                    if(motor_ref.Dir_flag ==1)
+	                    {
 
-                        if((motor_ref.power_on ==2)||(motor_ref.motor_run == 1))//motor is runing
-                        {
-                            if(motor_ref.Dir_flag == 0)
-                            {
-                              pwm_duty = 10;
-							  uwStep = HallSensor_GetPinState();
-				              HALLSensor_Detected_BLDC(pwm_duty);
-							  pwm_duty = 5;
-							  uwStep = HallSensor_GetPinState();
-							  HALLSensor_Detected_BLDC(pwm_duty);
-                            
-                              motor_ref.power_on = 1;
-                              motor_ref.Dir_flag =1;
-                              Dir =1;
-                            }
-                          
-                        }
-                        else
-                        {
-                          Dir=1;
-                          motor_ref.Dir_flag =1;
-                          motor_ref.power_on = 1;
-						  setRun_flag = 1;
-                        
-                        }
-                         UART_WriteBlocking(DEMO_UART, printx1, sizeof(printx1) - 1);
-				  }
-			   else // Dir = 0; //ÄæÊ±ÕëÐý×ª
-			   {
-                 dir_s=0;
-                 if((motor_ref.power_on == 2)||(motor_ref.motor_run == 1)) //motor is runing
-                 {
-                    if(motor_ref.Dir_flag ==1)
-                    {
+	                      pwm_duty = 10;
+						  uwStep = HallSensor_GetPinState();
+			              HALLSensor_Detected_BLDC(pwm_duty);
+						  pwm_duty = 5;
+						  uwStep = HallSensor_GetPinState();
+						  HALLSensor_Detected_BLDC(pwm_duty);
+	                     
+	                      motor_ref.power_on = 1;
+	                      motor_ref.Dir_flag = 0;
+	                      Dir =0;
+	                    }
+	                  
+	                  }
+	                  else
+	                  {
+	                     
+	                     Dir = 0;
+	                    
+	                     motor_ref.Dir_flag = 0;
+	                     motor_ref.power_on = 1;
+	                     
 
-                      pwm_duty = 10;
-					  uwStep = HallSensor_GetPinState();
-		              HALLSensor_Detected_BLDC(pwm_duty);
-					  pwm_duty = 5;
-					  uwStep = HallSensor_GetPinState();
-					  HALLSensor_Detected_BLDC(pwm_duty);
-                     
-                      motor_ref.power_on = 1;
-                      motor_ref.Dir_flag = 0;
-                      Dir =0;
-                    }
-                  
-                  }
-                  else
-                  {
-                     
-                     Dir = 0;
-                    
-                     motor_ref.Dir_flag = 0;
-                     motor_ref.power_on = 1;
-                     
-
-                  }
+	                  }
                  UART_WriteBlocking(DEMO_UART, printx2, sizeof(printx2) - 1);
 			   }
 			
