@@ -59,6 +59,8 @@ int16_t setHome=0xfff;
 int16_t setEnd=0xfff;
 int16_t setPositionHome=0xfff;
 int16_t setPositionEnd=0xfff;
+uint8_t setRun_flag=0 ;
+uint8_t setStop_flag=0;
 
 
 /*******************************************************************************
@@ -86,7 +88,7 @@ int main(void)
      uint8_t dir_s =0;
      uint16_t pwm_duty;
 	// uint16_t adcr;
-	 uint8_t i=0;
+
     
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -122,16 +124,16 @@ int main(void)
 		//adcr = CADC_Read_ADC_Value();
 	   // PRINTF("ADC: %d\r\n", adcr);
         //  PRINTF("setHome= %d \r\n",setHome);
-		 // PRINTF("setEnd= %d \r\n",setEnd);
-		 // PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
-		 //  PRINTF("setPositionEnd@@@@@@= %d \r\n",setPositionEnd);
+		//  PRINTF("setEnd= %d \r\n",setEnd);
+		  PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
+		   PRINTF("setPositionEnd@@@@@@= %d \r\n",setPositionEnd);
 	      en_t.capture_width =Capture_ReadPulse_Value();
 		  PRINTF("Cpw = %d\r\n", en_t.capture_width);
 		
 		
 		en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 		/* Read the position values. */
-      //  PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
+        PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
       /******************************************************************************************/
 	   if(((en_t.firstPowerOn ==0)||(en_t.firstPowerOn <4))&&(en_t.en_interrupt_flag == 1 ))
 		{
@@ -168,66 +170,42 @@ int main(void)
 		 if(setPositionHome  == en_t.mCurPosValue||setPositionHome == (en_t.mCurPosValue +1 )||setPositionHome == en_t.mCurPosValue-1)
 		 {
               
-                   
-				   PRINTF("setPositionHome ok \r\n");
-				   PRINTF("setPositionHome = %d \r\n",setPositionHome);
-				   en_t.sethome_flag=1; 
-				  
-                   
-                        pwm_duty = 20;
-                        uwStep = HallSensor_GetPinState();
-                        HALLSensor_Detected_BLDC(pwm_duty);
-                        DelayMs(50);
-                        
-                        pwm_duty = 10;
-                        uwStep = HallSensor_GetPinState();
-                        HALLSensor_Detected_BLDC(pwm_duty);
-                        DelayMs(50);
-                       
-                        pwm_duty = 5;
-                        uwStep = HallSensor_GetPinState();
-                        HALLSensor_Detected_BLDC(pwm_duty);
-                        DelayMs(50);
-                        PMW_AllClose_ABC_Channel();
-                        DelayMs(50);
-			  
-		  }
-         else  if((setPositionEnd == en_t.mCurPosValue-1)||setPositionEnd  == en_t.mCurPosValue+1||setPositionEnd  == en_t.mCurPosValue)//绝对位置是不变的，setHome 软件指定的
-          {
+           PRINTF("setPositionHome ok \r\n");
+		   PRINTF("setPositionHome = %d \r\n",setPositionHome);
+		   if(setRun_flag == 1)
+		   {
+               setStop_flag=0; 
+               PRINTF("setPosHomeRun||||| = %d \r\n",setRun_flag);
+		   }
+		   else
+           {
+             setStop_flag=1; 
+             PRINTF("setPosHomeRun = %d \r\n",setRun_flag);
+           }	  
+          }
+          if((setPositionEnd == en_t.mCurPosValue-1)||setPositionEnd  == en_t.mCurPosValue+1||setPositionEnd  == en_t.mCurPosValue)//绝对位置是不变的，setHome 软件指定的
+         {
 			 
-				       PRINTF("setPositionEnd ok \r\n");
-					   PRINTF("setPositionEnd = %d \r\n",setPositionEnd);
-	                   
-					   en_t.setend_flag = 1;
+		       PRINTF("setPositionEnd ok \r\n");
+			   PRINTF("setPositionEnd = %d \r\n",setPositionEnd);
+               if(setRun_flag ==1)
+               {
+				  setStop_flag=0;
+                  PRINTF("setPosEndRun ~~~~~= %d \r\n",setRun_flag);
+               }
+			   else
+               {
+			     setStop_flag = 1;
+			   PRINTF("setPosEndRun = %d \r\n",setRun_flag);
+               }
 
-					  
-                        pwm_duty = 20;
-                        uwStep = HallSensor_GetPinState();
-                        HALLSensor_Detected_BLDC(pwm_duty);
-                        DelayMs(50);
-                        
-                        pwm_duty = 10;
-                        uwStep = HallSensor_GetPinState();
-                        HALLSensor_Detected_BLDC(pwm_duty);
-                        DelayMs(50);
-                       
-                        pwm_duty = 5;
-                        uwStep = HallSensor_GetPinState();
-                        HALLSensor_Detected_BLDC(pwm_duty);
-                        DelayMs(50);
-                        PMW_AllClose_ABC_Channel();
-                        DelayMs(50);
-					
-		 }
+		}
 
          
-
-
-
-		/**************************************************************************************************************************************/
+/**************************************************************************************************************************************/
         
      /***********motor run main*********************/
-      if(motor_ref.motor_run == 1)
+      if((motor_ref.motor_run == 1)&&(setStop_flag !=1))
       {
    				
 			        GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
@@ -242,6 +220,7 @@ int main(void)
               {
                    motor_ref.en_on=0;
                    motor_ref.power_on ++;
+				   setRun_flag=0;
                   
 	#ifdef IRFP4768PbF
                    printf("************************************************************\r \n");
@@ -386,10 +365,12 @@ int main(void)
                    
 				   motor_ref.motor_run ++ ;
                    motor_ref.power_on ++ ;
-                   en_t.setStop_flag = 0;
+                   setRun_flag = 1;
+				   PRINTF("Run = %d \r\n",setRun_flag);
                  if(motor_ref.motor_run == 1)
     			  {
                       motor_ref.power_on =1;
+                      setRun_flag = 1;
                       UART_WriteBlocking(DEMO_UART, printx5, sizeof(printx5) - 1);
     			  }
 				  else 
@@ -404,7 +385,7 @@ int main(void)
 				 case DIR_PRES: //3
 
 			       dir_s ++ ;
-                   en_t.setStop_flag = 0;
+                   setRun_flag = 1;
 	  			 if(dir_s == 1) //Dir =1 ;  //顺时针旋转
 	   			 {
 
@@ -430,7 +411,7 @@ int main(void)
                           Dir=1;
                           motor_ref.Dir_flag =1;
                           motor_ref.power_on = 1;
-						
+						  setRun_flag = 1;
                         
                         }
                          UART_WriteBlocking(DEMO_UART, printx1, sizeof(printx1) - 1);

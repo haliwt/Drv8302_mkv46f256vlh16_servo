@@ -35,8 +35,7 @@ typedef struct _encoder_t_
   uint8_t L_flag;
   uint8_t R_flag;
   uint8_t en_interrupt_flag;
-  uint8_t setStop_flag;
-
+  
   uint8_t sethome_flag;
   uint8_t setend_flag;
 
@@ -75,7 +74,8 @@ extern int16_t setEnd;
 extern int16_t setPositionHome;
 extern int16_t setPositionEnd;
 
-
+extern uint8_t setRun_flag;
+extern uint8_t setStop_flag;
   
 
 void Capture_Input_Init(void);
