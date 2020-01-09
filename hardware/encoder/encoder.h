@@ -25,10 +25,7 @@ typedef struct _encoder_t_
    uint16_t mCurVelValue;
    uint16_t mCurRevValue;
   
-
-  
-
-  uint8_t arr[2];
+   uint8_t arrayPos[2];
 
   uint8_t firstPowerOn;
 
@@ -38,6 +35,9 @@ typedef struct _encoder_t_
   uint8_t R_flag;
   uint8_t en_interrupt_flag;
   uint8_t setStop_flag;
+
+  uint8_t sethome_flag;
+  uint8_t setend_flag;
 
  }encoder_t;
 
