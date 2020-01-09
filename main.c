@@ -125,15 +125,15 @@ int main(void)
 	   // PRINTF("ADC: %d\r\n", adcr);
         //  PRINTF("setHome= %d \r\n",setHome);
 		//  PRINTF("setEnd= %d \r\n",setEnd);
-		  PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
-		   PRINTF("setPositionEnd@@@@@@= %d \r\n",setPositionEnd);
+		//  PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
+		 //  PRINTF("setPositionEnd@@@@@@= %d \r\n",setPositionEnd);
 	      en_t.capture_width =Capture_ReadPulse_Value();
-		  PRINTF("Cpw = %d\r\n", en_t.capture_width);
+		//  PRINTF("Cpw = %d\r\n", en_t.capture_width);
 		
 		
 		en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 		/* Read the position values. */
-        PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
+      //  PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
       /******************************************************************************************/
 	   if(((en_t.firstPowerOn ==0)||(en_t.firstPowerOn <4))&&(en_t.en_interrupt_flag == 1 ))
 		{
