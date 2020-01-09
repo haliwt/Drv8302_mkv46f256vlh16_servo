@@ -157,22 +157,17 @@ int main(void)
 								
 		}
            
-     /******************************************************************************/ 
-		 if(setHome  ==  en_t.capture_width)
+     /*********************************************************************************************************/ 
+		 if((setHome  == (en_t.capture_width -2 )||setHome  == (en_t.capture_width +2 )||setHome  == en_t.capture_width)&&(setHome < setEnd))
 		 {
-               if(Dir == 1)
+               if(Dir == 1)//顺时针
                {
-					if(setHome == en_t.capture_width)
-					PRINTF("Repeat!!!!!!!\r\n");
+					
 			   }
 			   else if((Dir==0)&&(i==0)) //逆时针旋转
 			   {
-                
-				 if(setHome == en_t.capture_width)
-				 	{
-					   i++;
-					   PRINTF("!!!!!!Repeat\r\n");
-				 	}
+                    i++;
+					
 			   }
 			   else
 			   	{
@@ -196,8 +191,50 @@ int main(void)
 				  // PMW_AllClose_ABC_Channel();
 				   i=0;
 			   	}
-		 }
-		  if(setEnd  ==  en_t.capture_width)
+		  }
+          else  if(((setEnd  == en_t.capture_width-2)||setEnd  == en_t.capture_width+2||setEnd  == en_t.capture_width)&&(setHome > setEnd))//绝对位置是不变的，setHome 软件指定的
+          {
+			  if(Dir == 1)//顺时针
+               {
+					
+			   }
+			   else if((Dir==0)&&(i==0)) //逆时针旋转
+			   {
+                    i++;
+					
+			   }
+			   else
+			   	{
+			       PRINTF("setEnd ok \r\n");
+				   PRINTF("END = %d \r\n",setEnd);
+                   
+				   pwm_duty = 20;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+                  
+                  pwm_duty = 10;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+				 
+				  pwm_duty = 5;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+				  // PMW_AllClose_ABC_Channel();
+				   i=0;
+			   	}
+
+
+
+		  }
+
+
+
+
+
+		  if(((setEnd  ==  en_t.capture_width-2)||setEnd == en_t.capture_width+2||setEnd == en_t.capture_width)&&(setHome < setEnd))
           {
                   PRINTF("END  OK ");
                   PRINTF("END  = %d \r\n",setEnd);
@@ -217,10 +254,30 @@ int main(void)
 				  DelayMs(50);
 				  // PMW_AllClose_ABC_Channel();
 				   
-          
+          }
+          else if(((setHome  ==  en_t.capture_width-2)||setHome==en_t.capture_width+2||setHome==en_t.capture_width)&&(setHome > setEnd))
+           {
+                  PRINTF("END  OK ");
+                  PRINTF("END  = %d \r\n",setEnd);
+				   pwm_duty = 20;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+                  
+                  pwm_duty = 10;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+				 
+				  pwm_duty = 5;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC(pwm_duty);
+				  DelayMs(50);
+				  // PMW_AllClose_ABC_Channel();
+				   
           }
 
-		/************************************************************************************/
+		/**************************************************************************************************************************************/
         
      
       if(motor_ref.motor_run == 1)
