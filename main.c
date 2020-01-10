@@ -85,9 +85,8 @@ int main(void)
      uint8_t printx4[]="key motor run = 0 ^^^^ \r\n";
      uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
      uint8_t ucKeyCode=0;
-     uint8_t dir_s =0;
      uint16_t pwm_duty;
-	// uint16_t adcr;
+	 uint8_t keyRunTime=0;
 
     
     XBARA_Init(XBARA);
@@ -121,22 +120,24 @@ int main(void)
    while(1)
    {
          ucKeyCode = KEY_Scan(0);
-		//adcr = CADC_Read_ADC_Value();
+        //adcr = CADC_Read_ADC_Value();
 	   // PRINTF("ADC: %d\r\n", adcr);
         //  PRINTF("setHome= %d \r\n",setHome);
 		//  PRINTF("setEnd= %d \r\n",setEnd);
 		//  PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
 		 //  PRINTF("setPositionEnd@@@@@@= %d \r\n",setPositionEnd);
-	      en_t.capture_width =Capture_ReadPulse_Value();
-		//  PRINTF("Cpw = %d\r\n", en_t.capture_width);
-		
-		
+	      
 		en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-		/* Read the position values. */
-      //  PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
-      /******************************************************************************************/
+			/* Read the position values. */
+	    // PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
+	#if 1	
+		
+      /***************************Zerio AND Point***************************************************************/
 	   if(((en_t.firstPowerOn ==0)||(en_t.firstPowerOn <4))&&(en_t.en_interrupt_flag == 1 ))
 		{
+			  en_t.capture_width =Capture_ReadPulse_Value();
+		      PRINTF("Cpw = %d\r\n", en_t.capture_width);
+
 			   PRINTF("--------------------------------------\r\n" ); 
 			   en_t.en_interrupt_flag=0;
 			   en_t.firstPowerOn++;
@@ -145,8 +146,11 @@ int main(void)
 				
 			   if(en_t.firstPowerOn ==2)
 			   	{
-				   setHome = en_t.capture_width;
-				   setPositionHome = en_t.mCurPosValue;
+				   setHome = en_t.capture_width-10;
+                   if(setPositionHome == 0 )
+				   setPositionHome = en_t.mCurPosValue + 10;
+                   else
+                     setPositionHome = en_t.mCurPosValue - 10;
 				   PRINTF("setHome= %d \r\n",setHome);
 				   PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
 								  
@@ -154,8 +158,11 @@ int main(void)
 			    if(en_t.firstPowerOn ==3)
 			   {
 
-				   setEnd = en_t.capture_width;
-				   setPositionEnd = en_t.mCurPosValue;
+				   setEnd = en_t.capture_width-10;
+                   if(setPositionEnd ==0 )
+                    setPositionEnd = en_t.mCurPosValue + 10;
+                   else
+                     setPositionEnd = en_t.mCurPosValue -10;
 				   PRINTF("setPositionEnd@@@= %d \r\n",setPositionEnd);
 			   }
 			  
@@ -172,15 +179,15 @@ int main(void)
               
            PRINTF("setPositionHome ok \r\n");
 		   PRINTF("setPositionHome = %d \r\n",setPositionHome);
-		   if(setRun_flag == 1)
+		   if(keyRunTime == 1)
 		   {
-               setStop_flag=0; 
-               PRINTF("setPosHomeRun||||| = %d \r\n",setRun_flag);
+              setStop_flag=0; 
+               PRINTF("setPosHomeRun||||| =0 \r\n");
 		   }
 		   else
            {
              setStop_flag=1; 
-             PRINTF("setPosHomeRun = %d \r\n",setRun_flag);
+             PRINTF("setPosHomeRun%%%%%%%% = 0\r\n");
            }	  
           }
           if((setPositionEnd == en_t.mCurPosValue-1)||setPositionEnd  == en_t.mCurPosValue+1||setPositionEnd  == en_t.mCurPosValue)//绝对位置是不变的，setHome 软件指定的
@@ -188,31 +195,30 @@ int main(void)
 			 
 		       PRINTF("setPositionEnd ok \r\n");
 			   PRINTF("setPositionEnd = %d \r\n",setPositionEnd);
-               if(setRun_flag ==1)
+               if(keyRunTime ==1)
                {
 				  setStop_flag=0;
-                  PRINTF("setPosEndRun ~~~~~= %d \r\n",setRun_flag);
+                  PRINTF("setPosEndRun~~~~~~~~ ~~~~~= 1 \r\n");
                }
 			   else
                {
 			     setStop_flag = 1;
-			   PRINTF("setPosEndRun = %d \r\n",setRun_flag);
+                 PRINTF("setPosEndRun########## =  0\r\n");
                }
 
-		}
-
+		   }
+#endif 
          
 /**************************************************************************************************************************************/
         
      /***********motor run main*********************/
-      if((motor_ref.motor_run == 1)&&(setStop_flag !=1))
+      if((motor_ref.motor_run == 1)&&(setStop_flag ==0))
       {
    				
-			        GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
+               keyRunTime=2;
+			   GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 					  
-				
-			  
-             pwm_duty=60;
+				pwm_duty=60;
 	#ifdef DEBUG_PRINT 
              printf("pwm_duty = %d\r \n",pwm_duty); 
 	#endif 
@@ -295,25 +301,14 @@ int main(void)
                  }
                 #endif 
                }
-              else
-			  {
+              else{
                   
-                     
-					 uwStep = HallSensor_GetPinState();
+                     uwStep = HallSensor_GetPinState();
 	               
 	                 HALLSensor_Detected_BLDC(pwm_duty);
-					
-                     
-					  #ifdef DEBUG_PRINT
-					     // PRINTF("uwStep = %d\r \n",uwStep); 
-						  PRINTF("Current position value: %d\r\n", mCurPosValue);
-		                  PRINTF("Position differential value: %d\r\n",mCurVelValue );
-		                  PRINTF("Position revolution value: %d\r\n",mCurRevValue );
-						  PRINTF("......................\r \n"); 
-				   	  #endif 
-				  
-              }
-           }/*end if motor_ref.motor_run == 1*/
+                    // en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+                    }
+            }/*end if motor_ref.motor_run == 1*/
           
           else
 		  {
@@ -356,9 +351,10 @@ int main(void)
            switch(ucKeyCode)
             { 
                  
-                  case ABC_POWER_PRES ://顺时针
-				  	//  Dir = 1;
+                  case ABC_POWER_PRES ://顺时针---方向
+				  	 Dir = 1;
 					  setRun_flag = 1;
+				     PRINTF("Right Key: %d\r\n", setRun_flag);
                     if(Dir == 0) //Dir =1 ;  //顺时针旋转
 	   			    {
 
@@ -379,16 +375,19 @@ int main(void)
                             }
                           
                         }
-                        else
-                        {
-                          Dir=1;
-                          motor_ref.Dir_flag =1;
-                          motor_ref.power_on = 1;
-						 
-                        
-                        }
+						else
+							Dir = 1;
+                     }
+                      else
+                      {
+                        Dir=1;
+                        motor_ref.Dir_flag =1;
+                        motor_ref.power_on = 1;
+                       
+                      
+                      }
                          UART_WriteBlocking(DEMO_UART, printx1, sizeof(printx1) - 1);
-				    }
+				    
                       
 				  	break;
         		
@@ -396,8 +395,11 @@ int main(void)
                    
 				   motor_ref.motor_run ++ ;
                    motor_ref.power_on ++ ;
+                   keyRunTime = 1;
                    setRun_flag = 1;
-				   PRINTF("Run = %d \r\n",setRun_flag);
+                   setStop_flag=0;
+				  PRINTF("Run = %d \r\n",setRun_flag);
+                  PRINTF("keysetStop_flag = %d\r\n",setStop_flag);
                  if(motor_ref.motor_run == 1)
     			  {
                       motor_ref.power_on =1;
@@ -406,7 +408,8 @@ int main(void)
     			  }
 				  else 
 				  {
-                      motor_ref.motor_run = 0;
+					  setRun_flag = 1;
+					  motor_ref.motor_run = 0;
                       motor_ref.power_on =0;
                       UART_WriteBlocking(DEMO_UART, printx4, sizeof(printx4) - 1);
 				  }
@@ -414,13 +417,14 @@ int main(void)
 				  break;
 		
 				 case DIR_PRES: //逆时针旋转
-				  // Dir = 0 ; //逆时针
-			       dir_s ++ ;
+				    Dir = 0 ; //逆时针
+		
                    setRun_flag = 1;
+				   PRINTF("key setRun_flag: %d\r\n", setRun_flag);
 	  			
 			     if(Dir==1) // Dir = 0; //逆时针旋转
 				   {
-	                 dir_s=0;
+	               
 	                 if((motor_ref.power_on == 2)||(motor_ref.motor_run == 1)) //motor is runing
 	                 {
 	                    if(motor_ref.Dir_flag ==1)
@@ -437,8 +441,11 @@ int main(void)
 	                      motor_ref.Dir_flag = 0;
 	                      Dir =0;
 	                    }
+						else
+							Dir = 0;
 	                  
 	                  }
+                   }
 	                  else
 	                  {
 	                     
@@ -450,7 +457,7 @@ int main(void)
 
 	                  }
                  UART_WriteBlocking(DEMO_UART, printx2, sizeof(printx2) - 1);
-			   }
+			   
 			
            		break;
             default :
