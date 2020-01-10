@@ -137,6 +137,7 @@ int main(void)
 		{
 			  en_t.capture_width =Capture_ReadPulse_Value();
 		      PRINTF("Cpw = %d\r\n", en_t.capture_width);
+			  PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
 
 			   PRINTF("--------------------------------------\r\n" ); 
 			   en_t.en_interrupt_flag=0;
@@ -149,8 +150,10 @@ int main(void)
 				   setHome = en_t.capture_width-10;
                    if(setPositionHome == 0 )
 				   setPositionHome = en_t.mCurPosValue + 10;
-                   else
-                     setPositionHome = en_t.mCurPosValue - 10;
+                   else if(Dir ==1) //顺时针
+                     setPositionHome = en_t.mCurPosValue + 10;
+				   else
+				   	 setPositionHome = en_t.mCurPosValue - 10;
 				   PRINTF("setHome= %d \r\n",setHome);
 				   PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
 								  
@@ -161,15 +164,17 @@ int main(void)
 				   setEnd = en_t.capture_width-10;
                    if(setPositionEnd ==0 )
                     setPositionEnd = en_t.mCurPosValue + 10;
-                   else
-                     setPositionEnd = en_t.mCurPosValue -10;
+                   else if(Dir ==1) //顺时针
+                     setPositionEnd = en_t.mCurPosValue +10;
+				   else
+				   	 setPositionEnd = en_t.mCurPosValue - 10;
 				   PRINTF("setPositionEnd@@@= %d \r\n",setPositionEnd);
 			   }
 			  
 			   PRINTF("setHome= %d \r\n",setHome);
 			   PRINTF("setEnd= %d \r\n",setEnd);
-			   PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
-			   PRINTF("setPositionEnd@@@@@@= %d \r\n",setPositionEnd);
+			   PRINTF("setPositionHome^^= %d \r\n",setPositionHome);
+			   PRINTF("setPositionEnd@@@= %d \r\n",setPositionEnd);
 								
 		}
            
@@ -187,7 +192,8 @@ int main(void)
 		   else
            {
              setStop_flag=1; 
-             PRINTF("setPosHomeRun%%%%%%%% = 0\r\n");
+             PRINTF("setPosHomeRun%%%%%%%% = 1\r\n");
+			 PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
            }	  
           }
           if((setPositionEnd == en_t.mCurPosValue-1)||setPositionEnd  == en_t.mCurPosValue+1||setPositionEnd  == en_t.mCurPosValue)//绝对位置是不变的，setHome 软件指定的
@@ -203,7 +209,8 @@ int main(void)
 			   else
                {
 			     setStop_flag = 1;
-                 PRINTF("setPosEndRun########## =  0\r\n");
+                 PRINTF("setPosEndRun########## =  1\r\n");
+				 PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
                }
 
 		   }
