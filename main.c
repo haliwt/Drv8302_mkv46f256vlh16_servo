@@ -86,7 +86,7 @@ int main(void)
      uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
      uint8_t ucKeyCode=0;
      uint16_t pwm_duty;
-	 uint8_t keyRunTime=0;
+	 static uint8_t keyRunTime=0;
 
     
     XBARA_Init(XBARA);
@@ -353,7 +353,9 @@ int main(void)
                  
                   case ABC_POWER_PRES ://顺时针---方向
 				  	 Dir = 1;
-					  setRun_flag = 1;
+					 keyRunTime = 1;
+					  setRun_flag = 0;
+					  setStop_flag=0;
 				     PRINTF("Right Key: %d\r\n", setRun_flag);
                     if(Dir == 0) //Dir =1 ;  //顺时针旋转
 	   			    {
@@ -396,7 +398,7 @@ int main(void)
 				   motor_ref.motor_run ++ ;
                    motor_ref.power_on ++ ;
                    keyRunTime = 1;
-                   setRun_flag = 1;
+                   setRun_flag = 0;
                    setStop_flag=0;
 				  PRINTF("Run = %d \r\n",setRun_flag);
                   PRINTF("keysetStop_flag = %d\r\n",setStop_flag);
@@ -418,8 +420,9 @@ int main(void)
 		
 				 case DIR_PRES: //逆时针旋转
 				    Dir = 0 ; //逆时针
-		
-                   setRun_flag = 1;
+					keyRunTime = 1;
+                   setRun_flag = 0;
+				   setStop_flag=0;
 				   PRINTF("key setRun_flag: %d\r\n", setRun_flag);
 	  			
 			     if(Dir==1) // Dir = 0; //逆时针旋转
