@@ -21,7 +21,7 @@ typedef struct _encoder_t_
 
    uint16_t drv8302_adc_value;
 
-   uint32_t mCurPosValue;
+   
    uint16_t mCurVelValue;
    uint16_t mCurRevValue;
    
@@ -68,14 +68,15 @@ typedef struct _encoder_t_
 /* Get source clock for FTM driver */
 #define FTM_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_FastPeriphClk)
 
-extern int16_t setHome;
-extern int16_t setEnd;
+extern int16_t setHome ;
+extern int16_t setEnd ;
 
 extern int16_t setPositionHome;
 extern int16_t setPositionEnd;
 
 extern uint8_t setRun_flag;
 extern uint8_t setStop_flag;
+extern uint32_t mCurPosValue;
   
 
 void Capture_Input_Init(void);

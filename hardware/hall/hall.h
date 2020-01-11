@@ -4,6 +4,7 @@
 #include "fsl_gpio.h"
 #include "fsl_port.h"
 #include "bldc.h"
+#include "encoder.h"
 
 /* 类型定义 ------------------------------------------------------------------*/
 typedef struct {
@@ -34,6 +35,7 @@ typedef struct
 }PID_TypeDef;
 
 
+#define  SysTick_IRQ_Handler            SysTick_Handler     
 
 
 #define  P_DATA      0.85f                                // P参数
@@ -51,16 +53,20 @@ typedef struct
 /* 扩展声明 ------------------------------------------------------------------*/
 
 
-extern BLDC_Typedef BLDCMotor ;
-extern PID_TypeDef  sPID;
+extern uint8_t  arithmetic_flag ;
+
+
 
 
 
 void ENCODER_Init(void);
 void IncPIDInit(void) ;    //PID 初始化函数
 
+
+
 int32_t LocPIDCalc(int32_t NextPoint);  //位置PID计算
 
+void SysTick_IRQ_Handler  (void);
 
 
 

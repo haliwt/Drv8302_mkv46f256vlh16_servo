@@ -47,6 +47,8 @@
  * Definitions
  ******************************************************************************/
 
+output_t  motor_ref;
+encoder_t en_t;
 
 
 
@@ -54,25 +56,20 @@ volatile uint32_t g_EncIndexCounter = 0U;
 uint32_t pulseWidth;
 
 
-output_t  motor_ref;
-encoder_t en_t;
- BLDC_Typedef BLDCMotor = {0,CW,0,0,100,0,0,0}; //CW = - 
-PID_TypeDef  sPID; 
 
- uint16_t pwm_duty;
-int16_t setHome=0xfff;
+//__IO uint16_t	PWM_Duty; 
+
+int16_t setHome = 0xfff;
 int16_t setEnd=0xfff;
 int16_t setPositionHome=0xfff;
 int16_t setPositionEnd=0xfff;
 uint8_t setRun_flag=0 ;
 uint8_t setStop_flag=0;
 
+uint8_t  arithmetic_flag ;
 
-/* 私有变量 ------------------------------------------------------------------*/
-uint32_t IS_EnableMotor = 0;  // 使能电机标志
-uint32_t Time_CNT = 0;
-int32_t  flag = 0;
-int32_t  start_flag = 0;
+
+
 
 
 
@@ -142,9 +139,10 @@ int main(void)
        
 		
 	      
-		en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-		BLDCMotor.Hall_PulNum = en_t.mCurPosValue;//
-		pwm_duty=60;
+		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+        SysTick_IRQ_Handler ();
+	
+		PWM_Duty=60;
 	#if 1	
 		
       /***************************Zerio AND Point***************************************************************/
@@ -152,7 +150,7 @@ int main(void)
 		{
 			  en_t.capture_width =Capture_ReadPulse_Value();
 		      PRINTF("Cpw = %d\r\n", en_t.capture_width);
-			  PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
+			  PRINTF("Current position : %d\r\n", mCurPosValue);
 
 			   PRINTF("--------------------------------------\r\n" ); 
 			   en_t.en_interrupt_flag=0;
@@ -164,13 +162,13 @@ int main(void)
 			   	{
 				   setHome = en_t.capture_width-10;
                    if(setPositionHome == 0 )
-				   setPositionHome = en_t.mCurPosValue + 10;
+				   setPositionHome = mCurPosValue + 20;
                    else if(Dir ==1) //顺时针
-                     setPositionHome = en_t.mCurPosValue + 10;
+                     setPositionHome = mCurPosValue + 20;
 				   else
-				   	 setPositionHome = en_t.mCurPosValue - 10;
+				   	 setPositionHome = mCurPosValue - 20;
 
-				    sPID.SetPoint=setPositionHome;
+				   arithmetic_flag  = 1;
 				   PRINTF("setHome= %d \r\n",setHome);
 				   PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
 								  
@@ -180,12 +178,12 @@ int main(void)
 
 				   setEnd = en_t.capture_width-10;
                    if(setPositionEnd ==0 )
-                    setPositionEnd = en_t.mCurPosValue + 10;
+                    setPositionEnd = mCurPosValue + 20;
                    else if(Dir ==1) //顺时针
-                     setPositionEnd = en_t.mCurPosValue +10;
+                     setPositionEnd = mCurPosValue +20;
 				   else
-				   	 setPositionEnd = en_t.mCurPosValue - 10;
-				   sPID.SetPoint=setPositionEnd;
+				   	setPositionEnd = mCurPosValue - 20;
+				   arithmetic_flag  = 1;
 				   PRINTF("setPositionEnd@@@= %d \r\n",setPositionEnd);
 			   }
 			  
@@ -197,7 +195,7 @@ int main(void)
 		}
            
      /*********************************检测信号************************************************************************/ 
-		 if(setPositionHome  == en_t.mCurPosValue||setPositionHome == (en_t.mCurPosValue +1 )||setPositionHome == en_t.mCurPosValue-1)
+		 if(setPositionHome  == mCurPosValue||setPositionHome == (mCurPosValue +1 )||setPositionHome == mCurPosValue-1)
 		 {
               
            PRINTF("setPositionHome ok \r\n");
@@ -211,10 +209,10 @@ int main(void)
            {
              setStop_flag=1; 
              PRINTF("setPosHomeRun%%%%%%%% = 1\r\n");
-			 PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
+			 PRINTF("Current position : %d\r\n", mCurPosValue);
            }	  
           }
-          if((setPositionEnd == en_t.mCurPosValue-1)||setPositionEnd  == en_t.mCurPosValue+1||setPositionEnd  == en_t.mCurPosValue)//绝对位置是不变的，setHome 软件指定的
+          if((setPositionEnd == mCurPosValue-1)||setPositionEnd  == mCurPosValue+1||setPositionEnd  == mCurPosValue)//绝对位置是不变的，setHome 软件指定的
          {
 			 
 		       PRINTF("setPositionEnd ok \r\n");
@@ -228,7 +226,8 @@ int main(void)
                {
 			     setStop_flag = 1;
                  PRINTF("setPosEndRun########## =  1\r\n");
-				 PRINTF("Current position : %d\r\n", en_t.mCurPosValue);
+				 PRINTF("Current position : %d\r\n", mCurPosValue);
+				 
                }
 
 		   }
@@ -241,6 +240,7 @@ int main(void)
       {
    				
                keyRunTime=2;
+			 
 			   GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 			  	  
 	#ifdef DEBUG_PRINT 
@@ -329,7 +329,7 @@ int main(void)
                   
                      uwStep = HallSensor_GetPinState();
 	               
-	                 HALLSensor_Detected_BLDC(pwm_duty);
+	                 HALLSensor_Detected_BLDC(PWM_Duty);
                     // en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
                     }
             }/*end if motor_ref.motor_run == 1*/
@@ -341,25 +341,25 @@ int main(void)
              	{
 				  
 				  
-				  pwm_duty = 20;
+				  PWM_Duty = 20;
 				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC(pwm_duty);
+	              HALLSensor_Detected_BLDC( PWM_Duty);
 				  DelayMs(50);
                   
-                  pwm_duty = 10;
+                   PWM_Duty = 10;
 				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC(pwm_duty);
+	              HALLSensor_Detected_BLDC( PWM_Duty);
 				  DelayMs(50);
 				 
-				  pwm_duty = 5;
+				   PWM_Duty = 5;
 				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC(pwm_duty);
+	              HALLSensor_Detected_BLDC( PWM_Duty);
 				  DelayMs(50);
 				 
              	}
               
                  
-             
+      
 			  PMW_AllClose_ABC_Channel();
               DelayMs(50);
               GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
@@ -381,20 +381,20 @@ int main(void)
 					  setRun_flag = 0;
 					  setStop_flag=0;
 				     PRINTF("Right Key: %d\r\n", setRun_flag);
-                    if(Dir == 0) //Dir =1 ;  //顺时针旋转
+                    if(Dir == 0) //顺时针旋转
 	   			    {
 
                         if((motor_ref.power_on ==2)||(motor_ref.motor_run == 1))//motor is runing
                         {
                             if(motor_ref.Dir_flag == 0)
                             {
-                              pwm_duty = 10;
+                               PWM_Duty= 10;
 							  uwStep = HallSensor_GetPinState();
-				              HALLSensor_Detected_BLDC(pwm_duty);
-							  pwm_duty = 5;
+				              HALLSensor_Detected_BLDC( PWM_Duty);
+							   PWM_Duty = 5;
 							  uwStep = HallSensor_GetPinState();
-							  HALLSensor_Detected_BLDC(pwm_duty);
-                            
+							  HALLSensor_Detected_BLDC( PWM_Duty);
+                              DelayMs(30);
                               motor_ref.power_on = 1;
                               motor_ref.Dir_flag =1;
                               Dir =1;
@@ -457,13 +457,13 @@ int main(void)
 	                    if(motor_ref.Dir_flag ==1)
 	                    {
 
-	                      pwm_duty = 10;
+	                       PWM_Duty = 10;
 						  uwStep = HallSensor_GetPinState();
-			              HALLSensor_Detected_BLDC(pwm_duty);
-						  pwm_duty = 5;
+			              HALLSensor_Detected_BLDC( PWM_Duty);
+						   PWM_Duty = 5;
 						  uwStep = HallSensor_GetPinState();
-						  HALLSensor_Detected_BLDC(pwm_duty);
-	                     
+						  HALLSensor_Detected_BLDC( PWM_Duty);
+	                      DelayMs(30);
 	                      motor_ref.power_on = 1;
 	                      motor_ref.Dir_flag = 0;
 	                      Dir =0;
@@ -526,83 +526,10 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
 #endif
 }
 
-#if 0
-/*!
- * @brief ISR for systick intrrupt
- */
- int32_t PID_Result = 0;
-//void SysTick_IRQ_Handler(void)
- void vPortSetupTimerInterrupt( void )
-{
- 	PRINTF("vPortSetupTimerInterrupt = OK \r\n");
-  #if 0
-  static uint32_t Last_Dir = 0;
-  Time_CNT++;
-  PRINTF("vPortSetupTimerInterrupt = OK \r\n");
-  if(start_flag  == 1)
-  {
-    /* 100ms 采样周期,控制周期 */
-    if(Time_CNT % 100 == 0)
-    {
-      /* 获取速度值:由捕获到的脉冲数除以总的时间 Pul/t */
-      /* BLDCMotor是4对极,旋转一圈有4个脉冲信号,3相UVW信号线,共12个脉冲信号,每个脉冲边沿计数一次,
-       * 所以BLDCM旋转一圈,可以捕获到的霍尔信号是24,计数值可以计数到24.
-       * 每个信号边沿都会捕获到接口定时器的CCR1,每100ms读取捕获到的时间和脉冲数,就可以得到电机的速度值.
-       */
-       PID_Result = LocPIDCalc(BLDCMotor.Hall_PulNum);
-      /* 限定PWM数值范围 */
-      if(PID_Result<0)//判断方向，PID值＜ 0
-      {
-        PID_Result = abs(PID_Result);
-        BLDCMotor.Dir = CCW; //判断方向，逆时针
-        Dir = 1;
-      }
-      else 
-      	{
-          BLDCMotor.Dir = CW;  //顺时针方向
-          Dir =0 ;
-      	}
-        
-      /*判断电机运行方向*/
-	   BLDCMotor.Dir= Dir ; //逆时针
-      if(Last_Dir != BLDCMotor.Dir ) //
-      {
-        Disable_BLDC(); //停止电机运转
-       // Enable_BLDC();  //开启电机运转
-       uwStep = HallSensor_GetPinState();
-	   HALLSensor_Detected_BLDC(pwm_duty);
-      }
-      Last_Dir = BLDCMotor.Dir;// CW
-      
-     // if(PID_Result>=(int32_t)(BLDCMOTOR_TIM_PERIOD/3)) //1.9KHZ/3=0.63khz
-      //  PID_Result = (int32_t)(BLDCMOTOR_TIM_PERIOD/3);
-      
-      BLDCMotor.PWM_Duty = PID_Result;
-	 /// pwm_duty = PID_Result;
-     // PWM_ChangeFlag = 1; //中断，标志位
-      uwStep = HallSensor_GetPinState();
-	               
-	  HALLSensor_Detected_BLDC(BLDCMotor.PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
-      //PWM_ChangeFlag = 0;
 
-    }
-  }  
-  //50ms反馈一次数据
-  if(Time_CNT % 50 == 0)
-  {
-    PRINTF("Current position : %d\r\n", en_t.mCurPosValue);//Transmit_FB(ptr_FB);
-  }
-  if(Time_CNT == 100)
-    Time_CNT = 0;
-   // PRINTF("g_en = %d \r\n",g_EncIndexCounter);
-    /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
-      exception return operation might vector to incorrect interrupt */
-#if defined __CORTEX_M && (__CORTEX_M == 4U)
-    __DSB();
-#endif
-#endif 
-}
-#endif 
+
+
+
 
 /*******************************************************************************************/
 
