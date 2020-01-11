@@ -46,22 +46,22 @@ typedef enum
 
 #define BRAKE_KEY               PAin(1)   //刹车按键 - 按一次刹车，再按一次解除刹车
 #define START_KEY               PEin(25)  //起停按键，电机 //PEin(30)  //雨刷器按键，按一次一档，再按一次二档，再按一下关闭
-#define DIR_KEY                 PEin(24)  //方向按键，电机 DIR_KEY3
+#define DIR_UP_KEY                 PEin(24)  //方向按键，电机 DIR_KEY3
 #define DIGITAL_ADD_KEY         PAin(12)  //数字加速     DIGITAL_ADD_KEY
 #define DIGITAL_REDUCE_KEY      PAin(13)  //数字减速
 #define DOOR_KEY          		PAin(2)   //车门按键，
 #define HALL_SWITCH_KEY         PAin(4)   //有无霍尔切换，按键
 #define WHEEL_KEY          		PAin(5)   //车轮探测按键
 #define WIPERS_KEY          	PEin(30)  //雨刷器按键，按一次一档，再按一次二档，再按一下关闭  
-#define ABC_POWER_KEY       	PEin(29)
+#define DIR_DOWN_KEY       	PEin(29)
 
 
 
 
 //#define BRAKE_PRES              1      //PTA1
-#define ABC_POWER_PRES          1      //
+#define DIR_DOWN_PRES          1      //
 #define START_PRES              2      //PTE25
-#define DIR_PRES                3      //PTE24, DIR KEY
+#define DIR_UP_PRES                3      //PTE24, DIR KEY
 #define DIGITAL_ADD_PRES        4      //PTA12,
 #define DIGITAL_REDUCE_PRES     5      //PTA13,
 #define DOOR_PRES               6      //PTA2,

@@ -33,7 +33,7 @@ void IncPIDInit(void)
     sPID.Proportion=P_DATA;      // 比列常数 Proportional Const
     sPID.Integral=I_DATA;        // 积分常数  Integral Const
     sPID.Derivative=D_DATA;      // 微分常数 Derivative Const
-    sPID.SetPoint=TARGET_PULSE;            // 设定目标Desired Value
+    sPID.SetPoint=setEnd;//TARGET_PULSE;            // 设定目标Desired Value
 }
 /*******************************************************
   *
@@ -46,35 +46,38 @@ void IncPIDInit(void)
 int32_t LocPIDCalc(int32_t NextPoint)
 {
   int32_t iError,dError;
-  if(Dir == 0) //逆时针旋转
-  	{
-	  if(setHome < setEnd)
+ 
+	  if(Dir == 0) //逆时针旋转 DIR_UP_PRES，//水平位置是起始位置--只能往水平位置移动
 	  {
-	     sPID.SetPoint = setEnd;
-		 iError = sPID.SetPoint - NextPoint; //偏差= 目标位置 - 当前位置 (distance)
-	  }
-	  else
-	  {
-		  sPID.SetPoint = setHome;
-		  iError = sPID.SetPoint - NextPoint; //偏差= 目标位置 - 当前位置 (distance)
-	  }
-  	}
-  else //顺时针旋转
-  	{
-       if(setHome < setEnd)
-	  {
-	     sPID.SetPoint = setEnd;
-		
-		 iError = sPID.SetPoint - NextPoint; //偏差= 目标位置 - 当前位置 (distance)
-	  }
-	  else
-	  {
-		  sPID.SetPoint = setHome;
-		 
-		  iError = sPID.SetPoint - NextPoint; //偏差= 目标位置 - 当前位置 (distance)
-	  }
+		     if(judge_he_flag ==1) //setHome垂直是起始位置//实际测试值水平位置setHome = 265，垂直位置setEnd =12241 反向
+		     	{
+			       sPID.SetPoint = setPositionEnd; //只能往水平位置移动-UP
+				   iError = sPID.SetPoint - NextPoint ; //偏差= 目标位置 - 当前位置 (distance)
+		     	}
+			
+			 if(judge_he_flag == 2) //起始位置在水平位置,UP-向水平位置移动-不移动
+			 {
+               sPID.SetPoint =0;                         
+               iError = 0; //不移动
+			 }
 
-    }
+	  }
+	  else //顺时针旋转 “下”---Down --往
+	  {
+			if (judge_he_flag == 1)  //起始点位置在垂直的位置
+			{
+
+				sPID.SetPoint = 0;
+
+				iError = 0; //不移动
+			}
+			if(judge_he_flag ==2) //起点位置，在水平位置
+			{
+			     sPID.SetPoint = setPositionEnd;
+				 iError = sPID.SetPoint + NextPoint; 
+			}
+	  }
+  
   iError = sPID.SetPoint - NextPoint; //偏差= 目标位置 - 当前位置 (distance)
   if((iError<1 )&& (iError>-1)) //霍尔传感器误差，精度低（闭环）
     iError = 0;
@@ -89,7 +92,7 @@ int32_t LocPIDCalc(int32_t NextPoint)
         sPID.SumError = 2 * sPID.SetPoint;
     }
     else if(sPID.SumError <= 2 * sPID.SetPoint)
-         sPID.SumError = 2 * sPID.SetPoint;
+         sPID.SumError = 2 * sPID.SetPoint; //积累误差值
   }
   dError = iError - sPID.LastError; //微分项
   sPID.LastError = iError;
@@ -125,21 +128,23 @@ void SysTick_IRQ_Handler  (void)
 		   * 每个信号边沿都会捕获到接口定时器的CCR1,每100ms读取捕获到的时间和脉冲数,就可以得到电机的速度值.
 		   */
 		   PID_Result = LocPIDCalc(mCurPosValue);
-	
+	   #if 0
 		  /* 限定PWM数值范围 */
 		  if(PID_Result<0)//判断方向，PID值＜ 0
 		  {
 			PID_Result = abs(PID_Result);
 			BLDCMotor.Dir = CCW; //判断方向，逆时针
 			Dir = 1;
+			PRINTF("IRQ Dir = %d \r\n",Dir);
 		  }
 		  else 
 			{
-			  BLDCMotor.Dir = CW;  //顺时针方向
+			  BLDCMotor.Dir = CW;  //顺时针方向 
 			  Dir =0 ;
+			  PRINTF("IRQ Dir = %d \r\n",Dir);
 			}
-	
-		#if 0	
+	     
+		
 		  /*判断电机运行方向*/
 		   BLDCMotor.Dir= Dir ; //逆时针
 		  if(Last_Dir != BLDCMotor.Dir ) //
@@ -151,8 +156,8 @@ void SysTick_IRQ_Handler  (void)
 		  }
 		  Last_Dir = BLDCMotor.Dir;// CW
 		 #endif 
-		  if(PID_Result>= 20000) //PMW =20000
-		     PID_Result = 20000;
+		  if(PID_Result>= 100) //PMW_Duty max is 100
+		     PID_Result = 100;
 		  
 		    PWM_Duty = PID_Result;
 		

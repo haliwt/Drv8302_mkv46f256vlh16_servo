@@ -59,15 +59,17 @@ uint32_t pulseWidth;
 
 //__IO uint16_t	PWM_Duty; 
 
-int16_t setHome = 0xfff;
-int16_t setEnd=0xfff;
+int32_t setHome = 0xfff;
+int32_t setEnd=0xfff;
 int16_t setPositionHome=0xfff;
 int16_t setPositionEnd=0xfff;
 uint8_t setRun_flag=0 ;
 uint8_t setStop_flag=0;
 
 uint8_t  arithmetic_flag ;
-
+uint8_t home_flag;
+uint8_t end_flag;
+uint8_t judge_he_flag;
 
 
 
@@ -160,15 +162,16 @@ int main(void)
 				
 			   if(en_t.firstPowerOn ==2)
 			   	{
-				   setHome = en_t.capture_width-10;
+				   setHome = en_t.capture_width-20;
                    if(setPositionHome == 0 )
 				   setPositionHome = mCurPosValue + 20;
                    else if(Dir ==1) //顺时针
                      setPositionHome = mCurPosValue + 20;
-				   else
+				   else //逆时针旋转 Dir =0 
 				   	 setPositionHome = mCurPosValue - 20;
-
-				   arithmetic_flag  = 1;
+				    
+				
+				    home_flag =1;
 				   PRINTF("setHome= %d \r\n",setHome);
 				   PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
 								  
@@ -176,17 +179,29 @@ int main(void)
 			    if(en_t.firstPowerOn ==3)
 			   {
 
-				   setEnd = en_t.capture_width-10;
+				   setEnd = en_t.capture_width-20;
                    if(setPositionEnd ==0 )
                     setPositionEnd = mCurPosValue + 20;
                    else if(Dir ==1) //顺时针
                      setPositionEnd = mCurPosValue +20;
 				   else
 				   	setPositionEnd = mCurPosValue - 20;
-				   arithmetic_flag  = 1;
+				   
+				   end_flag =1;
 				   PRINTF("setPositionEnd@@@= %d \r\n",setPositionEnd);
 			   }
-			  
+                /*判断起始的位置*/
+                if((home_flag ==1)&&(end_flag ==1))
+                	{
+						if(setHome > setEnd) //起始位置，垂直位置
+						{
+							judge_he_flag =1; //只能往水平位置移动
+						}
+						else //setHome < setEnd  //起始位置在，水平位置
+							judge_he_flag =2;
+						arithmetic_flag  = 1;
+                	}
+				
 			   PRINTF("setHome= %d \r\n",setHome);
 			   PRINTF("setEnd= %d \r\n",setEnd);
 			   PRINTF("setPositionHome^^= %d \r\n",setPositionHome);
@@ -220,7 +235,7 @@ int main(void)
                if(keyRunTime ==1)
                {
 				  setStop_flag=0;
-                  PRINTF("setPosEndRun~~~~~~~~ ~~~~~= 1 \r\n");
+                  PRINTF("setPosEndRun~~~~~~~~= 1 \r\n");
                }
 			   else
                {
@@ -375,7 +390,7 @@ int main(void)
            switch(ucKeyCode)
             { 
                  
-                  case ABC_POWER_PRES ://顺时针---方向
+                  case DIR_DOWN_PRES ://顺时针---方向--“下”-水平方向
 				  	 Dir = 1;
 					 keyRunTime = 1;
 					  setRun_flag = 0;
@@ -442,7 +457,7 @@ int main(void)
                  
 				  break;
 		
-				 case DIR_PRES: //逆时针旋转
+				 case DIR_UP_PRES: //逆时针旋转 Dir = 0;“上”--垂直方向
 				    Dir = 0 ; //逆时针
 					keyRunTime = 1;
                    setRun_flag = 0;

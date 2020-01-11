@@ -32,8 +32,7 @@ typedef struct _encoder_t_
 
   uint32_t PulseWidth;
 
-  uint8_t L_flag;
-  uint8_t R_flag;
+ 
   uint8_t en_interrupt_flag;
   
   uint8_t sethome_flag;
@@ -68,8 +67,8 @@ typedef struct _encoder_t_
 /* Get source clock for FTM driver */
 #define FTM_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_FastPeriphClk)
 
-extern int16_t setHome ;
-extern int16_t setEnd ;
+extern int32_t setHome ;
+extern int32_t setEnd ;
 
 extern int16_t setPositionHome;
 extern int16_t setPositionEnd;
@@ -77,6 +76,10 @@ extern int16_t setPositionEnd;
 extern uint8_t setRun_flag;
 extern uint8_t setStop_flag;
 extern uint32_t mCurPosValue;
+
+extern uint8_t home_flag;
+extern uint8_t end_flag;
+extern uint8_t judge_he_flag ;
   
 
 void Capture_Input_Init(void);

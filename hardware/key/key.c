@@ -89,14 +89,14 @@ void KEY_Init(void)
     * mode: 0 - 不支持连续按，1-支持连续按
     * 0，没有任何按键按下
     *，按下按键
-    * 优先权 ：BRAKE>START_KEY>DIR_KEY>DIGITAL_ADD_KEY>DIGITAL_REDUCE_RKEY>
+    * 优先权 ：BRAKE>START_KEY>DIR_UP_KEY>DIGITAL_ADD_KEY>DIGITAL_REDUCE_RKEY>
     *
 **************************************************************************************/
 uint8_t KEY_Scan(uint8_t mode)
 {
 	   static uint8_t key_up = 1; //按键松开标志
 	   if(mode == 1) key_up =1;
-	  if(key_up &&(ABC_POWER_KEY == 1 || START_KEY ==1 ||DIR_KEY ==1 || DIGITAL_ADD_KEY==1||\
+	  if(key_up &&(DIR_DOWN_KEY == 1 || START_KEY ==1 ||DIR_UP_KEY ==1 || DIGITAL_ADD_KEY==1||\
 					DIGITAL_REDUCE_KEY==1||DOOR_KEY==1||HALL_SWITCH_KEY==1||\
 					WHEEL_KEY==1|| WIPERS_KEY==1 ))
 	  
@@ -104,14 +104,14 @@ uint8_t KEY_Scan(uint8_t mode)
 		 DelayMs(10);
 		 key_up =0;
 	 
-		 if(ABC_POWER_KEY ==1)
+		 if(DIR_DOWN_KEY ==1)
 		 {
 			/* 等待按键弹开，退出按键扫描函数 */
-			//  while(ABC_POWER_KEY==1); //WT.EDIT 2019-11-15
+			//  while(DIR_DOWN_KEY==1); //WT.EDIT 2019-11-15
 			   /* 按键扫描完毕，确定按键按下 */
-			 return ABC_POWER_PRES;
+			 return DIR_DOWN_PRES;
 		 }
-	#if 1
+	
 		 else if(START_KEY == 1)
 		 {
 			 /* 等待按键弹开，退出按键扫描函数 */
@@ -119,14 +119,14 @@ uint8_t KEY_Scan(uint8_t mode)
 			   /* 按键扫描完毕，确定按键按下 */
 			  return START_PRES;
 		  }
-   #endif 
-		 else if(DIR_KEY==1)
+  
+		 else if(DIR_UP_KEY==1)
 		 {
 			 /* 等待按键弹开，退出按键扫描函数 */
-			 //while(DIR_KEY==1);  WT.EDIT 2019-11-15
+			 //while(DIR_UP_KEY==1);  WT.EDIT 2019-11-15
 			   /* 按键扫描完毕，确定按键按下 */
 	
-			 return DIR_PRES;
+			 return DIR_UP_PRES;
 		 }
 		 else if(DIGITAL_ADD_KEY==1)		
 		 {
@@ -184,7 +184,7 @@ uint8_t KEY_Scan(uint8_t mode)
 		 }
          #endif 
 	   }
-	  else if(ABC_POWER_KEY == 0 && START_KEY == 0 && DIR_KEY==0 && DIGITAL_ADD_KEY==0 &&\
+	  else if(DIR_DOWN_KEY == 0 && START_KEY == 0 && DIR_UP_KEY==0 && DIGITAL_ADD_KEY==0 &&\
 				  DIGITAL_REDUCE_KEY==0 &&DOOR_KEY==0 && HALL_SWITCH_KEY==0 && \
 					 WHEEL_KEY == 0 && WIPERS_KEY== 0 ) 
       {
