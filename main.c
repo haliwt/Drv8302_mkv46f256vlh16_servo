@@ -41,6 +41,7 @@
 #include "encoder.h"
 #include "fsl_xbara.h"
 #include "fsl_enc.h"
+//#include "port.c"
 
 /*******************************************************************************
  * Definitions
@@ -55,12 +56,30 @@ uint32_t pulseWidth;
 
 output_t  motor_ref;
 encoder_t en_t;
+ BLDC_Typedef BLDCMotor = {0,CW,0,0,100,0,0,0}; //CW = - 
+PID_TypeDef  sPID; 
+
+ uint16_t pwm_duty;
 int16_t setHome=0xfff;
 int16_t setEnd=0xfff;
 int16_t setPositionHome=0xfff;
 int16_t setPositionEnd=0xfff;
 uint8_t setRun_flag=0 ;
 uint8_t setStop_flag=0;
+
+
+/* 私有变量 ------------------------------------------------------------------*/
+uint32_t IS_EnableMotor = 0;  // 使能电机标志
+uint32_t Time_CNT = 0;
+int32_t  flag = 0;
+int32_t  start_flag = 0;
+
+
+
+//__IO uint32_t PWM_ChangeFlag = 0;
+//__IO int32_t CaptureNumber = 0;      // 输入捕获数
+
+
 
 
 /*******************************************************************************
@@ -85,7 +104,7 @@ int main(void)
      uint8_t printx4[]="key motor run = 0 ^^^^ \r\n";
      uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
      uint8_t ucKeyCode=0;
-     uint16_t pwm_duty;
+    
 	 static uint8_t keyRunTime=0;
 
     
@@ -93,7 +112,7 @@ int main(void)
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
-    
+    IncPIDInit() ;
     
      LED_Init();
      KEY_Init();
@@ -124,7 +143,8 @@ int main(void)
 		
 	      
 		en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-		
+		BLDCMotor.Hall_PulNum = en_t.mCurPosValue;//
+		pwm_duty=60;
 	#if 1	
 		
       /***************************Zerio AND Point***************************************************************/
@@ -149,6 +169,8 @@ int main(void)
                      setPositionHome = en_t.mCurPosValue + 10;
 				   else
 				   	 setPositionHome = en_t.mCurPosValue - 10;
+
+				    sPID.SetPoint=setPositionHome;
 				   PRINTF("setHome= %d \r\n",setHome);
 				   PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
 								  
@@ -163,6 +185,7 @@ int main(void)
                      setPositionEnd = en_t.mCurPosValue +10;
 				   else
 				   	 setPositionEnd = en_t.mCurPosValue - 10;
+				   sPID.SetPoint=setPositionEnd;
 				   PRINTF("setPositionEnd@@@= %d \r\n",setPositionEnd);
 			   }
 			  
@@ -219,8 +242,7 @@ int main(void)
    				
                keyRunTime=2;
 			   GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
-					  
-				pwm_duty=60;
+			  	  
 	#ifdef DEBUG_PRINT 
              printf("pwm_duty = %d\r \n",pwm_duty); 
 	#endif 
@@ -506,50 +528,79 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
 
 #if 0
 /*!
- * @brief ISR for INDEX event
+ * @brief ISR for systick intrrupt
  */
-void ENC_INDEX_IRQHandler(void)
+ int32_t PID_Result = 0;
+//void SysTick_IRQ_Handler(void)
+ void vPortSetupTimerInterrupt( void )
 {
-    g_EncIndexCounter++;
-    ENC_ClearStatusFlags(DEMO_ENC_BASEADDR, kENC_INDEXPulseFlag);
+ 	PRINTF("vPortSetupTimerInterrupt = OK \r\n");
+  #if 0
+  static uint32_t Last_Dir = 0;
+  Time_CNT++;
+  PRINTF("vPortSetupTimerInterrupt = OK \r\n");
+  if(start_flag  == 1)
+  {
+    /* 100ms 采样周期,控制周期 */
+    if(Time_CNT % 100 == 0)
+    {
+      /* 获取速度值:由捕获到的脉冲数除以总的时间 Pul/t */
+      /* BLDCMotor是4对极,旋转一圈有4个脉冲信号,3相UVW信号线,共12个脉冲信号,每个脉冲边沿计数一次,
+       * 所以BLDCM旋转一圈,可以捕获到的霍尔信号是24,计数值可以计数到24.
+       * 每个信号边沿都会捕获到接口定时器的CCR1,每100ms读取捕获到的时间和脉冲数,就可以得到电机的速度值.
+       */
+       PID_Result = LocPIDCalc(BLDCMotor.Hall_PulNum);
+      /* 限定PWM数值范围 */
+      if(PID_Result<0)//判断方向，PID值＜ 0
+      {
+        PID_Result = abs(PID_Result);
+        BLDCMotor.Dir = CCW; //判断方向，逆时针
+        Dir = 1;
+      }
+      else 
+      	{
+          BLDCMotor.Dir = CW;  //顺时针方向
+          Dir =0 ;
+      	}
+        
+      /*判断电机运行方向*/
+	   BLDCMotor.Dir= Dir ; //逆时针
+      if(Last_Dir != BLDCMotor.Dir ) //
+      {
+        Disable_BLDC(); //停止电机运转
+       // Enable_BLDC();  //开启电机运转
+       uwStep = HallSensor_GetPinState();
+	   HALLSensor_Detected_BLDC(pwm_duty);
+      }
+      Last_Dir = BLDCMotor.Dir;// CW
+      
+     // if(PID_Result>=(int32_t)(BLDCMOTOR_TIM_PERIOD/3)) //1.9KHZ/3=0.63khz
+      //  PID_Result = (int32_t)(BLDCMOTOR_TIM_PERIOD/3);
+      
+      BLDCMotor.PWM_Duty = PID_Result;
+	 /// pwm_duty = PID_Result;
+     // PWM_ChangeFlag = 1; //中断，标志位
+      uwStep = HallSensor_GetPinState();
+	               
+	  HALLSensor_Detected_BLDC(BLDCMotor.PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
+      //PWM_ChangeFlag = 0;
+
+    }
+  }  
+  //50ms反馈一次数据
+  if(Time_CNT % 50 == 0)
+  {
+    PRINTF("Current position : %d\r\n", en_t.mCurPosValue);//Transmit_FB(ptr_FB);
+  }
+  if(Time_CNT == 100)
+    Time_CNT = 0;
    // PRINTF("g_en = %d \r\n",g_EncIndexCounter);
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
       exception return operation might vector to incorrect interrupt */
 #if defined __CORTEX_M && (__CORTEX_M == 4U)
     __DSB();
 #endif
-}
 #endif 
-#if 0
-void FTM_INPUT_CAPTURE_HANDLER(void)
-{
-    if ((FTM_GetStatusFlags(DEMO_FTM_BASEADDR) & kFTM_TimeOverflowFlag) == kFTM_TimeOverflowFlag)
-    {
-        /* Clear overflow interrupt flag.*/
-        FTM_ClearStatusFlags(DEMO_FTM_BASEADDR, kFTM_TimeOverflowFlag);
-        g_timerOverflowInterruptCount++;
-    }
-    else if (((FTM_GetStatusFlags(DEMO_FTM_BASEADDR) & FTM_FIRST_CHANNEL_FLAG) == FTM_FIRST_CHANNEL_FLAG) &&
-             (ftmFirstChannelInterruptFlag == false))
-    {
-        /* Disable first channel interrupt.*/
-        FTM_DisableInterrupts(DEMO_FTM_BASEADDR, FTM_FIRST_CHANNEL_INTERRUPT_ENABLE);
-        g_firstChannelOverflowCount  = g_timerOverflowInterruptCount;
-        ftmFirstChannelInterruptFlag = true;
-    }
-    else if ((FTM_GetStatusFlags(DEMO_FTM_BASEADDR) & FTM_SECOND_CHANNEL_FLAG) == FTM_SECOND_CHANNEL_FLAG)
-    {
-        /* Clear second channel interrupt flag.*/
-        FTM_ClearStatusFlags(DEMO_FTM_BASEADDR, FTM_SECOND_CHANNEL_FLAG);
-        /* Disable second channel interrupt.*/
-        FTM_DisableInterrupts(DEMO_FTM_BASEADDR, FTM_SECOND_CHANNEL_INTERRUPT_ENABLE);
-        g_secondChannelOverflowCount  = g_timerOverflowInterruptCount;
-        ftmSecondChannelInterruptFlag = true;
-    }
-    else
-    {
-    }
-    __DSB();
 }
 #endif 
 

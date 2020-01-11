@@ -66,38 +66,6 @@ int32_t LocPIDCalc(int32_t NextPoint)
   * 返回参数：目标控制量
   *
   */
-int32_t AnglePIDCalc(int32_t NextAngle)
-{
-  int32_t iError,dError;
-  iError = sPID.SetAngle - NextAngle; //偏差= 目标位置角度 - 当前位置角度 (角度)
-  if((iError<10 )&& (iError>-10)) //霍尔传感器误差，精度低（闭环）
-    iError = 0;
-  /* 积分分离 */
-  if((iError<200 )&& (iError>-200))
-  { 
-    sPID.SumError += iError; //积分
-    /* 积分上限 */
-    if(sPID.SetAngle>0)
-    {
-      if(sPID.SumError >= 7 * sPID.SetAngle)
-        sPID.SumError = 7 * sPID.SetAngle;
-    }
-    else if(sPID.SumError <= 7 * sPID.SetAngle)
-         sPID.SumError = 7 * sPID.SetAngle;
-  }
-  dError = iError - sPID.LastError; //微分项
-  sPID.LastError = iError;
-  
-  return (int32_t)(sPID.Proportion * iError //比例项
-  + sPID.Integral * sPID.SumError //积分项
-  + sPID.Derivative * dError); //微分项
-}
-
-
-
-
-
-
 
 
 
