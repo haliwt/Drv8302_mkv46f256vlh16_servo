@@ -140,9 +140,9 @@ int main(void)
        
 		
 	    en_t.capture_width =Capture_ReadPulse_Value(); 
-       // PRINTF("Cpw = %d\r\n", en_t.capture_width);
+        PRINTF("Cpw = %d\r\n", en_t.capture_width);
 		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-        
+        PRINTF("Current position : %d\r\n", mCurPosValue);
 	
 		
 	#if 1	
@@ -379,10 +379,10 @@ int main(void)
 					}
 			        else //Dir == 1 水平方向移动
 		        	{
-						     
+						 SysTick_IRQ_Handler ();  
 						 uwStep = HallSensor_GetPinState();
 		          		 HALLSensor_Detected_BLDC(PWM_Duty);
-	                     SysTick_IRQ_Handler ();
+	                     
 						 
 		        	}
                     }
@@ -416,7 +416,7 @@ int main(void)
               
                  
       
-			 // PMW_AllClose_ABC_Channel();
+			  PMW_AllClose_ABC_Channel();
               DelayMs(50);
               GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
               DelayMs(50);

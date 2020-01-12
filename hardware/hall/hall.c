@@ -11,6 +11,8 @@ int32_t PID_Result ;
 uint32_t Time_CNT = 0;
 int32_t  flag = 0;
 
+uint32_t ABZ_CNT;
+
 
 
 
@@ -122,49 +124,38 @@ int32_t LocPIDCalc(int32_t NextPoint)
 void SysTick_IRQ_Handler  (void)
 {
 
-	 uint8_t brake_times = 10,run_times = 30;	
-     int32_t speed_up =0,speed_cut =0,constant_speed=0;
-	 int32_t iError,dError;;
-	  
-	  
+	 uint32_t total_value;
+	 float  one_step ;	
+	 static uint8_t i=0;
+     static uint8_t j=0;
+	 int32_t iError,dError;
+	 uint8_t iEr_flag=0;
+	  mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 	  PRINTF("PID_Result = %d \r\n",PID_Result);
 	  
 	  Time_CNT++;
-	  speed_up = abs(setPositionEnd + setPositionHome) / 3 ;
-	  constant_speed = abs(setPositionEnd + setPositionHome) / 3 ;
-	  speed_cut =abs(setPositionEnd + setPositionHome) / 3 ;
-	  PRINTF("speed_up = %d \r\n",speed_up);
-	  PRINTF("constant_speed = %d \r\n",constant_speed);
-	  PRINTF("speed_cut = %d \r\n",speed_cut);
+	 
 
       if(Dir == 1) //Dir ==1 顺时针旋转 “下”---Down --往---往水平方向移动
 	  {
-			if (judge_he_flag == 1)  //起始点位置在垂直的位置
+			if (judge_he_flag == 1)  //起始点位置在垂直的位置,setHome > setEnd 
 			{
-
-				sPID.SetPoint =  array_data[1];//setPositionEnd;
-
-				iError = sPID.SetPoint + mCurPosValue; 
+				
+			   iError =  array_data[1] - mCurPosValue;//setPositionEnd;
+               iEr_flag =1;
+				
 			}
 			if(judge_he_flag ==2) //起点位置，在水平位置
 			{
-			     sPID.SetPoint =  array_data[0];//setPositionHome;
-				 iError = sPID.SetPoint + mCurPosValue; 
+			   iError =  array_data[0] - mCurPosValue;//setPositionHome
+			   iEr_flag =2;
 			}
 	  }
-	
-       PID_Result =iError;
-	   dError = array_data[2];//setHome 
-     PRINTF("iError= %d \r\n",iError);
-	 PRINTF("dError= %d \r\n",array_data[2]);
+	   PID_Result =iError;
+	   PRINTF("iError= %d \r\n",iError);
 
-
-
-
-
-	  
-	 if( arithmetic_flag  == 1)
-	 {
+if( arithmetic_flag  == 1)
+  {
 		/* 100ms 采样周期,控制周期 */
 		//if(Time_CNT % 50 == 0)
 		{
@@ -173,77 +164,74 @@ void SysTick_IRQ_Handler  (void)
 		   * 所以BLDCM旋转一圈,可以捕获到的mCurPosValue
 		   * 每个信号边沿都会捕获到接口定时器的CCR1,每100ms读取捕获到的时间和脉冲数,就可以得到电机的速度值.
 		   */
-		   mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-		//   PID_Result = LocPIDCalc(mCurPosValue);
-		   PRINTF("PID_Result = %d \r\n",PID_Result);
-	   #if 1
+		  
+		  // PID_Result = LocPIDCalc(mCurPosValue);
+		   //PRINTF("PID_Result = %d \r\n",iError);
+	 
 		  /* 限定PWM数值范围 */
-		  if(PID_Result==sPID.SetPoint)//判断方向，PID值＜ 0
+	   if(Dir ==1)
+	   	{
+		  if((PID_Result==0))//判断方向，PID值＜ 0
 		  {
               PMW_AllClose_ABC_Channel();
               DelayMs(50);
-			  PRINTF("IRQ Dir = 000000000\r\n");
+			  PRINTF("PID PROCESS STOP 000\r\n");
 		  }
-		  else if(PID_Result > 0)
+		  else if(PID_Result !=0)
 		  {
-		  	
-			 if(Dir ==1 ) //"DOWN"--往水平方向移动
-			   {
-					if(PID_Result >=100)
-					{
-                         if(PID_Result >  100)
-                         	{
-							 PID_Result = 40;
-							 PWM_Duty = PID_Result;
-                         	}
-						 else 
-						 	{
-								 run_times =run_times -2;
-								 PWM_Duty = run_times ;
-                         	}
-						
-					}
-					else 
-					{
-						 PID_Result = PID_Result +5;
-						 PWM_Duty = PID_Result;
+              total_value =abs(setPositionEnd)+abs(setPositionHome);
 
-					}
-				  	
-				   
-			   }
+			  one_step = (float)total_value / 90 ;
+			  if(PID_Result >= 100 || PID_Result < 0)
+			  {
+				   i++;
+				 PID_Result =30;
+ 			     ABZ_CNT = 30 - i ;
+				  PRINTF("ABZ_CNT = %d \r\n",ABZ_CNT);
+				   uwStep = HallSensor_GetPinState();
+					   
+		            HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
+			  }
+			  else if((PID_Result < 100)&&(PID_Result >20))
+			  {
+				  i++;
+ 			     ABZ_CNT = 30 - i ;
+				 PRINTF("ABZ_CNT = %d \r\n",ABZ_CNT);
+				 uwStep = HallSensor_GetPinState();
+				 HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
+			  }
+			  else if(((PID_Result) < 20)||(PID_Result == 20))
+			  {
+					j++;
+					
+				   ABZ_CNT = PID_Result - j ;
+				    PRINTF("ABZ_CNT = %d \r\n",ABZ_CNT);
+					 uwStep = HallSensor_GetPinState();
+					   
+		             HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
+			  }
 			  
-		   }
-		   else
-		   {
-				
-		   }
-		 
-	    #endif 
-		#if 0
-		  /*判断电机运行方向*/
-		   BLDCMotor.Dir= Dir ; //逆时针
-		  if(Last_Dir != BLDCMotor.Dir ) //
-		  {
-			//Disable_BLDC(); //停止电机运转
-		   // Enable_BLDC();  //开启电机运转
-		   uwStep = HallSensor_GetPinState();
-		   HALLSensor_Detected_BLDC(PWM_Duty);
+			 
 		  }
-		  Last_Dir = BLDCMotor.Dir;// CW
-		 #endif 
+		  
+		 
+		
+		 
+	  
 		 
 		  
-		   //PWM_Duty = PID_Result;
+
+		  
 		   
 		
-		  uwStep = HallSensor_GetPinState();
+		 // uwStep = HallSensor_GetPinState();
 					   
-		  HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
+		 // HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
 		 
 	
 		}
-	  }  
+	  }
+     }
 	  //50ms反馈一次数据
 	  if(Time_CNT % 25 == 0)
 	  {

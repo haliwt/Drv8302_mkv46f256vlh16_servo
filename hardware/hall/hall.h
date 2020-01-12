@@ -61,7 +61,7 @@ extern uint8_t  arithmetic_flag ;
 extern int32_t PID_Result ;
 
 extern uint32_t Time_CNT ;
-
+extern uint32_t ABZ_CNT;
 
 void ENCODER_Init(void);
 void IncPIDInit(void) ;    //PID ³õÊ¼»¯º¯Êý
