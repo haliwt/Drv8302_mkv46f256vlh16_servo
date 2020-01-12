@@ -5,6 +5,7 @@
 #include "fsl_port.h"
 #include "bldc.h"
 #include "encoder.h"
+#include "output.h"
 
 /* 类型定义 ------------------------------------------------------------------*/
 typedef struct {
@@ -38,9 +39,9 @@ typedef struct
 #define  SysTick_IRQ_Handler            SysTick_Handler     
 
 
-#define  P_DATA      0.85f                                // P参数
-#define  I_DATA      0.055f                                // I参数
-#define  D_DATA      0.558f                                 // D参赛
+#define  P_DATA      0.1f//0.85f                                // P参数
+#define  I_DATA      0.01//0.055f                                // I参数
+#define  D_DATA      0.2//0.558f                                 // D参赛
 
 #define P_ANGLE_DATA        0.35f   		//比例参数
 #define I_ANGLE_DATA		0.002f
@@ -49,6 +50,7 @@ typedef struct
 #define abs(x)    ((x)>0?(x):-(x))
 #define  TARGET_PULSE  1000
 
+extern int32_t array_data[4];
 
 /* 扩展声明 ------------------------------------------------------------------*/
 
@@ -56,7 +58,9 @@ typedef struct
 extern uint8_t  arithmetic_flag ;
 
 
+extern int32_t PID_Result ;
 
+extern uint32_t Time_CNT ;
 
 
 void ENCODER_Init(void);

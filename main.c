@@ -55,8 +55,6 @@ encoder_t en_t;
 volatile uint32_t g_EncIndexCounter = 0U;
 uint32_t pulseWidth;
 
-
-
 //__IO uint16_t	PWM_Duty; 
 
 int32_t setHome = 0xfff;
@@ -71,6 +69,7 @@ uint8_t home_flag;
 uint8_t end_flag;
 uint8_t judge_he_flag;
 
+int32_t array_data[4]={0xfff,0xfff,0xfff,0xfff};
 
 
 
@@ -105,7 +104,7 @@ int main(void)
      uint8_t ucKeyCode=0;
     
 	 static uint8_t keyRunTime=0;
-
+     static uint8_t rem_times = 0;
     
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -140,78 +139,107 @@ int main(void)
          ucKeyCode = KEY_Scan(0);
        
 		
-	      
+	    en_t.capture_width =Capture_ReadPulse_Value(); 
+       // PRINTF("Cpw = %d\r\n", en_t.capture_width);
 		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-        SysTick_IRQ_Handler ();
+        
 	
-		PWM_Duty=60;
+		
 	#if 1	
 		
       /***************************Zerio AND Point***************************************************************/
-	   if(((en_t.firstPowerOn ==0)||(en_t.firstPowerOn <4))&&(en_t.en_interrupt_flag == 1 ))
+	   if((rem_times <4)&&(en_t.en_interrupt_flag == 1 ))
 		{
-			  en_t.capture_width =Capture_ReadPulse_Value();
+			  
 		      PRINTF("Cpw = %d\r\n", en_t.capture_width);
 			  PRINTF("Current position : %d\r\n", mCurPosValue);
 
 			   PRINTF("--------------------------------------\r\n" ); 
 			   en_t.en_interrupt_flag=0;
-			   en_t.firstPowerOn++;
-	          
-			   PRINTF("firstOn= %d \r\n",en_t.firstPowerOn);
-				
-			   if(en_t.firstPowerOn ==2)
-			   	{
-				   setHome = en_t.capture_width-20;
-                   if(setPositionHome == 0 )
-				   setPositionHome = mCurPosValue + 20;
-                   else if(Dir ==1) //顺时针
-                     setPositionHome = mCurPosValue + 20;
-				   else //逆时针旋转 Dir =0 
-				   	 setPositionHome = mCurPosValue - 20;
-				    
-				
-				    home_flag =1;
-				   PRINTF("setHome= %d \r\n",setHome);
-				   PRINTF("setPositionHome^^^= %d \r\n",setPositionHome);
-								  
-			   	}
-			    if(en_t.firstPowerOn ==3)
-			   {
+			   rem_times++;
+			   PRINTF("rem_times= %d \r\n",rem_times);
+	           if(rem_times < 4)
+	           	{
+				  
+					
+				   if(rem_times ==2)
+				   	{
+					   setHome = en_t.capture_width-20;
+					   array_data[2]= setEnd;
+	                   if(setPositionHome == 0 )
+	                   	{
+					       setPositionHome = mCurPosValue + 20;
+						   array_data[0]=setPositionHome;
+	                   	}
+	                   else if(Dir ==1) //顺时针
+	                   	{
+	                     setPositionHome = mCurPosValue + 20;
+						 array_data[0]=setPositionHome;
+	                   	}
+					   else //逆时针旋转 Dir =0 
+					   	{
+					   	 setPositionHome = mCurPosValue - 20;
+						 array_data[0]=setPositionHome;
+					   	}
+					    
+					
+					    home_flag =1;
+					   PRINTF("setHome= %d \r\n",array_data[2]);
+					   PRINTF("setPositionHome^^^= %d \r\n",array_data[0]);
+									  
+				   	}
+				    if(rem_times ==3)
+				   {
 
-				   setEnd = en_t.capture_width-20;
-                   if(setPositionEnd ==0 )
-                    setPositionEnd = mCurPosValue + 20;
-                   else if(Dir ==1) //顺时针
-                     setPositionEnd = mCurPosValue +20;
-				   else
-				   	setPositionEnd = mCurPosValue - 20;
-				   
-				   end_flag =1;
-				   PRINTF("setPositionEnd@@@= %d \r\n",setPositionEnd);
-			   }
-                /*判断起始的位置*/
-                if((home_flag ==1)&&(end_flag ==1))
-                	{
-						if(setHome > setEnd) //起始位置，垂直位置
-						{
-							judge_he_flag =1; //只能往水平位置移动
-						}
-						else //setHome < setEnd  //起始位置在，水平位置
-							judge_he_flag =2;
-						arithmetic_flag  = 1;
-                	}
-				
-			   PRINTF("setHome= %d \r\n",setHome);
-			   PRINTF("setEnd= %d \r\n",setEnd);
-			   PRINTF("setPositionHome^^= %d \r\n",setPositionHome);
-			   PRINTF("setPositionEnd@@@= %d \r\n",setPositionEnd);
+					   setEnd = en_t.capture_width-20;
+					   array_data[3]= setEnd;
+	                   if(setPositionEnd ==0 )
+	                   	{
+	                      setPositionEnd = mCurPosValue + 20;
+						  array_data[1]=setPositionEnd;
+	                   	}
+	                   else if(Dir ==1) //顺时针
+	                   	{
+	                     setPositionEnd = mCurPosValue +20;
+						  array_data[1]=setPositionEnd;
+	                   	}
+					   else
+					   	{
+					   	   setPositionEnd = mCurPosValue - 20;
+						    array_data[1]=setPositionEnd;
+					   	}
+					   
+					   end_flag =1;
+					    PRINTF("setEnd!!!!= %d \r\n",array_data[3]);
+					   PRINTF("setPositionEnd@@@= %d \r\n",array_data[1]);
+					   arithmetic_flag  = 1;
+				   }
+	                /*判断起始的位置*/
+	                if((home_flag ==1)&&(end_flag ==1))
+	                	{
+							if(setHome > setEnd) //起始位置，垂直位置
+							{
+								judge_he_flag =1; //只能往水平位置移动
+							}
+							else //setHome < setEnd  //起始位置在，水平位置
+								judge_he_flag =2;
+							
+	                	}
+					
+						   PRINTF("setHome@@@= %d \r\n",array_data[2]);
+						   PRINTF("setEnd!!!!= %d \r\n",array_data[3]);
+						   PRINTF("setPositionHome^^= %d \r\n",array_data[0]);
+						   PRINTF("setPositionEnd@@@= %d \r\n",array_data[1]);
+	           	}
+			    else 
+					 PRINTF("rem_times over~~~~ \r\n");
 								
 		}
            
      /*********************************检测信号************************************************************************/ 
-		 if(setPositionHome  == mCurPosValue||setPositionHome == (mCurPosValue +1 )||setPositionHome == mCurPosValue-1)
-		 {
+		 if(((array_data[0]  <abs( mCurPosValue +30)) && (array_data[0]> abs(mCurPosValue -30)))\
+		 	||((array_data[2] < abs(en_t.capture_width +30)) && (array_data[2] >abs(en_t.capture_width-30))))
+		 { 
               
            PRINTF("setPositionHome ok \r\n");
 		   PRINTF("setPositionHome = %d \r\n",setPositionHome);
@@ -227,7 +255,7 @@ int main(void)
 			 PRINTF("Current position : %d\r\n", mCurPosValue);
            }	  
           }
-          if((setPositionEnd == mCurPosValue-1)||setPositionEnd  == mCurPosValue+1||setPositionEnd  == mCurPosValue)//绝对位置是不变的，setHome 软件指定的
+          if(((array_data[1] < abs(mCurPosValue +30))&& (array_data[1]  > abs(mCurPosValue-30)))||((array_data[3] < abs(en_t.capture_width +30)) && (array_data[3]>abs(en_t.capture_width-30))))//绝对位置是不变的，setHome 软件指定的
          {
 			 
 		       PRINTF("setPositionEnd ok \r\n");
@@ -341,11 +369,22 @@ int main(void)
                 #endif 
                }
               else{
-                  
-                     uwStep = HallSensor_GetPinState();
+                    if(Dir == 0) //向垂直方向移动
+                    {
+						uwStep = HallSensor_GetPinState();
 	               
-	                 HALLSensor_Detected_BLDC(PWM_Duty);
-                    // en_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+	                 	HALLSensor_Detected_BLDC(PWM_Duty);
+						PWM_Duty=60;
+
+					}
+			        else //水平方向移动
+			        	{
+							     
+								 uwStep = HallSensor_GetPinState();
+				               
+				                 HALLSensor_Detected_BLDC(PWM_Duty);
+			                     SysTick_IRQ_Handler ();
+			        	}
                     }
             }/*end if motor_ref.motor_run == 1*/
           
@@ -356,17 +395,17 @@ int main(void)
              	{
 				  
 				  
-				  PWM_Duty = 20;
+				  PWM_Duty = 30;
 				  uwStep = HallSensor_GetPinState();
 	              HALLSensor_Detected_BLDC( PWM_Duty);
 				  DelayMs(50);
                   
-                   PWM_Duty = 10;
+                   PWM_Duty = 20;
 				  uwStep = HallSensor_GetPinState();
 	              HALLSensor_Detected_BLDC( PWM_Duty);
 				  DelayMs(50);
 				 
-				   PWM_Duty = 5;
+				  PWM_Duty = 10;
 				  uwStep = HallSensor_GetPinState();
 	              HALLSensor_Detected_BLDC( PWM_Duty);
 				  DelayMs(50);
@@ -375,7 +414,7 @@ int main(void)
               
                  
       
-			  PMW_AllClose_ABC_Channel();
+			 // PMW_AllClose_ABC_Channel();
               DelayMs(50);
               GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
               DelayMs(50);
