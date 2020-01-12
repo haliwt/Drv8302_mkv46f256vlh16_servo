@@ -165,13 +165,13 @@ int main(void)
 				   if(rem_times ==2)
 				   	{
 					   setHome = en_t.capture_width-20;
-					   array_data[2]= setEnd;
+					   array_data[2]= setHome;
 	                   if(setPositionHome == 0 )
 	                   	{
 					       setPositionHome = mCurPosValue + 20;
 						   array_data[0]=setPositionHome;
 	                   	}
-	                   else if(Dir ==1) //顺时针
+	                   else if(Dir ==1) //顺时针---水平方向移动
 	                   	{
 	                     setPositionHome = mCurPosValue + 20;
 						 array_data[0]=setPositionHome;
@@ -250,7 +250,7 @@ int main(void)
 		   }
 		   else
            {
-             setStop_flag=1; 
+            // setStop_flag=1; 
              PRINTF("setPosHomeRun%%%%%%%% = 1\r\n");
 			 PRINTF("Current position : %d\r\n", mCurPosValue);
            }	  
@@ -267,7 +267,7 @@ int main(void)
                }
 			   else
                {
-			     setStop_flag = 1;
+			    // setStop_flag = 1;
                  PRINTF("setPosEndRun########## =  1\r\n");
 				 PRINTF("Current position : %d\r\n", mCurPosValue);
 				 
@@ -279,7 +279,7 @@ int main(void)
 /**************************************************************************************************************************************/
         
      /***********motor run main*********************/
-      if((motor_ref.motor_run == 1)&&(setStop_flag ==0))
+      if(motor_ref.motor_run == 1)
       {
    				
                keyRunTime=2;
@@ -377,14 +377,14 @@ int main(void)
 						PWM_Duty=60;
 
 					}
-			        else //水平方向移动
-			        	{
-							     
-								 uwStep = HallSensor_GetPinState();
-				               
-				                 HALLSensor_Detected_BLDC(PWM_Duty);
-			                     SysTick_IRQ_Handler ();
-			        	}
+			        else //Dir == 1 水平方向移动
+		        	{
+						     
+						 uwStep = HallSensor_GetPinState();
+		          		 HALLSensor_Detected_BLDC(PWM_Duty);
+	                     SysTick_IRQ_Handler ();
+						 
+		        	}
                     }
             }/*end if motor_ref.motor_run == 1*/
           
@@ -409,6 +409,8 @@ int main(void)
 				  uwStep = HallSensor_GetPinState();
 	              HALLSensor_Detected_BLDC( PWM_Duty);
 				  DelayMs(50);
+				  PRINTF("KEY STOP motor_run = %d \r\n",motor_ref.motor_run);
+				  PRINTF("KEY STOP power_on = %d \r\n",motor_ref.power_on);
 				 
              	}
               

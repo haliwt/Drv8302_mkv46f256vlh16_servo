@@ -48,7 +48,8 @@ int32_t LocPIDCalc(int32_t NextPoint)
 {
   int32_t iError,dError;
 
-	  if(Dir == 0) //逆时针旋转 DIR_UP_PRES，//往垂直方向移动
+     #if 0  
+	 // if(Dir == 0) //逆时针旋转 DIR_UP_PRES，//往垂直方向移动
 	  {
 		     if(judge_he_flag ==1) //setHome垂直是起始位置// 向垂直位置移动setEnd =12241 反向
 		     	{
@@ -64,7 +65,8 @@ int32_t LocPIDCalc(int32_t NextPoint)
 			 }
 
 	  }
-	  else //顺时针旋转 “下”---Down --往---往水平方向移动
+	 #endif 
+	  if(Dir == 1) //Dir ==1 顺时针旋转 “下”---Down --往---往水平方向移动
 	  {
 			if (judge_he_flag == 1)  //起始点位置在垂直的位置
 			{
@@ -79,7 +81,10 @@ int32_t LocPIDCalc(int32_t NextPoint)
 				 iError = sPID.SetPoint + NextPoint; 
 			}
 	  }
-  
+	
+
+     PRINTF("iError= %d \r\n",iError);
+#if 0
 //  iError = sPID.SetPoint - NextPoint; //偏差= 目标位置 - 当前位置 (distance)
   if((iError<2 )&& (iError>-2)) //霍尔传感器误差，精度低（闭环）
     iError = 0;
@@ -102,6 +107,8 @@ int32_t LocPIDCalc(int32_t NextPoint)
   return (int32_t)(sPID.Proportion * iError //比例项 
   + sPID.Integral * sPID.SumError //积分项
   + sPID.Derivative * dError); //微分项
+ #endif 
+  return iError;
 }
 
 /*******************************************************
@@ -114,30 +121,64 @@ int32_t LocPIDCalc(int32_t NextPoint)
   */
 void SysTick_IRQ_Handler  (void)
 {
-		
+
+	 uint8_t brake_times = 10,run_times = 30;	
      int32_t speed_up =0,speed_cut =0,constant_speed=0;
-	  PID_Result = LocPIDCalc(mCurPosValue);
+	 int32_t iError,dError;;
+	  
+	  
 	  PRINTF("PID_Result = %d \r\n",PID_Result);
+	  
 	  Time_CNT++;
-	  speed_up = abs(setPositionEnd - setPositionHome) / 3 ;
-	  constant_speed = abs(setPositionEnd - setPositionHome) / 3 ;
-	  speed_cut =abs(setPositionEnd - setPositionHome) / 3 ;
-	//	PRINTF("vPortSetupTimerInterrupt = OK \r\n");
+	  speed_up = abs(setPositionEnd + setPositionHome) / 3 ;
+	  constant_speed = abs(setPositionEnd + setPositionHome) / 3 ;
+	  speed_cut =abs(setPositionEnd + setPositionHome) / 3 ;
+	  PRINTF("speed_up = %d \r\n",speed_up);
+	  PRINTF("constant_speed = %d \r\n",constant_speed);
+	  PRINTF("speed_cut = %d \r\n",speed_cut);
+
+      if(Dir == 1) //Dir ==1 顺时针旋转 “下”---Down --往---往水平方向移动
+	  {
+			if (judge_he_flag == 1)  //起始点位置在垂直的位置
+			{
+
+				sPID.SetPoint =  array_data[1];//setPositionEnd;
+
+				iError = sPID.SetPoint + mCurPosValue; 
+			}
+			if(judge_he_flag ==2) //起点位置，在水平位置
+			{
+			     sPID.SetPoint =  array_data[0];//setPositionHome;
+				 iError = sPID.SetPoint + mCurPosValue; 
+			}
+	  }
+	
+       PID_Result =iError;
+	   dError = array_data[2];//setHome 
+     PRINTF("iError= %d \r\n",iError);
+	 PRINTF("dError= %d \r\n",array_data[2]);
+
+
+
+
+
+	  
 	 if( arithmetic_flag  == 1)
 	 {
 		/* 100ms 采样周期,控制周期 */
-		if(Time_CNT % 50 == 0)
+		//if(Time_CNT % 50 == 0)
 		{
 		  /* 获取速度值:由捕获到的脉冲数除以总的时间 Pul/t */
 		  /* BLDCMotor是4对极,旋转一圈有4个脉冲信号,3相UVW信号线,共12个脉冲信号,每个脉冲边沿计数一次,
 		   * 所以BLDCM旋转一圈,可以捕获到的mCurPosValue
 		   * 每个信号边沿都会捕获到接口定时器的CCR1,每100ms读取捕获到的时间和脉冲数,就可以得到电机的速度值.
 		   */
-		   PID_Result = LocPIDCalc(mCurPosValue);
+		   mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+		//   PID_Result = LocPIDCalc(mCurPosValue);
 		   PRINTF("PID_Result = %d \r\n",PID_Result);
 	   #if 1
 		  /* 限定PWM数值范围 */
-		  if(PID_Result==0)//判断方向，PID值＜ 0
+		  if(PID_Result==sPID.SetPoint)//判断方向，PID值＜ 0
 		  {
               PMW_AllClose_ABC_Channel();
               DelayMs(50);
@@ -146,24 +187,36 @@ void SysTick_IRQ_Handler  (void)
 		  else if(PID_Result > 0)
 		  {
 		  	
-			 if(Dir ==0 ) //"UP"--往垂直位置方向移动	
+			 if(Dir ==1 ) //"DOWN"--往水平方向移动
 			   {
 					if(PID_Result >=100)
-				  	PID_Result = 90;
-				   PRINTF("Dir= 0 to vertical run\r\n");
+					{
+                         if(PID_Result >  100)
+                         	{
+							 PID_Result = 40;
+							 PWM_Duty = PID_Result;
+                         	}
+						 else 
+						 	{
+								 run_times =run_times -2;
+								 PWM_Duty = run_times ;
+                         	}
+						
+					}
+					else 
+					{
+						 PID_Result = PID_Result +5;
+						 PWM_Duty = PID_Result;
+
+					}
+				  	
+				   
 			   }
-			   else //Dir ==1 ,"Down"---往水平方向移动
-			   {
-				  if(PID_Result >=100)
-				  	PID_Result = 40;
-				  PRINTF("Dir= 1 to horizontal run\r\n");
-			   }
+			  
 		   }
 		   else
 		   {
-				GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
-				DelayMs(50);
-				PRINTF("STOP run\r\n");
+				
 		   }
 		 
 	    #endif 
@@ -181,11 +234,12 @@ void SysTick_IRQ_Handler  (void)
 		 #endif 
 		 
 		  
-		   PWM_Duty = PID_Result;
+		   //PWM_Duty = PID_Result;
+		   
 		
-		  //uwStep = HallSensor_GetPinState();
+		  uwStep = HallSensor_GetPinState();
 					   
-		  //HALLSensor_Detected_BLDC(BLDCMotor.PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
+		  HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
 		 
 	
 		}
