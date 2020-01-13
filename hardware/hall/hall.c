@@ -183,7 +183,8 @@ void SysTick_IRQ_Handler  (void)
 		  /* 限定PWM数值范围 */
 	   if(Dir ==1)
 	   	{
-		  if((PID_Result ==0))//判断方向，PID值＜ 0
+		   i++;
+          if((PID_Result ==0))//判断方向，PID值＜ 0
 		  {
               uwStep = HallSensor_GetPinState();
               HALLSensor_Detected_BLDC( PWM_Duty);
@@ -200,20 +201,20 @@ void SysTick_IRQ_Handler  (void)
 			  if(PID_Result >= 100 || PID_Result < 0)
 			  {
                   
-				  i++;
+				//  i++;
 				  if((before_value[0] > before_value[1])&&(before_value[0] > 100))
                   {
                      goto  BECODER;
 
 				  } 
-				 if(i==1)PID_Result =40;
+				
                }
 		       else 
 BECODER:		  {
-						
-						if((before_value[0] > before_value[1])&&(before_value[0] < 100))
-						{
-							 ABZ_CNT = 40 - i ;
+					if((before_value[0] > before_value[1])&&(before_value[0] < 100))
+					{
+						   ABZ_CNT = 100 - i ;
+                           
 							if(ABZ_CNT ==0)
 								{
 							 	 motor_en_stop_flag=1;
@@ -242,7 +243,7 @@ BECODER:		  {
 						}
 						else
 						{ 
-						    ABZ_CNT = 40 - i ;
+						    ABZ_CNT = PID_Result;
 							if(ABZ_CNT ==0)
 								{
 							 	 motor_en_stop_flag=1;
@@ -267,7 +268,10 @@ BECODER:		  {
 							  		 uwStep = HallSensor_GetPinState();
 								   
 					            	HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
-								}
+
+                                      
+
+							}
 
 
 						}
