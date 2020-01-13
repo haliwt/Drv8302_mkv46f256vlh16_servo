@@ -187,7 +187,7 @@ if( arithmetic_flag  == 1)
 				   i++;
 				 PID_Result =30;
  			     ABZ_CNT = 30 - i ;
-				  PRINTF("ABZ_CNT = %d \r\n",ABZ_CNT);
+				  PRINTF("ABZ_CNT0 = %d \r\n",ABZ_CNT);
 				   uwStep = HallSensor_GetPinState();
 					   
 		            HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
@@ -196,7 +196,7 @@ if( arithmetic_flag  == 1)
 			  {
 				  i++;
  			     ABZ_CNT = 30 - i ;
-				 PRINTF("ABZ_CNT = %d \r\n",ABZ_CNT);
+				 PRINTF("ABZ_CNT 2= %d \r\n",ABZ_CNT);
 				 uwStep = HallSensor_GetPinState();
 				 HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
 			  }
@@ -205,7 +205,7 @@ if( arithmetic_flag  == 1)
 					j++;
 					
 				   ABZ_CNT = PID_Result - j ;
-				    PRINTF("ABZ_CNT = %d \r\n",ABZ_CNT);
+				    PRINTF("ABZ_CNT3 = %d \r\n",ABZ_CNT);
 					 uwStep = HallSensor_GetPinState();
 					   
 		             HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
