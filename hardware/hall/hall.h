@@ -51,8 +51,6 @@ typedef struct
 #define  TARGET_PULSE  1000
 
 extern int32_t array_data[4];
-extern uint8_t setStop_flag;
-
 
 /* 扩展声明 ------------------------------------------------------------------*/
 
@@ -63,11 +61,12 @@ extern uint8_t  arithmetic_flag ;
 extern int32_t PID_Result ;
 
 extern uint32_t Time_CNT ;
-extern uint8_t motor_en_stop_flag;
+extern uint32_t ABZ_CNT;
+
+extern int32_t PID_Result ;
 
 
 
-volatile extern uint32_t ABZ_CNT;
 
 void ENCODER_Init(void);
 void IncPIDInit(void) ;    //PID 初始化函数

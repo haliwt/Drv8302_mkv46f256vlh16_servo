@@ -37,16 +37,10 @@ typedef struct _encoder_t_
   
   uint8_t sethome_flag;
   uint8_t setend_flag;
-  uint8_t motor_en_stop_flag;
 
  }encoder_t;
 
-
-
- 
-
 #define abs(x)    ((x)>0?(x):-(x))
-
 
 /*******************************************************************************
  * Definitions
