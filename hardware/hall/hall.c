@@ -130,6 +130,7 @@ void SysTick_IRQ_Handler  (void)
      static uint8_t j=0;
 	 int32_t iError,dError;
 	 uint8_t iEr_flag=0;
+	 uint8_t ne_symbol = 0;
 	  mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 	  PRINTF("PID_Result = %d \r\n",PID_Result);
 	  
@@ -153,6 +154,16 @@ void SysTick_IRQ_Handler  (void)
 	  }
 	   PID_Result =iError;
 	   PRINTF("iError= %d \r\n",iError);
+	   if(PID_Result > 0)
+	   	{
+	   	   PRINTF(" ++ PID_Result \r\n");
+		   ne_symbol = 0;
+	   	}
+	   else
+	   	{
+	   	    PRINTF(" -- PID_Result \r\n");
+			ne_symbol = 1;
+	   	}
 
 if( arithmetic_flag  == 1)
   {
@@ -179,7 +190,8 @@ if( arithmetic_flag  == 1)
 		  }
 		  else if(PID_Result !=0)
 		  {
-              total_value =abs(setPositionEnd)+abs(setPositionHome);
+              /*-PID_Result 在此语句执行 递减*/
+			  total_value =abs(setPositionEnd)+abs(setPositionHome);
 
 			  one_step = (float)total_value / 90 ;
 			  if(PID_Result >= 100 || PID_Result < 0)
@@ -187,6 +199,8 @@ if( arithmetic_flag  == 1)
 				   i++;
 				 PID_Result =30;
  			     ABZ_CNT = 30 - i ;
+				
+				 
 				  PRINTF("ABZ_CNT0 = %d \r\n",ABZ_CNT);
 				   uwStep = HallSensor_GetPinState();
 					   
@@ -200,19 +214,24 @@ if( arithmetic_flag  == 1)
 				 uwStep = HallSensor_GetPinState();
 				 HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
 			  }
-			  else if(((PID_Result) < 20)||(PID_Result == 20))
+			  else if(((PID_Result) < 100)||(PID_Result == 20)||(PID_Result ==0))
 			  {
+					/* +PID_Result 在此语句执行，ABZ_CNT 递加*/
 					j++;
-					
-				   ABZ_CNT = PID_Result - j ;
+					if(PID_Result < 20)
+					{
+				    ABZ_CNT = 20 - PID_Result  ;
+					if(ABZ_CNT > 20)
 				    PRINTF("ABZ_CNT3 = %d \r\n",ABZ_CNT);
 					 uwStep = HallSensor_GetPinState();
 					   
 		             HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
-			  }
+
+					}
 			  
 			 
-		  }
+		      }
+		  	}
 		  
 		 
 		
