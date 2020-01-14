@@ -144,7 +144,7 @@ int main(void)
 	   // en_t.capture_width =Capture_ReadPulse_Value(); 
        // PRINTF("Cpw = %d\r\n", en_t.capture_width);
 		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-       // PRINTF("Current position : %d\r\n", mCurPosValue);
+        PRINTF("Current position : %d\r\n", mCurPosValue);
 	
 		
 	#if 1	
