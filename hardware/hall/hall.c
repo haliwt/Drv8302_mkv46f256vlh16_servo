@@ -125,17 +125,19 @@ void SysTick_IRQ_Handler  (void)
 {
 
 	 uint32_t total_value;
-	 float  one_step ;	
+	 uint32_t  one_step ;	
 	 static uint8_t i=0;
      static uint8_t j=0;
 	 int32_t iError,dError;
 	 uint8_t iEr_flag=0;
 	 uint8_t ne_symbol = 0;
-	  mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-	  PRINTF("PID_Result = %d \r\n",PID_Result);
+	 uint16_t comp_array[2];
+	 uint8_t com_result;
+	//  mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+	//  PRINTF("PID_Result = %d \r\n",PID_Result);
 	  
 	  Time_CNT++;
-	 
+	  j++;
 
       if(Dir == 1) //Dir ==1 顺时针旋转 “下”---Down --往---往水平方向移动
 	  {
@@ -153,23 +155,32 @@ void SysTick_IRQ_Handler  (void)
 			}
 	  }
 	   PID_Result =iError;
-	   PRINTF("iError= %d \r\n",iError);
+	 //  PRINTF("iError= %d \r\n",iError);
 	   if(PID_Result > 0)
 	   	{
-	   	   PRINTF(" ++ PID_Result \r\n");
+	   	  // PRINTF(" ++ PID_Result \r\n");
 		   ne_symbol = 0;
 	   	}
 	   else
 	   	{
-	   	    PRINTF(" -- PID_Result \r\n");
+	   	  //  PRINTF(" -- PID_Result \r\n");
 			ne_symbol = 1;
 	   	}
+	   if(j==1) comp_array[0]=PID_Result;
+	   else if(j==2)
+	   {
+			comp_array[1]=PID_Result;
+			j=0;
+	   }
+	   com_result = abs(comp_array[1]- comp_array[0]);
+	   
+	  
 
 if( arithmetic_flag  == 1)
   {
 		/* 100ms 采样周期,控制周期 */
 		//if(Time_CNT % 50 == 0)
-		{
+		
 		  /* 获取速度值:由捕获到的脉冲数除以总的时间 Pul/t */
 		  /* BLDCMotor是4对极,旋转一圈有4个脉冲信号,3相UVW信号线,共12个脉冲信号,每个脉冲边沿计数一次,
 		   * 所以BLDCM旋转一圈,可以捕获到的mCurPosValue
@@ -178,85 +189,57 @@ if( arithmetic_flag  == 1)
 		  
 		  // PID_Result = LocPIDCalc(mCurPosValue);
 		   //PRINTF("PID_Result = %d \r\n",iError);
+		    /*-PID_Result 在此语句执行 递减*/
+		total_value =abs(setPositionEnd)+abs(setPositionHome); //1107 /90=12.3
+
+		one_step = total_value / 90 ;
 	 
 		  /* 限定PWM数值范围 */
-	   if(Dir ==1)
-	   	{
-		  if((PID_Result==0))//判断方向，PID值＜ 0
+	
+		  if((com_result==0))//位置到终点
 		  {
-              PMW_AllClose_ABC_Channel();
-              DelayMs(50);
+                  PWM_Duty = 30;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC( PWM_Duty);
+				  DelayMs(50);
+                  
+                   PWM_Duty = 20;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC( PWM_Duty);
+				  DelayMs(50);
+				 
+				  PWM_Duty = 10;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC( PWM_Duty);
+				  DelayMs(50);
+				
 			  PRINTF("PID PROCESS STOP 000\r\n");
 		  }
-		  else if(PID_Result !=0)
+		  else if(com_result!=0)
 		  {
-              /*-PID_Result 在此语句执行 递减*/
-			  total_value =abs(setPositionEnd)+abs(setPositionHome);
 
-			  one_step = (float)total_value / 90 ;
-			  if(PID_Result >= 100 || PID_Result < 0)
+              ABZ_CNT = 1;
+			  PRINTF("ABZ_CNT = %d \r\n",ABZ_CNT);
+			  PRINTF("total_value = %d \r\n",total_value);
+			  if(Time_CNT == one_step)
 			  {
-				   i++;
-				 PID_Result =30;
- 			     ABZ_CNT = 30 - i ;
-				
-				 
-				  PRINTF("ABZ_CNT0 = %d \r\n",ABZ_CNT);
-				   uwStep = HallSensor_GetPinState();
-					   
-		            HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
-			  }
-			  else if((PID_Result < 100)&&(PID_Result >20))
-			  {
-				  i++;
- 			     ABZ_CNT = 30 - i ;
-				 PRINTF("ABZ_CNT 2= %d \r\n",ABZ_CNT);
-				 uwStep = HallSensor_GetPinState();
-				 HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
-			  }
-			  else if(((PID_Result) < 100)||(PID_Result == 20)||(PID_Result ==0))
-			  {
-					/* +PID_Result 在此语句执行，ABZ_CNT 递加*/
-					j++;
-					if(PID_Result < 20)
-					{
-				    ABZ_CNT = 20 - PID_Result  ;
-					if(ABZ_CNT > 20)
-				    PRINTF("ABZ_CNT3 = %d \r\n",ABZ_CNT);
-					 uwStep = HallSensor_GetPinState();
-					   
-		             HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
+				PRINTF("one_step = %d \r\n",one_step);
+				uwStep = HallSensor_GetPinState();
+		        HALLSensor_Detected_BLDC(PWM_Duty);
 
-					}
+			  }
 			  
-			 
-		      }
-		  	}
+			
 		  
-		 
-		
-		 
+		 }
 	  
-		 
-		  
-
-		  
-		   
-		
-		 // uwStep = HallSensor_GetPinState();
-					   
-		 // HALLSensor_Detected_BLDC(PWM_Duty);//HAL_TIM_TriggerCallback(&htimx_HALL); //换向函数,6步换向，无刷电机
-		 
-	
-		}
-	  }
-     }
+	}
 	  //50ms反馈一次数据
-	  if(Time_CNT % 25 == 0)
+	  if(Time_CNT % 10 == 0)
 	  {
 		PRINTF("Tick position : %d\r\n", mCurPosValue);//Transmit_FB(ptr_FB);
 	  }
-	  if(Time_CNT == 50)
+	  if(Time_CNT == one_step)
 		Time_CNT = 0;
 }
 

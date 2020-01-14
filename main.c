@@ -106,6 +106,7 @@ int main(void)
     
 	 static uint8_t keyRunTime=0;
      static uint8_t rem_times = 0;
+	 uint8_t down_run =0;
     
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -140,8 +141,8 @@ int main(void)
          ucKeyCode = KEY_Scan(0);
        
 		
-	    en_t.capture_width =Capture_ReadPulse_Value(); 
-        PRINTF("Cpw = %d\r\n", en_t.capture_width);
+	   // en_t.capture_width =Capture_ReadPulse_Value(); 
+       // PRINTF("Cpw = %d\r\n", en_t.capture_width);
 		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
         PRINTF("Current position : %d\r\n", mCurPosValue);
 	
@@ -152,7 +153,7 @@ int main(void)
 	   if((rem_times <4)&&(en_t.en_interrupt_flag == 1 ))
 		{
 			  
-		      PRINTF("Cpw = %d\r\n", en_t.capture_width);
+		    //  PRINTF("Cpw = %d\r\n", en_t.capture_width);
 			  PRINTF("Current position : %d\r\n", mCurPosValue);
 
 			   PRINTF("--------------------------------------\r\n" ); 
@@ -372,17 +373,28 @@ int main(void)
               else{
                     if(Dir == 0) //向垂直方向移动
                     {
+						PWM_Duty = 60;
 						uwStep = HallSensor_GetPinState();
 	               
 	                 	HALLSensor_Detected_BLDC(PWM_Duty);
-						PWM_Duty=60;
+						
 
 					}
 			        else //Dir == 1 水平方向移动
 		        	{
+					
 						 SysTick_IRQ_Handler ();  
-						 uwStep = HallSensor_GetPinState();
-		          		 HALLSensor_Detected_BLDC(PWM_Duty);
+					     if(ABZ_CNT == 0)
+					     {
+							 uwStep = HallSensor_GetPinState();
+			          		 HALLSensor_Detected_BLDC(PWM_Duty);
+					     }
+						 else 
+						 {
+
+						 }
+							 
+							
 	                     
 						 
 		        	}
@@ -417,7 +429,7 @@ int main(void)
               
                  
       
-			  PMW_AllClose_ABC_Channel();
+			 // PMW_AllClose_ABC_Channel();
               DelayMs(50);
               GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
               DelayMs(50);
