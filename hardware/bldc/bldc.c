@@ -1114,3 +1114,88 @@ uint8_t i;
 }
 #endif 
 
+
+/********************************************************************************************************
+    *
+    *Function Name  : void Motor_StartDown(void)
+    *Funciton Active :  电机逆时针旋转
+    *
+    *
+    *
+
+*********************************************************************************************************/
+void Motor_Down_Start(void)
+{
+
+   uwStep = HallSensor_GetPinState();
+    switch(uwStep)
+    {
+    case 5 :
+      BLDC_CW_Six_5_Run();
+      break;
+    case 4:
+      
+      BLDC_CW_Six_4_Run();
+     break;
+    
+    case 6:
+      BLDC_CW_Six_6_Run();
+    break;
+      
+     case 2:
+       BLDC_CW_Six_2_Run();
+     break;
+     
+     case 3:
+       BLDC_CW_Six_3_Run();
+     break;
+     
+     case 1:
+        BLDC_CW_Six_1_Run();
+     break;
+    }
+}
+
+/********************************************************************************************************
+    *
+    *Function Name  : void Motor_Up_Start(void)
+    *Funciton Active :  电机逆时针旋转
+    *
+    *
+    *
+
+*********************************************************************************************************/
+
+void Motor_Up_Start(void)
+{
+uwStep = HallSensor_GetPinState();
+					   switch(uwStep)
+					   {
+					   case 5 :
+						BLDC_CCW_SIX_5_Run();
+						 break;
+					   case 4:
+						 
+						 BLDC_CCW_SIX_4_Run();
+						break;
+					   
+					   case 6:
+						 BLDC_CCW_SIX_6_Run();
+					   break;
+						 
+						case 2:
+						  BLDC_CCW_SIX_2_Run();
+						break;
+						
+						case 3:
+						  BLDC_CCW_SIX_3_Run();
+						break;
+						
+						case 1:
+						   BLDC_CCW_SIX_1_Run();
+						break;
+					   }
+						 
+					
+}
+

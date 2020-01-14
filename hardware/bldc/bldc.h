@@ -93,6 +93,8 @@ void BLDC_CW_Six_3_Run(void);
 void BLDC_CW_Six_4_Run(void);
 void BLDC_CW_Six_5_Run(void);
 void BLDC_CW_Six_6_Run(void);
+void Motor_Down_Start(void); //电机往水平方向移动，导引
+void Motor_Up_Start(void);
 
 
 

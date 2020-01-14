@@ -57,6 +57,7 @@ typedef struct _output_t_
 
 
 
+extern output_t  motor_ref;
 
 void OUTPUT_Fucntion_Init(void);
 

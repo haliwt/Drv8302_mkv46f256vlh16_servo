@@ -196,44 +196,49 @@ if( arithmetic_flag  == 1)
 	 
 		  /* 限定PWM数值范围 */
 	
-		  if((com_result==0))//位置到终点
+		  if((setPositionEnd ==mCurPosValue )|| (setPositionHome==mCurPosValue)||com_result==0)//位置到终点
 		  {
-                  PWM_Duty = 30;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC( PWM_Duty);
-				  DelayMs(50);
-                  
-                   PWM_Duty = 20;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC( PWM_Duty);
-				  DelayMs(50);
-				 
-				  PWM_Duty = 10;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC( PWM_Duty);
-				  DelayMs(50);
-				
-			  PRINTF("PID PROCESS STOP 000\r\n");
+                  j++;
+				  if(j==2)
+				  	{
+					  PWM_Duty = 30;
+					  uwStep = HallSensor_GetPinState();
+		              HALLSensor_Detected_BLDC( PWM_Duty);
+					  DelayMs(50);
+	                  
+	                   PWM_Duty = 20;
+					  uwStep = HallSensor_GetPinState();
+		              HALLSensor_Detected_BLDC( PWM_Duty);
+					  DelayMs(50);
+					 
+					  PWM_Duty = 10;
+					  uwStep = HallSensor_GetPinState();
+		              HALLSensor_Detected_BLDC( PWM_Duty);
+					  DelayMs(50);
+					
+				      PRINTF("PID PROCESS STOP &&&&&&&&&&&&&&&&&&&&&&&&\r\n");
+				  	}
 		  }
 		  else if(com_result!=0)
 		  {
 
               ABZ_CNT = 1;
-			  PRINTF("ABZ_CNT = %d \r\n",ABZ_CNT);
-			  PRINTF("total_value = %d \r\n",total_value);
+			  motor_ref.power_on =1;
+			  PRINTF("motor_ref.power_on= %d \r\n", motor_ref.power_on =1);
+			 // PRINTF("ABZ_CNT = %d \r\n",com_result);
+			 // PRINTF("total_value = %d \r\n",total_value);
 			  if(Time_CNT == one_step)
 			  {
 				PRINTF("one_step = %d \r\n",one_step);
+				//Motor_Down_Start();
 				uwStep = HallSensor_GetPinState();
 		        HALLSensor_Detected_BLDC(PWM_Duty);
 
 			  }
-			  
-			
-		  
-		 }
+		
 	  
-	}
+	      }
+    }
 	  //50ms反馈一次数据
 	  if(Time_CNT % 10 == 0)
 	  {

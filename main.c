@@ -144,7 +144,7 @@ int main(void)
 	   // en_t.capture_width =Capture_ReadPulse_Value(); 
        // PRINTF("Cpw = %d\r\n", en_t.capture_width);
 		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-        PRINTF("Current position : %d\r\n", mCurPosValue);
+       // PRINTF("Current position : %d\r\n", mCurPosValue);
 	
 		
 	#if 1	
@@ -243,37 +243,20 @@ int main(void)
 		 	||((array_data[2] < abs(en_t.capture_width +30)) && (array_data[2] >abs(en_t.capture_width-30))))
 		 { 
               
-           PRINTF("setPositionHome ok \r\n");
-		   PRINTF("setPositionHome = %d \r\n",setPositionHome);
-		   if(keyRunTime == 1)
-		   {
-              setStop_flag=0; 
-               PRINTF("setPosHomeRun||||| =0 \r\n");
-		   }
-		   else
-           {
-            // setStop_flag=1; 
+          
              PRINTF("setPosHomeRun%%%%%%%% = 1\r\n");
 			 PRINTF("Current position : %d\r\n", mCurPosValue);
-           }	  
+            
           }
           if(((array_data[1] < abs(mCurPosValue +30))&& (array_data[1]  > abs(mCurPosValue-30)))||((array_data[3] < abs(en_t.capture_width +30)) && (array_data[3]>abs(en_t.capture_width-30))))//绝对位置是不变的，setHome 软件指定的
          {
 			 
-		       PRINTF("setPositionEnd ok \r\n");
+		       PRINTF("setPositionEnd~~~~~~~~~~~ \r\n");
 			   PRINTF("setPositionEnd = %d \r\n",setPositionEnd);
-               if(keyRunTime ==1)
-               {
-				  setStop_flag=0;
-                  PRINTF("setPosEndRun~~~~~~~~= 1 \r\n");
-               }
-			   else
-               {
-			    // setStop_flag = 1;
-                 PRINTF("setPosEndRun########## =  1\r\n");
-				 PRINTF("Current position : %d\r\n", mCurPosValue);
+              
+              
 				 
-               }
+            
 
 		   }
 #endif 
@@ -302,68 +285,16 @@ int main(void)
                    if(Dir==0)  
                    {
                       
-                       uwStep = HallSensor_GetPinState();
-                        switch(uwStep)
-                        {
-                        case 5 :
-                         BLDC_CCW_SIX_5_Run();
-                          break;
-                        case 4:
-                          
-                          BLDC_CCW_SIX_4_Run();
-                         break;
-                        
-                        case 6:
-                          BLDC_CCW_SIX_6_Run();
-                        break;
-                          
-                         case 2:
-                           BLDC_CCW_SIX_2_Run();
-                         break;
-                         
-                         case 3:
-                           BLDC_CCW_SIX_3_Run();
-                         break;
-                         
-                         case 1:
-                            BLDC_CCW_SIX_1_Run();
-                         break;
-                        }
+                     Motor_Up_Start();
                           
                      printf("Dir = %d\r \n",Dir); 
                      printf("PWM_Duty= %d\r \n",PWM_Duty);
                      
                         
                  }
-                 else //CW 
+                 else //if((ABZ_CNT == 0)&&(Dir==1))//CW 
                  {
-					uwStep = HallSensor_GetPinState();
-                        switch(uwStep)
-                        {
-                        case 5 :
-                         BLDC_CW_Six_5_Run();
-                          break;
-                        case 4:
-                          
-                          BLDC_CW_Six_4_Run();
-                         break;
-                        
-                        case 6:
-                          BLDC_CW_Six_6_Run();
-                        break;
-                          
-                         case 2:
-                           BLDC_CW_Six_2_Run();
-                         break;
-                         
-                         case 3:
-                           BLDC_CW_Six_3_Run();
-                         break;
-                         
-                         case 1:
-                            BLDC_CW_Six_1_Run();
-                         break;
-                        }
+					Motor_Down_Start();
 
                     printf("Dir = %d\r \n",Dir); 
                                    
@@ -389,17 +320,10 @@ int main(void)
 							 uwStep = HallSensor_GetPinState();
 			          		 HALLSensor_Detected_BLDC(PWM_Duty);
 					     }
-						 else 
-						 {
-
-						 }
-							 
-							
-	                     
-						 
-		        	}
-                    }
-            }/*end if motor_ref.motor_run == 1*/
+						
+					}
+              }
+      }/*end if motor_ref.motor_run == 1*/
           
           else
 		  {
