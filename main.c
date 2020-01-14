@@ -73,6 +73,7 @@ int32_t array_data[4]={0xfff,0xfff,0xfff,0xfff};
 
 
 int32_t PID_Result;
+//volatile int16_t  capture_width;
 
 
 //__IO uint32_t PWM_ChangeFlag = 0;
@@ -141,8 +142,8 @@ int main(void)
          ucKeyCode = KEY_Scan(0);
        
 		
-	    en_t.capture_width =Capture_ReadPulse_Value(); 
-        PRINTF("Cpw = %d\r\n", en_t.capture_width);
+	    capture_width =Capture_ReadPulse_Value(); 
+        PRINTF("Cpw = %d\r\n", capture_width);
 		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
        // PRINTF("Current position : %d\r\n", mCurPosValue);
 	
@@ -166,21 +167,21 @@ int main(void)
 					
 				   if(rem_times ==2)
 				   	{
-					   setHome = en_t.capture_width-20;
+					   setHome = capture_width-30;
 					   array_data[2]= setHome;
 	                   if(setPositionHome == 0 )
 	                   	{
-					       setPositionHome = mCurPosValue + 20;
+					       setPositionHome = mCurPosValue + 30;
 						   array_data[0]=setPositionHome;
 	                   	}
 	                   else if(Dir ==1) //顺时针---水平方向移动
 	                   	{
-	                     setPositionHome = mCurPosValue + 20;
+	                     setPositionHome = mCurPosValue + 30;
 						 array_data[0]=setPositionHome;
 	                   	}
 					   else //逆时针旋转 Dir =0 
 					   	{
-					   	 setPositionHome = mCurPosValue - 20;
+					   	 setPositionHome = mCurPosValue - 30;
 						 array_data[0]=setPositionHome;
 					   	}
 					    
@@ -193,21 +194,21 @@ int main(void)
 				    if(rem_times ==3)
 				   {
 
-					   setEnd = en_t.capture_width-20;
+					   setEnd = capture_width-30;
 					   array_data[3]= setEnd;
 	                   if(setPositionEnd ==0 )
 	                   	{
-	                      setPositionEnd = mCurPosValue + 20;
+	                      setPositionEnd = mCurPosValue + 30;
 						  array_data[1]=setPositionEnd;
 	                   	}
 	                   else if(Dir ==1) //顺时针
 	                   	{
-	                     setPositionEnd = mCurPosValue +20;
+	                     setPositionEnd = mCurPosValue +30;
 						  array_data[1]=setPositionEnd;
 	                   	}
 					   else
 					   	{
-					   	   setPositionEnd = mCurPosValue - 20;
+					   	   setPositionEnd = mCurPosValue - 30;
 						    array_data[1]=setPositionEnd;
 					   	}
 					   
@@ -240,7 +241,7 @@ int main(void)
            
      /*********************************检测信号************************************************************************/ 
 		 if(((array_data[0]  <abs( mCurPosValue +30)) && (array_data[0]> abs(mCurPosValue -30)))\
-		 	||((array_data[2] < abs(en_t.capture_width +30)) && (array_data[2] >abs(en_t.capture_width-30))))
+		 	||((array_data[2] < abs(capture_width +30)) && (array_data[2] >abs(capture_width-30))))
 		 { 
               
           
@@ -248,7 +249,7 @@ int main(void)
 			 PRINTF("Current position : %d\r\n", mCurPosValue);
             
           }
-          if(((array_data[1] < abs(mCurPosValue +30))&& (array_data[1]  > abs(mCurPosValue-30)))||((array_data[3] < abs(en_t.capture_width +30)) && (array_data[3]>abs(en_t.capture_width-30))))//绝对位置是不变的，setHome 软件指定的
+          if(((array_data[1] < abs(mCurPosValue +30))&& (array_data[1]  > abs(mCurPosValue-30)))||((array_data[3] < abs(capture_width +30)) && (array_data[3]>abs(capture_width-30))))//绝对位置是不变的，setHome 软件指定的
          {
 			 
 		       PRINTF("setPositionEnd~~~~~~~~~~~ \r\n");

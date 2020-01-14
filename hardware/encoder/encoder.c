@@ -35,10 +35,10 @@ void Capture_Input_Init(void)
     FTM_Init(DEMO_FTM_BASEADDR, &ftmInfo);
     
         edgeParam.mode=kFTM_Continuous;
-        edgeParam.currChanEdgeMode = kFTM_RisingEdge;
-        edgeParam.nextChanEdgeMode = kFTM_FallingEdge;
+        edgeParam.currChanEdgeMode = kFTM_FallingEdge;//kFTM_RisingEdge;
+        edgeParam.nextChanEdgeMode = kFTM_RisingEdge;//kFTM_FallingEdge;
        /* Setup dual-edge capture on a FTM channel pair */
-		FTM_SetupDualEdgeCapture(DEMO_FTM_BASEADDR, BOARD_FTM_INPUT_CAPTURE_CHANNEL_PAIR, &edgeParam, 0);
+		FTM_SetupDualEdgeCapture(DEMO_FTM_BASEADDR, BOARD_FTM_INPUT_CAPTURE_CHANNEL_PAIR, &edgeParam, 1);
 
 	
 

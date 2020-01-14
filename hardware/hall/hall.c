@@ -13,6 +13,7 @@ int32_t  flag = 0;
 
 uint32_t ABZ_CNT;
 
+volatile  int16_t  capture_width;
 
 
 
@@ -132,7 +133,8 @@ void SysTick_IRQ_Handler  (void)
 	 uint8_t iEr_flag=0;
 	 uint8_t ne_symbol = 0;
 	 uint16_t comp_array[2];
-	 uint8_t com_result;
+	 uint8_t  com_result;
+	 uint16_t Destination;
 	  mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 	  PRINTF("PID mCurPosValue = %d \r\n",mCurPosValue);
 	  
@@ -195,31 +197,45 @@ if( arithmetic_flag  == 1)
 
 		one_step = total_value / 90 ;
 	 
-		  /* 限定PWM数值范围 */
-	
-		  if(((abs(setPositionEnd+ 1) > mCurPosValue )&&( abs(setPositionEnd - 1) < mCurPosValue)) \
-		  	||((abs(setPositionHome + 1) >mCurPosValue)&&(abs(setPositionHome - 1 )< mCurPosValue))\
-		  	||(com_result ==0))//位置到终点
+		  /* 限定PWM数值范围    arrr_data[2]= setHome ,array_data[3]=setEnd    */
+	      if(iEr_flag ==1)//setEnd
+	      	{
+				   
+				 if(((abs(array_data[3] +30) >capture_width)&&(abs(array_data[3] - 30 )< capture_width))\
+				  	||(com_result ==0))//位置到终点
+				  {
+				          
+		                      PRINTF("com_result = %d \r\n",com_result);
+		STOP:			      PWM_Duty = 30;
+							  uwStep = HallSensor_GetPinState();
+				              HALLSensor_Detected_BLDC( PWM_Duty);
+							  DelayMs(50);
+			                  
+			                   PWM_Duty = 20;
+							  uwStep = HallSensor_GetPinState();
+				              HALLSensor_Detected_BLDC( PWM_Duty);
+							  DelayMs(50);
+							 
+							  PWM_Duty = 10;
+							  uwStep = HallSensor_GetPinState();
+				              HALLSensor_Detected_BLDC( PWM_Duty);
+							  DelayMs(50);
+							
+						      PRINTF("PID PROCESS STOP &&&&&&&&&&&&&&&&&&&&&&&&\r\n");
+						  	
+				  }
+	      	}
+		  else if(iEr_flag ==2)
 		  {
-		          
-                      PRINTF("com_result = %d \r\n",com_result);
-STOP:			      PWM_Duty = 30;
-					  uwStep = HallSensor_GetPinState();
-		              HALLSensor_Detected_BLDC( PWM_Duty);
-					  DelayMs(50);
-	                  
-	                   PWM_Duty = 20;
-					  uwStep = HallSensor_GetPinState();
-		              HALLSensor_Detected_BLDC( PWM_Duty);
-					  DelayMs(50);
-					 
-					  PWM_Duty = 10;
-					  uwStep = HallSensor_GetPinState();
-		              HALLSensor_Detected_BLDC( PWM_Duty);
-					  DelayMs(50);
-					
-				      PRINTF("PID PROCESS STOP &&&&&&&&&&&&&&&&&&&&&&&&\r\n");
-				  	
+
+		    if(((abs(array_data[2] + 30) > capture_width )&&( abs(array_data[2] -30) < capture_width))\
+				||(com_result ==0))//位置到终点
+		    	{
+
+                   goto STOP;
+
+				}
+
 		  }
 		  else if(com_result!=0)
 		  {
@@ -239,13 +255,42 @@ STOP:			      PWM_Duty = 30;
 				PWM_Duty =60;
 				uwStep = HallSensor_GetPinState();
 		        HALLSensor_Detected_BLDC(PWM_Duty);
-				DelayMs(2000);
+				DelayMs(1000);
+				 PWM_Duty = 50;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC( PWM_Duty);
+				  DelayMs(50);
+                  
+                   PWM_Duty = 40;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC( PWM_Duty);
+				  DelayMs(50);
+				 
+				  PWM_Duty =30;
+				  uwStep = HallSensor_GetPinState();
+	              HALLSensor_Detected_BLDC( PWM_Duty);
+				  DelayMs(50);
 				
 
-				//if(com_result ==0)goto STOP;
+				   if(iEr_flag ==1)//setEnd =array_data[3]
+				   {
+
+				      Destination= array_data[3]-100 ;
+					  if((Destination == capture_width)||(Destination < capture_width +30)||(Destination  > abs(capture_width-30)))
+					  {
+							goto STOP;
+					  }
+				   }
+				    if(iEr_flag ==2)//setHome =array_data[2]
+				   {
+	      				 Destination= array_data[2]-100 ;
+					 if((Destination == capture_width)||(Destination < capture_width +30)||(Destination  > abs(capture_width-1)))
+					  {
+							goto STOP;
+					  }
 					 
-				
-				}
+				    }
+			  }
 		
 	  
 	      }
