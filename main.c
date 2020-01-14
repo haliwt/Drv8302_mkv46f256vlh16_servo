@@ -268,7 +268,7 @@ int main(void)
       {
    				
                keyRunTime=2;
-			 
+			   PWM_Duty =60;
 			   GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 			  	  
 	#ifdef DEBUG_PRINT 
@@ -279,8 +279,7 @@ int main(void)
                    motor_ref.en_on=0;
                    motor_ref.power_on ++;
 				   setRun_flag=0;
-                  
-	#ifdef IRFP4768PbF
+#if IRFP4768PbF
                    printf("************************************************************\r \n");
                    if(Dir==0)  
                    {

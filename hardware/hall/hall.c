@@ -136,8 +136,8 @@ void SysTick_IRQ_Handler  (void)
 	//  mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 	//  PRINTF("PID_Result = %d \r\n",PID_Result);
 	  
-	  Time_CNT++;
-	  j++;
+	  
+	 
 
       if(Dir == 1) //Dir ==1 顺时针旋转 “下”---Down --往---往水平方向移动
 	  {
@@ -221,16 +221,18 @@ if( arithmetic_flag  == 1)
 		  }
 		  else if(com_result!=0)
 		  {
-
+			  Time_CNT++;
               ABZ_CNT = 1;
-			  motor_ref.power_on =1;
-			  PRINTF("motor_ref.power_on= %d \r\n", motor_ref.power_on =1);
-			 // PRINTF("ABZ_CNT = %d \r\n",com_result);
-			 // PRINTF("total_value = %d \r\n",total_value);
+			  motor_ref.power_on =4;
+			  motor_ref.motor_run=1; 
+			  PRINTF("motor_ref.power_on= %d \r\n", motor_ref.power_on);
+			  PRINTF("ABZ_CNT = %d \r\n",com_result);
+			  PRINTF("total_value = %d \r\n",total_value);
 			  if(Time_CNT == one_step)
 			  {
 				PRINTF("one_step = %d \r\n",one_step);
-				//Motor_Down_Start();
+				Motor_Down_Start();
+				PWM_Duty =60;
 				uwStep = HallSensor_GetPinState();
 		        HALLSensor_Detected_BLDC(PWM_Duty);
 
