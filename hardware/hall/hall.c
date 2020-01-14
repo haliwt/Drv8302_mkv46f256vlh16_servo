@@ -134,9 +134,10 @@ void SysTick_IRQ_Handler  (void)
 	 uint16_t comp_array[2];
 	 uint8_t com_result;
 	  mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-	  PRINTF("PID_Result = %d \r\n",PID_Result);
+	  PRINTF("PID mCurPosValue = %d \r\n",mCurPosValue);
 	  
-	  
+	  PRINTF("setHome = %d \r\n",array_data[2]);
+	  PRINTF("setEnd = %d \r\n",array_data[3]);
 	 
 
       if(Dir == 1) //Dir ==1 顺时针旋转 “下”---Down --往---往水平方向移动
@@ -196,11 +197,12 @@ if( arithmetic_flag  == 1)
 	 
 		  /* 限定PWM数值范围 */
 	
-		  if(((abs(setPositionEnd+ 5) > mCurPosValue )&&( abs(setPositionEnd - 5) < mCurPosValue)) \
-		  	||((abs(setPositionHome + 5) >mCurPosValue)&&(abs(setPositionHome - 5 )< mCurPosValue))\
-		  	||(com_result < 5 && com_result >=0))//位置到终点
+		  if(((abs(setPositionEnd+ 1) > mCurPosValue )&&( abs(setPositionEnd - 1) < mCurPosValue)) \
+		  	||((abs(setPositionHome + 1) >mCurPosValue)&&(abs(setPositionHome - 1 )< mCurPosValue))\
+		  	||(com_result ==0))//位置到终点
 		  {
-                 
+		          
+                      PRINTF("com_result = %d \r\n",com_result);
 STOP:			      PWM_Duty = 30;
 					  uwStep = HallSensor_GetPinState();
 		              HALLSensor_Detected_BLDC( PWM_Duty);
@@ -230,30 +232,29 @@ STOP:			      PWM_Duty = 30;
 			  PRINTF("total_value = %d \r\n",total_value);
 			  if(Time_CNT == one_step)
 			  {
+
+				//mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 				PRINTF("one_step = %d \r\n",one_step);
 				Motor_Down_Start();
 				PWM_Duty =60;
 				uwStep = HallSensor_GetPinState();
 		        HALLSensor_Detected_BLDC(PWM_Duty);
-				DelayMs(100);
-			
+				DelayMs(2000);
+				
 
-			  }
-			 if(((abs(setPositionEnd+ 5) > mCurPosValue )&&( abs(setPositionEnd - 5) < mCurPosValue)) \
-		  	||((abs(setPositionHome + 5) >mCurPosValue)&&(abs(setPositionHome - 5 )< mCurPosValue))\
-		  	||(com_result < 5 && com_result >=0))//位置到终点
-			  {
-					goto STOP;
-			  }
+				//if(com_result ==0)goto STOP;
+					 
+				
+				}
 		
 	  
 	      }
     }
 	  //50ms反馈一次数据
-	  if(Time_CNT % 10 == 0)
-	  {
-		PRINTF("Tick position : %d\r\n", mCurPosValue);//Transmit_FB(ptr_FB);
-	  }
+	//  if(Time_CNT % 10 == 0)
+	//  {
+	//	PRINTF("Tick position : %d\r\n", mCurPosValue);
+	//  }
 	  if(Time_CNT == one_step)
 		Time_CNT = 0;
 }
