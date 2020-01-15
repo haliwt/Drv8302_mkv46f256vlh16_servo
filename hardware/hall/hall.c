@@ -216,8 +216,9 @@ if( arithmetic_flag  == 1)
 		   {
 			
 				PWM_Duty = 60;
-				if((com_result ==0) ||(array_data[2]==capture_width)\
-					|| ((array_data[2] -10 < capture_width )&&(array_data[2]+10 > capture_width)))
+				if(((com_result ==0) ||(array_data[2]==capture_width)\
+					|| ((array_data[2] -10 < capture_width )&&(array_data[2]+10 > capture_width)))\
+					&&(array_data[0]==mCurPosValue || (array_data[0] > (mCurPosValue -2) && array_data[0] <(mCurPosValue +2) )))
 				{
 						
 		STOP:		
@@ -272,8 +273,9 @@ if( arithmetic_flag  == 1)
 		   }
 		 if((judge_home_flag ==2) &&(pid_stop ==1))//起点位置，垂直位置
 		   {
-			   	if((com_result ==0) ||(array_data[3]==capture_width)\
-					|| (array_data[3] -10 < capture_width )&&(array_data[3]+10 < capture_width))
+			   	if(((com_result ==0) ||(array_data[3]==capture_width)\
+					|| (array_data[3] -10 < capture_width )&&(array_data[3]+10 > capture_width))\
+					&&(array_data[1]==mCurPosValue || (array_data[1] > (mCurPosValue -2) && array_data[1] <(mCurPosValue +2))))
 					{
 							PRINTF("flag =2 start vertial \r\n");
 							goto STOP;

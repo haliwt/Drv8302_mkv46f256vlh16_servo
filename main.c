@@ -144,9 +144,9 @@ int main(void)
        
 		
 	    capture_width =Capture_ReadPulse_Value(); 
-     //   PRINTF("Cpw = %d\r\n", capture_width);
+        PRINTF("Cpw = %d\r\n", capture_width);
 		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-     //   PRINTF("Current position : %d\r\n", mCurPosValue);
+        PRINTF("Current position : %d\r\n", mCurPosValue);
 	
 		
 	#if 1	
@@ -168,22 +168,22 @@ int main(void)
 					
 				   if(rem_times ==2)
 				   	{
-					   setHome = capture_width-30;
+					   setHome = capture_width-10;
 					   g_destination_home = capture_width - 10;
 					   array_data[2]= setHome;
 	                   if(setPositionHome == 0 )
 	                   	{
-					       setPositionHome = mCurPosValue + 30;
+					       setPositionHome = mCurPosValue + 10;
 						   array_data[0]=setPositionHome;
 	                   	}
 	                   else if(Dir ==1) //Ë³Ê±ï¿½ï¿½---Ë®Æ½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
 	                   	{
-	                     setPositionHome = mCurPosValue + 30;
+	                     setPositionHome = mCurPosValue + 10;
 						 array_data[0]=setPositionHome;
 	                   	}
 					   else //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª Dir =0 
 					   	{
-					   	 setPositionHome = mCurPosValue - 30;
+					   	 setPositionHome = mCurPosValue - 10;
 						 array_data[0]=setPositionHome;
 					   	}
 					    
@@ -196,22 +196,22 @@ int main(void)
 				    if(rem_times ==3)
 				   {
 
-					   setEnd = capture_width-30;
+					   setEnd = capture_width-10;
 					   array_data[3]= setEnd;
 					   g_destination_end = capture_width -10;
 	                   if(setPositionEnd ==0 )
 	                   	{
-	                      setPositionEnd = mCurPosValue + 30;
+	                      setPositionEnd = mCurPosValue + 10;
 						  array_data[1]=setPositionEnd;
 	                   	}
 	                   else if(Dir ==1) //Ë³Ê±ï¿½ï¿½
 	                   	{
-	                     setPositionEnd = mCurPosValue +30;
+	                     setPositionEnd = mCurPosValue +10;
 						  array_data[1]=setPositionEnd;
 	                   	}
 					   else
 					   	{
-					   	   setPositionEnd = mCurPosValue - 30;
+					   	   setPositionEnd = mCurPosValue - 10;
 						    array_data[1]=setPositionEnd;
 					   	}
 					   
@@ -309,9 +309,9 @@ int main(void)
                                           HALLSensor_Detected_BLDC(PWM_Duty);
                                           PRINTF("i= %d \r\n",i);
                                          
-                                  }while(i<3100);//3200
+                                  }while(i<3000);//3200
                                    
-                                  for(j=0;j<5;j++)
+                                  for(j=0;j<3;j++)
                                   {
                                    
                                    PWM_Duty =50;
