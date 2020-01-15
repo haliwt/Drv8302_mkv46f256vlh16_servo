@@ -235,38 +235,21 @@ if( arithmetic_flag  == 1)
 					    i=0;
                         for(z=0;z<50;z++)
                         {
-                          if(z > 50)
-                          {
-                              PRINTF("z = %d \r\n",z);
-						  }
-                          else if(z < 20)
-                          {
-							  	z=1;
-							    PWM_Duty =PWM_Duty -z ;
-								if(PWM_Duty ==1 ||PWM_Duty ==0||PWM_Duty < 0)
-								{
-
-								}
-								else
-									{
-								        if(PWM_Duty < 0 ||PWM_Duty ==0 )
-								        {
-
-										}
-										else
-										{
-										PRINTF("zPW = %d \r\n",PWM_Duty);
-			                            uwStep = HallSensor_GetPinState();
-			                            HALLSensor_Detected_BLDC(PWM_Duty);
-			                           
-			                            DelayMs(20);
-										}
-									}
+                         
+                          
+							    PWM_Duty -- ;
+							
+											PRINTF("zPW = %d \r\n",PWM_Duty);
+				                            uwStep = HallSensor_GetPinState();
+				                            HALLSensor_Detected_BLDC(PWM_Duty);
+				                           
+				                            DelayMs(20);
+								
                           }
                         
                           
                         }
-					  }
+					  
 					
 					PRINTF("PID PROCESS STOP &&&&&&&&&&&&&&&&&&&&&&&&\r\n");
                     if((array_data[2] +30  == capture_width || array_data[2]+ 40 > capture_width))
