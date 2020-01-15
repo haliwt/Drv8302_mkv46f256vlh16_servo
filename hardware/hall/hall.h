@@ -7,43 +7,43 @@
 #include "encoder.h"
 #include "output.h"
 
-/* ÀàÐÍ¶¨Òå ------------------------------------------------------------------*/
+/* ï¿½ï¿½ï¿½Í¶ï¿½ï¿½ï¿½ ------------------------------------------------------------------*/
 typedef struct {
-  __IO int32_t  uwStep ;  	  // µç»úÐý×ª×´Ì¬
-  __IO int32_t  Dir ;        	// µç»úÐý×ª·½Ïò
-  __IO int32_t  Position;		  // µç»úÎ»ÖÃ
-  __IO int32_t  Speed;		    // µç»úËÙ¶È
-  __IO uint16_t PWM_Duty; 	  // µç»úÕ¼¿Õ±È
-  __IO int32_t  Hall_Period;  // »ô¶û´«¸ÐÆ÷´¥·¢ÖÜÆÚ
-  __IO int32_t  Hall_PulNum;  // »ô¶û´«¸ÐÆ÷Âö³åÊý
-  __IO int32_t  Lock_Time;    // µç»ú¶Â×ªÊ±¼ä
+  __IO int32_t  uwStep ;  	  // ï¿½ï¿½ï¿½ï¿½ï¿½×ª×´Ì¬
+  __IO int32_t  Dir ;        	// ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½
+  __IO int32_t  Position;		  // ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+  __IO int32_t  Speed;		    // ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+  __IO uint16_t PWM_Duty; 	  // ï¿½ï¿½ï¿½Õ¼ï¿½Õ±ï¿½
+  __IO int32_t  Hall_Period;  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  __IO int32_t  Hall_PulNum;  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  __IO int32_t  Lock_Time;    // ï¿½ï¿½ï¿½ï¿½ï¿½×ªÊ±ï¿½ï¿½
 }BLDC_Typedef;
 
 
 
 
 
-/* Ë½ÓÐÀàÐÍ¶¨Òå --------------------------------------------------------------*/
+/* Ë½ï¿½ï¿½ï¿½ï¿½ï¿½Í¶ï¿½ï¿½ï¿½ --------------------------------------------------------------*/
 typedef struct 
 {
-  __IO int32_t  SetPoint;                                 //Éè¶¨Ä¿±ê Desired Value
-  __IO long     SumError;                                 //Îó²îÀÛ¼Æ
-  __IO float    Proportion;                               //±ÈÀý³£Êý Proportional Const
-  __IO float    Integral;                                 //»ý·Ö³£Êý Integral Const
-  __IO float    Derivative;                               //Î¢·Ö³£Êý Derivative Const
+  __IO int32_t  SetPoint;                                 //ï¿½è¶¨Ä¿ï¿½ï¿½ Desired Value
+  __IO long     SumError;                                 //ï¿½ï¿½ï¿½ï¿½Û¼ï¿½
+  __IO float    Proportion;                               //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Proportional Const
+  __IO float    Integral;                                 //ï¿½ï¿½ï¿½Ö³ï¿½ï¿½ï¿½ Integral Const
+  __IO float    Derivative;                               //Î¢ï¿½Ö³ï¿½ï¿½ï¿½ Derivative Const
   __IO int      LastError;                                //Error[-1]
   __IO int      PrevError;                                //Error[-2]
 }PID_TypeDef;
 
 
-#define  SysTick_IRQ_Handler            SysTick_Handler     
+//#define  SysTick_IRQ_Handler            SysTick_Handler     
 
 
-#define  P_DATA      0.1f//0.85f                                // P²ÎÊý
-#define  I_DATA      0.01//0.055f                                // I²ÎÊý
-#define  D_DATA      0.2//0.558f                                 // D²ÎÈü
+#define  P_DATA      0.1f//0.85f                                // Pï¿½ï¿½ï¿½ï¿½
+#define  I_DATA      0.01//0.055f                                // Iï¿½ï¿½ï¿½ï¿½
+#define  D_DATA      0.2//0.558f                                 // Dï¿½ï¿½ï¿½ï¿½
 
-#define P_ANGLE_DATA        0.35f   		//±ÈÀý²ÎÊý
+#define P_ANGLE_DATA        0.35f   		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 #define I_ANGLE_DATA		0.002f
 #define D_ANGLE_DATA		0.35f
 
@@ -52,7 +52,7 @@ typedef struct
 
 extern int32_t array_data[4];
 
-/* À©Õ¹ÉùÃ÷ ------------------------------------------------------------------*/
+/* ï¿½ï¿½Õ¹ï¿½ï¿½ï¿½ï¿½ ------------------------------------------------------------------*/
 
 
 extern uint8_t  arithmetic_flag ;
@@ -69,11 +69,11 @@ extern int32_t PID_Result ;
 
 
 void ENCODER_Init(void);
-void IncPIDInit(void) ;    //PID ³õÊ¼»¯º¯Êý
+void IncPIDInit(void) ;    //PID ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
 
-int32_t LocPIDCalc(int32_t NextPoint);  //Î»ÖÃPID¼ÆËã
+int32_t LocPIDCalc(int32_t NextPoint);  //Î»ï¿½ï¿½PIDï¿½ï¿½ï¿½ï¿½
 
 void SysTick_IRQ_Handler  (void);
 

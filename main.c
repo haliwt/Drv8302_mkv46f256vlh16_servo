@@ -67,17 +67,16 @@ uint8_t setStop_flag=0;
 uint8_t  arithmetic_flag ;
 uint8_t home_flag;
 uint8_t end_flag;
-uint8_t judge_he_flag;
+uint8_t judge_home_flag;
 
 int32_t array_data[4]={0xfff,0xfff,0xfff,0xfff};
 
 
 int32_t PID_Result;
-//volatile int16_t  capture_width;
 
-
+volatile int16_t  capture_width;
 //__IO uint32_t PWM_ChangeFlag = 0;
-//__IO int32_t CaptureNumber = 0;      // ÊäÈë²¶»ñÊı
+//__IO int32_t CaptureNumber = 0;      // ï¿½ï¿½ï¿½ë²¶ï¿½ï¿½ï¿½ï¿½
 
 
 
@@ -145,7 +144,7 @@ int main(void)
 	    capture_width =Capture_ReadPulse_Value(); 
         PRINTF("Cpw = %d\r\n", capture_width);
 		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-       // PRINTF("Current position : %d\r\n", mCurPosValue);
+        PRINTF("Current position : %d\r\n", mCurPosValue);
 	
 		
 	#if 1	
@@ -154,7 +153,7 @@ int main(void)
 	   if((rem_times <4)&&(en_t.en_interrupt_flag == 1 ))
 		{
 			  
-		    //  PRINTF("Cpw = %d\r\n", en_t.capture_width);
+		    //  PRINTF("Cpw = %d\r\n", capture_width);
 			  PRINTF("Current position : %d\r\n", mCurPosValue);
 
 			   PRINTF("--------------------------------------\r\n" ); 
@@ -174,12 +173,12 @@ int main(void)
 					       setPositionHome = mCurPosValue + 30;
 						   array_data[0]=setPositionHome;
 	                   	}
-	                   else if(Dir ==1) //Ë³Ê±Õë---Ë®Æ½·½ÏòÒÆ¶¯
+	                   else if(Dir ==1) //Ë³Ê±ï¿½ï¿½---Ë®Æ½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
 	                   	{
 	                     setPositionHome = mCurPosValue + 30;
 						 array_data[0]=setPositionHome;
 	                   	}
-					   else //ÄæÊ±ÕëĞı×ª Dir =0 
+					   else //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª Dir =0 
 					   	{
 					   	 setPositionHome = mCurPosValue - 30;
 						 array_data[0]=setPositionHome;
@@ -201,7 +200,7 @@ int main(void)
 	                      setPositionEnd = mCurPosValue + 30;
 						  array_data[1]=setPositionEnd;
 	                   	}
-	                   else if(Dir ==1) //Ë³Ê±Õë
+	                   else if(Dir ==1) //Ë³Ê±ï¿½ï¿½
 	                   	{
 	                     setPositionEnd = mCurPosValue +30;
 						  array_data[1]=setPositionEnd;
@@ -217,15 +216,15 @@ int main(void)
 					   PRINTF("setPositionEnd@@@= %d \r\n",array_data[1]);
 					   arithmetic_flag  = 1;
 				   }
-	                /*ÅĞ¶ÏÆğÊ¼µÄÎ»ÖÃ*/
+	                /*ï¿½Ğ¶ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½Î»ï¿½ï¿½*/
 	                if((home_flag ==1)&&(end_flag ==1))
 	                	{
-							if(setHome > setEnd) //ÆğÊ¼Î»ÖÃ£¬´¹Ö±Î»ÖÃ
+							if(setHome > setEnd) //èµ·å§‹ä½ç½®åœ¨æ°´å¹³ç‚¹ï¼Œç£ç¼–ç PWMä½ç½®å›ºå®šï¼Œå…³æœºä¸Šç”µï¼ŒPWMå ç©ºæ¯”ä¸å˜
 							{
-								judge_he_flag =1; //Ö»ÄÜÍùË®Æ½Î»ÖÃÒÆ¶¯
+								judge_home_flag =1; //Ö»èµ·å§‹ç‚¹åœ¨æ°´å¹³ä½ç½®
 							}
-							else //setHome < setEnd  //ÆğÊ¼Î»ÖÃÔÚ£¬Ë®Æ½Î»ÖÃ
-								judge_he_flag =2;
+							else //setHome < setEnd  //èµ·å§‹ç‚¹ä½ç½®åœ¨å‚ç›´ä½ç½®ã€‚
+								judge_home_flag =2;
 							
 	                	}
 					
@@ -239,27 +238,21 @@ int main(void)
 								
 		}
            
-     /*********************************¼ì²âĞÅºÅ************************************************************************/ 
+     /*********************************ï¿½ï¿½ï¿½ï¿½Åºï¿½************************************************************************/ 
 		 if(((array_data[0]  <abs( mCurPosValue +30)) && (array_data[0]> abs(mCurPosValue -30)))\
 		 	||((array_data[2] < abs(capture_width +30)) && (array_data[2] >abs(capture_width-30))))
 		 { 
-              
-          
-             PRINTF("setPosHomeRun%%%%%%%% = 1\r\n");
+              setStop_flag=1;
+              PRINTF("setPosHomeRun%%%%%%%% = 1\r\n");
 			 PRINTF("Current position : %d\r\n", mCurPosValue);
             
           }
-          if(((array_data[1] < abs(mCurPosValue +30))&& (array_data[1]  > abs(mCurPosValue-30)))||((array_data[3] < abs(capture_width +30)) && (array_data[3]>abs(capture_width-30))))//¾ø¶ÔÎ»ÖÃÊÇ²»±äµÄ£¬setHome Èí¼şÖ¸¶¨µÄ
+          if(((array_data[1] < abs(mCurPosValue +30))&& (array_data[1]  > abs(mCurPosValue-30)))||((array_data[3] < abs(capture_width +30)) && (array_data[3]>abs(capture_width-30))))//ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½Ç²ï¿½ï¿½ï¿½Ä£ï¿½setHome ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½
          {
-			 
+			  setStop_flag=1;
 		       PRINTF("setPositionEnd~~~~~~~~~~~ \r\n");
 			   PRINTF("setPositionEnd = %d \r\n",setPositionEnd);
-              
-              
-				 
-            
-
-		   }
+          }
 #endif 
          
 /**************************************************************************************************************************************/
@@ -282,27 +275,26 @@ int main(void)
 				   setRun_flag=0;
 #if IRFP4768PbF
                    printf("************************************************************\r \n");
-                   if(Dir==0)  
-                   {
+                   if(Dir==0) {
                       
-                     Motor_Up_Start();
-                          
-                     printf("Dir = %d\r \n",Dir); 
-                     printf("PWM_Duty= %d\r \n",PWM_Duty);
-                     
-                        
-                 }
-                 else //if((ABZ_CNT == 0)&&(Dir==1))//CW 
-                 {
-					Motor_Down_Start();
+									Motor_Up_Start();
+										
+									printf("Dir = %d\r \n",Dir); 
+									printf("PWM_Duty= %d\r \n",PWM_Duty);
+								
+									
+								}
+								else //if((ABZ_CNT == 0)&&(Dir==1))//CW 
+									{
+										Motor_Down_Start();
 
-                    printf("Dir = %d\r \n",Dir); 
-                                   
-                 }
-                #endif 
-               }
+										printf("Dir = %d\r \n",Dir); 
+													
+						            }
+#endif 
+             }
               else{
-                    if(Dir == 0) //Ïò´¹Ö±·½ÏòÒÆ¶¯
+                    if(Dir == 0) //å‘å‚ç›´æ–¹å‘ç§»åŠ¨
                     {
 						PWM_Duty = 60;
 						uwStep = HallSensor_GetPinState();
@@ -311,7 +303,7 @@ int main(void)
 						
 
 					}
-			        else //Dir == 1 Ë®Æ½·½ÏòÒÆ¶¯
+			        else //Dir == 1  å‘æ°´å¹³æ–¹å‘ç§»åŠ¨
 		        	{
 					
 						 SysTick_IRQ_Handler ();  
@@ -362,19 +354,19 @@ int main(void)
             }
         
    
-       /*´¦Àí½ÓÊÕµ½µÄ°´¼ü¹¦ÄÜ*/  
+       /*Key process*/  
 		if(ucKeyCode !=KEY_UP) 
 		{
            switch(ucKeyCode)
             { 
                  
-                  case DIR_DOWN_PRES ://Ë³Ê±Õë---·½Ïò--¡°ÏÂ¡±-Ë®Æ½·½Ïò
+                  case DIR_DOWN_PRES ://Ë³Ê±ï¿½ï¿½---ï¿½ï¿½ï¿½ï¿½--ï¿½ï¿½ï¿½Â¡ï¿½-Ë®Æ½ï¿½ï¿½ï¿½ï¿½
 				  	 Dir = 1;
 					 keyRunTime = 1;
 					  setRun_flag = 0;
 					  setStop_flag=0;
 				     PRINTF("Right Key: %d\r\n", setRun_flag);
-                    if(Dir == 0) //Ë³Ê±ÕëĞı×ª
+                    if(Dir == 0) //Ë³Ê±ï¿½ï¿½ï¿½ï¿½×ª
 	   			    {
 
                         if((motor_ref.power_on ==2)||(motor_ref.motor_run == 1))//motor is runing
@@ -435,14 +427,14 @@ int main(void)
                  
 				  break;
 		
-				 case DIR_UP_PRES: //ÄæÊ±ÕëĞı×ª Dir = 0;¡°ÉÏ¡±--´¹Ö±·½Ïò
-				    Dir = 0 ; //ÄæÊ±Õë
+				 case DIR_UP_PRES: //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª Dir = 0;ï¿½ï¿½ï¿½Ï¡ï¿½--ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½
+				    Dir = 0 ; //ï¿½ï¿½Ê±ï¿½ï¿½
 					keyRunTime = 1;
                    setRun_flag = 0;
 				   setStop_flag=0;
 				   PRINTF("key setRun_flag: %d\r\n", setRun_flag);
 	  			
-			     if(Dir==1) // Dir = 0; //ÄæÊ±ÕëĞı×ª
+			     if(Dir==1) // Dir = 0; //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª
 				   {
 	               
 	                 if((motor_ref.power_on == 2)||(motor_ref.motor_run == 1)) //motor is runing

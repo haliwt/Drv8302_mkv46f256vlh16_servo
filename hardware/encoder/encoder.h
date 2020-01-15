@@ -14,12 +14,10 @@ typedef struct _encoder_t_
 {
   volatile int16_t  en_add_value;
   volatile int16_t  en_reduce_value;
-  
+ // volatile int16_t  capture_width;
 
   volatile int16_t captureVal_1;
   volatile int16_t captureVal_2;
-
-
 
    uint16_t drv8302_adc_value;
 
@@ -81,9 +79,11 @@ extern uint32_t mCurPosValue;
 
 extern uint8_t home_flag;
 extern uint8_t end_flag;
-extern uint8_t judge_he_flag ;
+extern uint8_t judge_home_flag ; //判断起始点的位置，1=水平， 2=垂直位置
 
-extern volatile  int16_t  capture_width;
+extern volatile int16_t  capture_width;
+
+
   
 
 void Capture_Input_Init(void);

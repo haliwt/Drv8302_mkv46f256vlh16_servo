@@ -11,7 +11,6 @@ encoder_t encap_t;
 	*
 ************************************************/
 void Capture_Input_Init(void)
-
 {
 
 	ftm_config_t ftmInfo;
@@ -40,9 +39,6 @@ void Capture_Input_Init(void)
        /* Setup dual-edge capture on a FTM channel pair */
 		FTM_SetupDualEdgeCapture(DEMO_FTM_BASEADDR, BOARD_FTM_INPUT_CAPTURE_CHANNEL_PAIR, &edgeParam, 1);
 
-	
-
-  
 }
 /***********************************************
 	*
@@ -90,9 +86,4 @@ uint16_t Capture_ReadPulse_Value(void)
 
 
 
-void ENC_SetPositionZero(ENC_Type *base, uint32_t value)
-{
-    base->UPOS = (uint16_t)(value << 16U); /* Set upper 16 bits. */
-    base->LPOS = (uint16_t)(value);        /* Set lower 16 bits. */
-}
 

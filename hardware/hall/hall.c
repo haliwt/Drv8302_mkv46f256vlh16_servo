@@ -13,7 +13,6 @@ int32_t  flag = 0;
 
 uint32_t ABZ_CNT;
 
-volatile  int16_t  capture_width;
 
 
 
@@ -54,14 +53,14 @@ int32_t LocPIDCalc(int32_t NextPoint)
      #if 0  
 	 // if(Dir == 0) //逆时针旋转 DIR_UP_PRES，//往垂直方向移动
 	  {
-		     if(judge_he_flag ==1) //setHome垂直是起始位置// 向垂直位置移动setEnd =12241 反向
+		     if(judge_home_flag ==1) //setHome垂直是起始位置// 向垂直位置移动setEnd =12241 反向
 		     	{
 			       sPID.SetPoint = setPositionHome; //往垂直方向移动
 			           
 				   iError = sPID.SetPoint - NextPoint ; //偏差= 目标位置 - 当前位置 (distance)
 		     	}
 			
-			 if(judge_he_flag == 2) //起始位置在水平位置,UP-往垂直方向移动
+			 if(judge_home_flag == 2) //起始位置在水平位置,UP-往垂直方向移动
 			 {
                sPID.SetPoint =setPositionEnd;                         
                iError = sPID.SetPoint - NextPoint ; 
@@ -71,14 +70,14 @@ int32_t LocPIDCalc(int32_t NextPoint)
 	 #endif 
 	  if(Dir == 1) //Dir ==1 顺时针旋转 “下”---Down --往---往水平方向移动
 	  {
-			if (judge_he_flag == 1)  //起始点位置在垂直的位置
+			if (judge_home_flag == 1)  //起始点位置在垂直的位置
 			{
 
 				sPID.SetPoint = setPositionEnd;
 
 				iError = sPID.SetPoint + NextPoint; 
 			}
-			if(judge_he_flag ==2) //起点位置，在水平位置
+			if(judge_home_flag ==2) //起点位置，在水平位置
 			{
 			     sPID.SetPoint = setPositionHome;
 				 iError = sPID.SetPoint + NextPoint; 
@@ -133,42 +132,33 @@ void SysTick_IRQ_Handler  (void)
 	 uint8_t iEr_flag=0;
 	 uint8_t ne_symbol = 0;
 	 uint16_t comp_array[2];
-	 uint8_t  com_result;
-	 uint16_t Destination;
-	  mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-	  PRINTF("PID mCurPosValue = %d \r\n",mCurPosValue);
-	  
-	  PRINTF("setHome = %d \r\n",array_data[2]);
-	  PRINTF("setEnd = %d \r\n",array_data[3]);
+	 uint8_t com_result;
+	 uint8_t pid_stop=0;
+	// mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 	 
-
-      if(Dir == 1) //Dir ==1 顺时针旋转 “下”---Down --往---往水平方向移动
+	 PRINTF("setHome = %d \r\n",setHome);
+	 PRINTF("setEnd= %d \r\n",setEnd); 
+	 #if 0
+	if(Dir == 1) //Dir ==1 顺时针旋转 “下”---Down --往---往水平方向移动
 	  {
-			if (judge_he_flag == 1)  //起始点位置在垂直的位置,setHome > setEnd 
+			if (judge_home_flag == 1)   //ֻ起始点在水平位置
 			{
 				
-			   iError =  array_data[1] - mCurPosValue;//setPositionEnd;
+			   iError =  array_data[0] - mCurPosValue;//setPositionHome;
                iEr_flag =1;
 				
 			}
-			if(judge_he_flag ==2) //起点位置，在水平位置
+			if(judge_home_flag ==2) //起点位置，垂直位置
 			{
-			   iError =  array_data[0] - mCurPosValue;//setPositionHome
+			   iError =  array_data[1] - mCurPosValue;//setPositionEnd
 			   iEr_flag =2;
 			}
 	  }
 	   PID_Result =iError;
+	   #endif 
 	 //  PRINTF("iError= %d \r\n",iError);
-	   if(PID_Result > 0)
-	   	{
-	   	  // PRINTF(" ++ PID_Result \r\n");
-		   ne_symbol = 0;
-	   	}
-	   else
-	   	{
-	   	  //  PRINTF(" -- PID_Result \r\n");
-			ne_symbol = 1;
-	   	}
+	  
+		/**/
 	   if(j==1) comp_array[0]=PID_Result;
 	   else if(j==2)
 	   {
@@ -193,117 +183,81 @@ if( arithmetic_flag  == 1)
 		  // PID_Result = LocPIDCalc(mCurPosValue);
 		   //PRINTF("PID_Result = %d \r\n",iError);
 		    /*-PID_Result 在此语句执行 递减*/
-		total_value =abs(setPositionEnd)+abs(setPositionHome); //1107 /90=12.3
+		total_value =abs(array_data[0])+abs(array_data[1]); //1107 /90=12.3
 
 		one_step = total_value / 90 ;
 	 
-		  /* 限定PWM数值范围    arrr_data[2]= setHome ,array_data[3]=setEnd    */
-	      if(iEr_flag ==1)//setEnd
-	      	{
-				   
-				 if(((abs(array_data[3] +30) >capture_width)&&(abs(array_data[3] - 30 )< capture_width))\
-				  	||(com_result ==0))//位置到终点
-				  {
-				          
-		                      PRINTF("com_result = %d \r\n",com_result);
-		STOP:			      PWM_Duty = 30;
-							  uwStep = HallSensor_GetPinState();
-				              HALLSensor_Detected_BLDC( PWM_Duty);
-							  DelayMs(50);
-			                  
-			                   PWM_Duty = 20;
-							  uwStep = HallSensor_GetPinState();
-				              HALLSensor_Detected_BLDC( PWM_Duty);
-							  DelayMs(50);
-							 
-							  PWM_Duty = 10;
-							  uwStep = HallSensor_GetPinState();
-				              HALLSensor_Detected_BLDC( PWM_Duty);
-							  DelayMs(50);
-							
-						      PRINTF("PID PROCESS STOP &&&&&&&&&&&&&&&&&&&&&&&&\r\n");
-						  	
-				  }
-	      	}
-		  else if(iEr_flag ==2)
-		  {
-
-		    if(((abs(array_data[2] + 30) > capture_width )&&( abs(array_data[2] -30) < capture_width))\
-				||(com_result ==0))//位置到终点
-		    	{
-
-                   goto STOP;
-
-				}
-
-		  }
-		  else if(com_result!=0)
-		  {
+		  
+		   if((com_result!=0)&&(pid_stop ==0))
+		   {
 			  Time_CNT++;
               ABZ_CNT = 1;
 			  motor_ref.power_on =4;
 			  motor_ref.motor_run=1; 
-			  PRINTF("motor_ref.power_on= %d \r\n", motor_ref.power_on);
-			  PRINTF("ABZ_CNT = %d \r\n",com_result);
-			  PRINTF("total_value = %d \r\n",total_value);
+			//  PRINTF("motor_ref.power_on= %d \r\n", motor_ref.power_on);
+			//  PRINTF("ABZ_CNT = %d \r\n",com_result);
+			//  PRINTF("total_value = %d \r\n",total_value);
+			
 			  if(Time_CNT == one_step)
 			  {
-
-				//mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-				PRINTF("one_step = %d \r\n",one_step);
-				Motor_Down_Start();
-				PWM_Duty =60;
+				//PRINTF("one_step = %d \r\n",one_step);
 				uwStep = HallSensor_GetPinState();
 		        HALLSensor_Detected_BLDC(PWM_Duty);
-				DelayMs(1000);
-				 PWM_Duty = 50;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC( PWM_Duty);
-				  DelayMs(50);
-                  
-                   PWM_Duty = 40;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC( PWM_Duty);
-				  DelayMs(50);
-				 
-				  PWM_Duty =30;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC( PWM_Duty);
-				  DelayMs(50);
-				
-
-				   if(iEr_flag ==1)//setEnd =array_data[3]
-				   {
-
-				      Destination= array_data[3]-100 ;
-					  if((Destination == capture_width)||(Destination < capture_width +30)||(Destination  > abs(capture_width-30)))
-					  {
-							goto STOP;
-					  }
-				   }
-				    if(iEr_flag ==2)//setHome =array_data[2]
-				   {
-	      				 Destination= array_data[2]-100 ;
-					 if((Destination == capture_width)||(Destination < capture_width +30)||(Destination  > abs(capture_width-1)))
-					  {
-							goto STOP;
-					  }
-					 
-				    }
+				//DelayMs(10);
 			  }
+		      if(setStop_flag ==1)pid_stop =1;
+           }
+		  
+		  /* 限定PWM数值范围 */
+	       if ((judge_home_flag == 1) &&(pid_stop ==1) ) //ֻ起始点在水平位置
+		   {
+			
+				PWM_Duty = 60;
+				if((com_result ==0) ||(array_data[2]==capture_width)\
+					|| (array_data[2] -20 < capture_width ))
+				{
+						
+		STOP:		
+                    i++;
+                    PRINTF("i == %d \r\n",i);
+					if(i==45)
+					{
+						PWM_Duty =0;
+						pid_stop =1;
+					    motor_ref.motor_run=0; 
+					}
+					uwStep = HallSensor_GetPinState();
+					HALLSensor_Detected_BLDC(PWM_Duty);
+					DelayMs(500);
+					//PRINTF("PWM_Duty == %d \r\n",PWM_Duty);
+					
+					PRINTF("PID PROCESS STOP &&&&&&&&&&&&&&&&&&&&&&&&\r\n");
+							
+				}
+		   }
+		 if((judge_home_flag ==2) &&(pid_stop ==1))//起点位置，垂直位置
+		   {
+			   	if((com_result ==0) ||(array_data[3]==capture_width)\
+					|| (array_data[3] -20 < capture_width ))
+					{
+							PRINTF("flag =2 start vertial \r\n");
+							goto STOP;
+
+					}
+
+            }
 		
-	  
-	      }
-    }
+		}
+    
 	  //50ms反馈一次数据
-	//  if(Time_CNT % 10 == 0)
-	//  {
-	//	PRINTF("Tick position : %d\r\n", mCurPosValue);
-	//  }
+	 // if(Time_CNT % 10 == 0)
+	 // {
+		//PRINTF("Tick position : %d\r\n", mCurPosValue);//Transmit_FB(ptr_FB);
+	 // }
 	  if(Time_CNT == one_step)
 		Time_CNT = 0;
-}
 
+}
 
 
 
