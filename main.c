@@ -318,24 +318,24 @@ int main(void)
               }
       }/*end if motor_ref.motor_run == 1*/
           
-          else
-		  {
+     else
+	{
 
              if(motor_ref.power_on==2||motor_ref.motor_run==1)
              	{
 				  
 				  
-				  PWM_Duty = 30;
+				  PWM_Duty = 60;
 				  uwStep = HallSensor_GetPinState();
 	              HALLSensor_Detected_BLDC( PWM_Duty);
 				  DelayMs(50);
                   
-                   PWM_Duty = 20;
+                   PWM_Duty = 60;
 				  uwStep = HallSensor_GetPinState();
 	              HALLSensor_Detected_BLDC( PWM_Duty);
 				  DelayMs(50);
 				 
-				  PWM_Duty = 10;
+				  PWM_Duty = 60;
 				  uwStep = HallSensor_GetPinState();
 	              HALLSensor_Detected_BLDC( PWM_Duty);
 				  DelayMs(50);
