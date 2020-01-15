@@ -167,7 +167,7 @@ void SysTick_IRQ_Handler  (void)
 	   }
 	   com_result = abs(comp_array[1]- comp_array[0]);
 	   
-	  
+	  PWM_Duty =60;
 
 if( arithmetic_flag  == 1)
   {
@@ -192,13 +192,13 @@ if( arithmetic_flag  == 1)
 		   {
 			  Time_CNT++;
               ABZ_CNT = 1;
-			  motor_ref.power_on =4;
+			//  motor_ref.power_on =4;
 			  motor_ref.motor_run=1; 
 			//  PRINTF("motor_ref.power_on= %d \r\n", motor_ref.power_on);
 			//  PRINTF("ABZ_CNT = %d \r\n",com_result);
 			//  PRINTF("total_value = %d \r\n",total_value);
 			
-			  if(Time_CNT == one_step)
+			 // if(Time_CNT == one_step)
 			  {
 				//PRINTF("one_step = %d \r\n",one_step);
 				uwStep = HallSensor_GetPinState();

@@ -219,11 +219,11 @@ int main(void)
 	                /*�ж���ʼ��λ��*/
 	                if((home_flag ==1)&&(end_flag ==1))
 	                	{
-							if(setHome > setEnd) //起始位置在水平点，磁编码PWM位置固定，关机上电，PWM占空比不变
+							if(setHome > setEnd) //起始位置在水平点，磁编码PWM位置固定，关机上电，PWM占空比不�?
 							{
 								judge_home_flag =1; //ֻ起始点在水平位置
 							}
-							else //setHome < setEnd  //起始点位置在垂直位置。
+							else //setHome < setEnd  //起始点位置在垂直位置�?
 								judge_home_flag =2;
 							
 	                	}
@@ -238,7 +238,7 @@ int main(void)
 								
 		}
            
-     /*********************************����ź�************************************************************************/ 
+     /*********************************����ź�?***********************************************************************/ 
 		 if(((array_data[0]  <abs( mCurPosValue +30)) && (array_data[0]> abs(mCurPosValue -30)))\
 		 	||((array_data[2] < abs(capture_width +30)) && (array_data[2] >abs(capture_width-30))))
 		 { 
@@ -294,16 +294,14 @@ int main(void)
 #endif 
              }
               else{
-                    if(Dir == 0) //向垂直方向移动
+                    if(Dir == 0) //向垂直方向移�?
                     {
 						PWM_Duty = 60;
 						uwStep = HallSensor_GetPinState();
 	               
 	                 	HALLSensor_Detected_BLDC(PWM_Duty);
-						
-
 					}
-			        else //Dir == 1  向水平方向移动
+			        else //Dir == 1  向水平方向移�?
 		        	{
 					
 						 SysTick_IRQ_Handler ();  
