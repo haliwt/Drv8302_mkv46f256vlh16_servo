@@ -272,42 +272,22 @@ int main(void)
 	#ifdef DEBUG_PRINT 
              printf("pwm_duty = %d\r \n",pwm_duty); 
 	#endif 
-              if(motor_ref.power_on == 1)
-              {
-                   motor_ref.en_on=0;
-                   motor_ref.power_on ++;
-				   setRun_flag=0;
-#if IRFP4768PbF
-                   printf("************************************************************\r \n");
-                   if(Dir==0) {
-                      
-									Motor_Up_Start();
-										
-									printf("Dir = %d\r \n",Dir); 
-									printf("PWM_Duty= %d\r \n",PWM_Duty);
-								
-									
-								}
-								else //if((ABZ_CNT == 0)&&(Dir==1))//CW 
-									{
-										Motor_Down_Start();
+             
 
-										printf("Dir = %d\r \n",Dir); 
-													
-						            }
-#endif 
-             }
-              else{
+              
                     if(Dir == 0) //向垂直方向移�?
                     {
 						
+                               if( arithmetic_flag  ==1)
+                               {
+                                  
                                   do
                                   {
                                           i++;
                                           PWM_Duty =60;
                                           uwStep = HallSensor_GetPinState();
                                           HALLSensor_Detected_BLDC(PWM_Duty);
-                                          PRINTF("i= %d \r\n",i);
+                                       //   PRINTF("i= %d \r\n",i);
                                          
                                   }while(i<3000);//3200
                                    
@@ -317,7 +297,7 @@ int main(void)
                                    PWM_Duty =50;
                                    uwStep = HallSensor_GetPinState();
                                    HALLSensor_Detected_BLDC(PWM_Duty);
-                                   PRINTF("j@@@@= %d \r\n",j);
+                                 //  PRINTF("j@@@@= %d \r\n",j);
                                    DelayMs(500);
                                   
                                   }
@@ -326,6 +306,15 @@ int main(void)
                                    HALLSensor_Detected_BLDC(PWM_Duty);
 								  
                                    motor_ref.motor_run=0;// while(1);
+								  
+                               }
+                               else
+                               {
+                                          PWM_Duty =60;
+                                          uwStep = HallSensor_GetPinState();
+                                          HALLSensor_Detected_BLDC(PWM_Duty);
+                               }
+                                 
 								  
 					}
 			        else //Dir == 1 向水平方向移�?
@@ -340,7 +329,7 @@ int main(void)
 						
 					}
               }
-      }/*end if motor_ref.motor_run == 1*/
+     
           
      else
 	{ 

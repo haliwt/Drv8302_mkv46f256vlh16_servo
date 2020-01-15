@@ -233,11 +233,11 @@ if( arithmetic_flag  == 1)
 					
 		             if(i == 1)
 					  {
-					   // i=0;
-                          for(z=0;z<36;z++)
+					      i=0;
+                          for(z=0;z<5;z++)
                         {
                          
-                            z++;
+                          //  z++;
 							PWM_Duty=50  ;
 							
 							PRINTF("z = %d \r\n",z);
@@ -257,7 +257,7 @@ if( arithmetic_flag  == 1)
 						uwStep = HallSensor_GetPinState();
                         HALLSensor_Detected_BLDC(PWM_Duty);
 						
-						 
+					    DelayMs(2000);
 						DelayMs(2000);
 					    DelayMs(2000);
 						pid_stop =1;
