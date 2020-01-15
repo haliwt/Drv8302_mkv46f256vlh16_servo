@@ -278,42 +278,35 @@ int main(void)
                     if(Dir == 0) //向垂直方向移�?
                     {
 						
-                               if( arithmetic_flag  ==1)
-                               {
-                                  
-                                  do
-                                  {
+                               
                                           i++;
-                                          PWM_Duty =60;
+                                      
                                           uwStep = HallSensor_GetPinState();
                                           HALLSensor_Detected_BLDC(PWM_Duty);
-                                       //   PRINTF("i= %d \r\n",i);
+                                          PRINTF("i= %d \r\n",i);
                                          
-                                  }while(i<3000);//3200
+                                 
                                    
-                                  for(j=0;j<3;j++)
+                                  if(i==650)
                                   {
                                    
-                                   PWM_Duty =50;
+                                   PWM_Duty =55;
                                    uwStep = HallSensor_GetPinState();
                                    HALLSensor_Detected_BLDC(PWM_Duty);
-                                 //  PRINTF("j@@@@= %d \r\n",j);
+                                   PRINTF(" dir =0 stop\r\n");
                                    DelayMs(500);
                                   
-                                  }
+                                  
+                                   
                                    PWM_Duty =60;
                                    uwStep = HallSensor_GetPinState();
                                    HALLSensor_Detected_BLDC(PWM_Duty);
+                                   
+                                    if( arithmetic_flag  ==1);
 								  
                                    motor_ref.motor_run=0;// while(1);
 								  
-                               }
-                               else
-                               {
-                                          PWM_Duty =60;
-                                          uwStep = HallSensor_GetPinState();
-                                          HALLSensor_Detected_BLDC(PWM_Duty);
-                               }
+                                  }
                                  
 								  
 					}

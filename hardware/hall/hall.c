@@ -136,7 +136,7 @@ void SysTick_IRQ_Handler  (void)
 	 uint16_t comp_array[2];
 	 uint8_t com_result;
 	 uint8_t pid_stop=0;
-	 uint8_t z=0;
+	 uint8_t z=0,w=0,y=0;
 	// mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 	 
 	 PRINTF("setHome = %d \r\n",setHome);
@@ -212,80 +212,61 @@ if( arithmetic_flag  == 1)
            }
 		  
 		  /* 限定PWM数值范围 */
-	       if ((judge_home_flag == 1) &&(pid_stop ==1) ) //ֻ起始点在水平位置
+	       if ((judge_home_flag == 1) && (mCurPosValue < 50 )) //ֻ起始点在水平位置
 		   {
 			
-				PWM_Duty = 60;
-				if(((com_result ==0) ||(array_data[2]==capture_width)\
-					|| ((array_data[2] -10 < capture_width )&&(array_data[2]+10 > capture_width)))\
-					&&(array_data[0]==mCurPosValue || (array_data[0] > (mCurPosValue -2) && array_data[0] <(mCurPosValue +2) )))
-				{
-						
-		STOP:		
-                    i++;
-                    PRINTF("i == %d \r\n",i);
-					
-					//uwStep = HallSensor_GetPinState();
-					//HALLSensor_Detected_BLDC(PWM_Duty);
-					//DelayMs(500);
-					//PRINTF("PWM_Duty == %d \r\n",PWM_Duty);
-
-					
-		             if(i == 1)
-					  {
-					      i=0;
-                          for(z=0;z<5;z++)
-                        {
-                         
-                          //  z++;
-							PWM_Duty=50  ;
-							
-							PRINTF("z = %d \r\n",z);
-                            uwStep = HallSensor_GetPinState();
-                            HALLSensor_Detected_BLDC(PWM_Duty);
+			
+						PRINTF("home_flag =1 \r\n");
+		
+                   uwStep = HallSensor_GetPinState();
+                   HALLSensor_Detected_BLDC(PWM_Duty);
                            
-                            DelayMs(10);
-						}
-                        
-                     }
-					  
+                         
 					
-					PRINTF("PID PROCESS STOP &&&&&&&&&&&&&&&&&&&&&&&&\r\n");
-                   
-					{
-						PWM_Duty =60;
-						uwStep = HallSensor_GetPinState();
-                        HALLSensor_Detected_BLDC(PWM_Duty);
+					
+                        
+                        
 						
 					    DelayMs(2000);
 						DelayMs(2000);
 					    DelayMs(2000);
-						pid_stop =1;
-					    motor_ref.motor_run=0; 
-						PRINTF("Destination STOP ^^^^^^^^^^^^^^\r\n");
-					  
-					   
+						 PRINTF("Destination STOP ^^^^^^^^^^^^^^\r\n");
 						
-					    
-					}
+					    motor_ref.motor_run=0; 
+					  
+		             	
+						
+           }  
+					
 							
-				}
-		   }
-		 if((judge_home_flag ==2) &&(pid_stop ==1))//起点位置，垂直位置
+				
+		
+		 if((judge_home_flag ==2) &&(mCurPosValue > array_data[1] -10))//起点位置，垂直位置
 		   {
-			   	if(((com_result ==0) ||(array_data[3]==capture_width)\
-					|| (array_data[3] -10 < capture_width )&&(array_data[3]+10 > capture_width))\
-					&&(array_data[1]==mCurPosValue || (array_data[1] > (mCurPosValue -2) && array_data[1] <(mCurPosValue +2))))
-					{
-							PRINTF("flag =2 start vertial \r\n");
-							goto STOP;
+			      
+				
+                            PRINTF("End_flag =1 \r\n");
+					
+							
+						
+                            uwStep = HallSensor_GetPinState();
+                            HALLSensor_Detected_BLDC(PWM_Duty);
+                         
+						
+                        DelayMs(2000);
+						DelayMs(2000);
+					    DelayMs(2000);
+						PRINTF("YYYY STOP ^^^^^^^^^^^^^^\r\n");
+						motor_ref.motor_run=0; 
+					  
+		        
 
-					}
+				
 
             }
 		
-		}
-    
+		
+  }
 	  //50ms反馈一次数据
 	 // if(Time_CNT % 10 == 0)
 	 // {
@@ -294,7 +275,7 @@ if( arithmetic_flag  == 1)
 	  if(Time_CNT == one_step)
 		Time_CNT = 0;
 
+
+
+
 }
-
-
-
