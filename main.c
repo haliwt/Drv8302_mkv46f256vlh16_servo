@@ -52,8 +52,9 @@ encoder_t en_t;
 
 
 
+
 volatile uint32_t g_EncIndexCounter = 0U;
-uint32_t pulseWidth;
+
 
 //__IO uint16_t	PWM_Duty; 
 
@@ -167,6 +168,7 @@ int main(void)
 				   if(rem_times ==2)
 				   	{
 					   setHome = capture_width-30;
+					   g_destination_home = capture_width - 10;
 					   array_data[2]= setHome;
 	                   if(setPositionHome == 0 )
 	                   	{
@@ -195,6 +197,7 @@ int main(void)
 
 					   setEnd = capture_width-30;
 					   array_data[3]= setEnd;
+					   g_destination_end = capture_width -10;
 	                   if(setPositionEnd ==0 )
 	                   	{
 	                      setPositionEnd = mCurPosValue + 30;

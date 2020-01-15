@@ -13,6 +13,8 @@ int32_t  flag = 0;
 
 uint32_t ABZ_CNT;
 
+ volatile uint16_t g_destination_home; 
+volatile uint16_t g_destination_end; 
 
 
 
@@ -214,17 +216,18 @@ if( arithmetic_flag  == 1)
 			
 				PWM_Duty = 60;
 				if((com_result ==0) ||(array_data[2]==capture_width)\
-					|| (array_data[2] -20 < capture_width ))
+					|| ((array_data[2] -10 < capture_width )&&(array_data[2]+10 > capture_width)))
 				{
 						
 		STOP:		
                     i++;
                     PRINTF("i == %d \r\n",i);
-					if(i==45)
+					if(g_destination_end == capture_width || g_destination_end + 5 > capture_width)
 					{
 						PWM_Duty =0;
 						pid_stop =1;
 					    motor_ref.motor_run=0; 
+						PRINTF("Destination STOP ^^^^^^^^^^^^^^&&\r\n");
 					}
 					uwStep = HallSensor_GetPinState();
 					HALLSensor_Detected_BLDC(PWM_Duty);
@@ -238,7 +241,7 @@ if( arithmetic_flag  == 1)
 		 if((judge_home_flag ==2) &&(pid_stop ==1))//起点位置，垂直位置
 		   {
 			   	if((com_result ==0) ||(array_data[3]==capture_width)\
-					|| (array_data[3] -20 < capture_width ))
+					|| (array_data[3] -10 < capture_width )&&(array_data[3]+10 < capture_width))
 					{
 							PRINTF("flag =2 start vertial \r\n");
 							goto STOP;

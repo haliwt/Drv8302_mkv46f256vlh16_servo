@@ -9,14 +9,14 @@
 
 /* ���Ͷ��� ------------------------------------------------------------------*/
 typedef struct {
-  __IO int32_t  uwStep ;  	  // �����ת״̬
-  __IO int32_t  Dir ;        	// �����ת����
-  __IO int32_t  Position;		  // ���λ��
-  __IO int32_t  Speed;		    // ����ٶ�
-  __IO uint16_t PWM_Duty; 	  // ���ռ�ձ�
+  __IO int32_t  uwStep ;  	  // �����ת״�?
+  __IO int32_t  Dir ;        	// �����ת����?
+  __IO int32_t  Position;		  // ���λ��?
+  __IO int32_t  Speed;		    // ����ٶ�?
+  __IO uint16_t PWM_Duty; 	  // ���ռ�ձ�?
   __IO int32_t  Hall_Period;  // ������������������
   __IO int32_t  Hall_PulNum;  // ����������������
-  __IO int32_t  Lock_Time;    // �����תʱ��
+  __IO int32_t  Lock_Time;    // �����תʱ��?
 }BLDC_Typedef;
 
 
@@ -27,7 +27,7 @@ typedef struct {
 typedef struct 
 {
   __IO int32_t  SetPoint;                                 //�趨Ŀ�� Desired Value
-  __IO long     SumError;                                 //����ۼ�
+  __IO long     SumError;                                 //����ۼ�?
   __IO float    Proportion;                               //�������� Proportional Const
   __IO float    Integral;                                 //���ֳ��� Integral Const
   __IO float    Derivative;                               //΢�ֳ��� Derivative Const
@@ -65,6 +65,8 @@ extern uint32_t ABZ_CNT;
 
 extern int32_t PID_Result ;
 
+extern volatile uint16_t g_destination_home; 
+extern volatile uint16_t g_destination_end; 
 
 
 
