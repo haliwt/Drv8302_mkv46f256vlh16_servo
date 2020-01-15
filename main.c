@@ -77,7 +77,7 @@ int32_t PID_Result;
 
 volatile int16_t  capture_width;
 //__IO uint32_t PWM_ChangeFlag = 0;
-//__IO int32_t CaptureNumber = 0;      // ���벶����
+//__IO int32_t CaptureNumber = 0;      // ï¿½ï¿½ï¿½ë²¶ï¿½ï¿½ï¿½ï¿½
 
 
 
@@ -108,6 +108,7 @@ int main(void)
 	 static uint8_t keyRunTime=0;
      static uint8_t rem_times = 0;
 	 uint8_t down_run =0;
+	 uint32_t i=0,j=0;
     
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -143,9 +144,9 @@ int main(void)
        
 		
 	    capture_width =Capture_ReadPulse_Value(); 
-        PRINTF("Cpw = %d\r\n", capture_width);
+     //   PRINTF("Cpw = %d\r\n", capture_width);
 		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-        PRINTF("Current position : %d\r\n", mCurPosValue);
+     //   PRINTF("Current position : %d\r\n", mCurPosValue);
 	
 		
 	#if 1	
@@ -175,12 +176,12 @@ int main(void)
 					       setPositionHome = mCurPosValue + 30;
 						   array_data[0]=setPositionHome;
 	                   	}
-	                   else if(Dir ==1) //˳ʱ��---ˮƽ�����ƶ�
+	                   else if(Dir ==1) //Ë³Ê±ï¿½ï¿½---Ë®Æ½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
 	                   	{
 	                     setPositionHome = mCurPosValue + 30;
 						 array_data[0]=setPositionHome;
 	                   	}
-					   else //��ʱ����ת Dir =0 
+					   else //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª Dir =0 
 					   	{
 					   	 setPositionHome = mCurPosValue - 30;
 						 array_data[0]=setPositionHome;
@@ -203,7 +204,7 @@ int main(void)
 	                      setPositionEnd = mCurPosValue + 30;
 						  array_data[1]=setPositionEnd;
 	                   	}
-	                   else if(Dir ==1) //˳ʱ��
+	                   else if(Dir ==1) //Ë³Ê±ï¿½ï¿½
 	                   	{
 	                     setPositionEnd = mCurPosValue +30;
 						  array_data[1]=setPositionEnd;
@@ -219,14 +220,14 @@ int main(void)
 					   PRINTF("setPositionEnd@@@= %d \r\n",array_data[1]);
 					   arithmetic_flag  = 1;
 				   }
-	                /*�ж���ʼ��λ��*/
+	                /*ï¿½Ð¶ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½Î»ï¿½ï¿½*/
 	                if((home_flag ==1)&&(end_flag ==1))
 	                	{
-							if(setHome > setEnd) //起始位置在水平点，磁编码PWM位置固定，关机上电，PWM占空比不�?
+							if(setHome > setEnd) //èµ·å§‹ä½ç½®åœ¨æ°´å¹³ç‚¹ï¼Œç£ç¼–ç PWMä½ç½®å›ºå®šï¼Œå…³æœºä¸Šç”µï¼ŒPWMå ç©ºæ¯”ä¸å�?
 							{
-								judge_home_flag =1; //ֻ起始点在水平位置
+								judge_home_flag =1; //Ö»èµ·å§‹ç‚¹åœ¨æ°´å¹³ä½ç½�?
 							}
-							else //setHome < setEnd  //起始点位置在垂直位置�?
+							else //setHome < setEnd  //èµ·å§‹ç‚¹ä½ç½®åœ¨åž‚ç›´ä½ç½®ã€?
 								judge_home_flag =2;
 							
 	                	}
@@ -241,7 +242,7 @@ int main(void)
 								
 		}
            
-     /*********************************����ź�?***********************************************************************/ 
+     /*********************************ï¿½ï¿½ï¿½ï¿½Åºï¿?***********************************************************************/ 
 		 if(((array_data[0]  <abs( mCurPosValue +30)) && (array_data[0]> abs(mCurPosValue -30)))\
 		 	||((array_data[2] < abs(capture_width +30)) && (array_data[2] >abs(capture_width-30))))
 		 { 
@@ -250,7 +251,7 @@ int main(void)
 			 PRINTF("Current position : %d\r\n", mCurPosValue);
             
           }
-          if(((array_data[1] < abs(mCurPosValue +30))&& (array_data[1]  > abs(mCurPosValue-30)))||((array_data[3] < abs(capture_width +30)) && (array_data[3]>abs(capture_width-30))))//����λ���ǲ���ģ�setHome ����ָ����
+          if(((array_data[1] < abs(mCurPosValue +30))&& (array_data[1]  > abs(mCurPosValue-30)))||((array_data[3] < abs(capture_width +30)) && (array_data[3]>abs(capture_width-30))))//ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½Ç²ï¿½ï¿½ï¿½Ä£ï¿½setHome ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½
          {
 			  setStop_flag=1;
 		       PRINTF("setPositionEnd~~~~~~~~~~~ \r\n");
@@ -299,12 +300,35 @@ int main(void)
               else{
                     if(Dir == 0) //向垂直方向移�?
                     {
-						PWM_Duty = 60;
-						uwStep = HallSensor_GetPinState();
-	               
-	                 	HALLSensor_Detected_BLDC(PWM_Duty);
+						
+                                  do
+                                  {
+                                          i++;
+                                          PWM_Duty =60;
+                                          uwStep = HallSensor_GetPinState();
+                                          HALLSensor_Detected_BLDC(PWM_Duty);
+                                          PRINTF("i= %d \r\n",i);
+                                         
+                                  }while(i<3100);//3200
+                                   
+                                  for(j=0;j<5;j++)
+                                  {
+                                   
+                                   PWM_Duty =50;
+                                   uwStep = HallSensor_GetPinState();
+                                   HALLSensor_Detected_BLDC(PWM_Duty);
+                                   PRINTF("j@@@@= %d \r\n",j);
+                                   DelayMs(500);
+                                  
+                                  }
+                                   PWM_Duty =60;
+                                   uwStep = HallSensor_GetPinState();
+                                   HALLSensor_Detected_BLDC(PWM_Duty);
+								  
+                                   motor_ref.motor_run=0;// while(1);
+								  
 					}
-			        else //Dir == 1  向水平方向移�?
+			        else //Dir == 1 向水平方向移�?
 		        	{
 					
 						 SysTick_IRQ_Handler ();  
@@ -319,40 +343,18 @@ int main(void)
       }/*end if motor_ref.motor_run == 1*/
           
      else
-	{
-
-             if(motor_ref.power_on==2||motor_ref.motor_run==1)
-             	{
+	{ 
+	    // if(motor_ref.power_on==2||motor_ref.motor_run==1)
+             
 				  
-				  
-				  PWM_Duty = 60;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC( PWM_Duty);
-				  DelayMs(50);
-                  
-                   PWM_Duty = 60;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC( PWM_Duty);
-				  DelayMs(50);
-				 
-				  PWM_Duty = 60;
-				  uwStep = HallSensor_GetPinState();
-	              HALLSensor_Detected_BLDC( PWM_Duty);
-				  DelayMs(50);
-				  PRINTF("KEY STOP motor_run = %d \r\n",motor_ref.motor_run);
-				  PRINTF("KEY STOP power_on = %d \r\n",motor_ref.power_on);
-				 
-             	}
+	  PRINTF("Motor Stop ! \r\n");
+		// PMW_AllClose_ABC_Channel();
+      DelayMs(50);
+      GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
+      DelayMs(50);
               
-                 
-      
-			 // PMW_AllClose_ABC_Channel();
-              DelayMs(50);
-              GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
-              DelayMs(50);
-              
-		
-            }
+     }
+            
         
    
        /*Key process*/  
@@ -361,13 +363,13 @@ int main(void)
            switch(ucKeyCode)
             { 
                  
-                  case DIR_DOWN_PRES ://˳ʱ��---����--���¡�-ˮƽ����
+                  case DIR_DOWN_PRES ://Ë³Ê±ï¿½ï¿½---ï¿½ï¿½ï¿½ï¿½--ï¿½ï¿½ï¿½Â¡ï¿½-Ë®Æ½ï¿½ï¿½ï¿½ï¿½
 				  	 Dir = 1;
 					 keyRunTime = 1;
 					  setRun_flag = 0;
 					  setStop_flag=0;
 				     PRINTF("Right Key: %d\r\n", setRun_flag);
-                    if(Dir == 0) //˳ʱ����ת
+                    if(Dir == 0) //Ë³Ê±ï¿½ï¿½ï¿½ï¿½×ª
 	   			    {
 
                         if((motor_ref.power_on ==2)||(motor_ref.motor_run == 1))//motor is runing
@@ -410,6 +412,8 @@ int main(void)
                    keyRunTime = 1;
                    setRun_flag = 0;
                    setStop_flag=0;
+                    i=0;
+                   j=0;
 				  PRINTF("Run = %d \r\n",setRun_flag);
                   PRINTF("keysetStop_flag = %d\r\n",setStop_flag);
                  if(motor_ref.motor_run == 1)
@@ -428,14 +432,14 @@ int main(void)
                  
 				  break;
 		
-				 case DIR_UP_PRES: //��ʱ����ת Dir = 0;���ϡ�--��ֱ����
-				    Dir = 0 ; //��ʱ��
+				 case DIR_UP_PRES: //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª Dir = 0;ï¿½ï¿½ï¿½Ï¡ï¿½--ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½
+				    Dir = 0 ; //ï¿½ï¿½Ê±ï¿½ï¿½
 					keyRunTime = 1;
                    setRun_flag = 0;
 				   setStop_flag=0;
 				   PRINTF("key setRun_flag: %d\r\n", setRun_flag);
 	  			
-			     if(Dir==1) // Dir = 0; //��ʱ����ת
+			     if(Dir==1) // Dir = 0; //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª
 				   {
 	               
 	                 if((motor_ref.power_on == 2)||(motor_ref.motor_run == 1)) //motor is runing

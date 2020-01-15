@@ -250,24 +250,21 @@ if( arithmetic_flag  == 1)
 					  
 					
 					PRINTF("PID PROCESS STOP &&&&&&&&&&&&&&&&&&&&&&&&\r\n");
-                    if((array_data[2] +30  == capture_width || array_data[2]+ 40 > capture_width))
+                   
 					{
 						PWM_Duty =60;
 						uwStep = HallSensor_GetPinState();
                         HALLSensor_Detected_BLDC(PWM_Duty);
-						GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
+						
 						 
-						DelayMs(5000);
-						DelayMs(5000);
-						DelayMs(5000);
-					    
-					//	pid_stop =1;
-					 //   motor_ref.motor_run=0; 
-						PRINTF("Destination STOP ^^^^^^^^^^^^^^\r\n");
-					    while(1);
-					    motor_ref.power_on=2;
+						DelayMs(2000);
+					    DelayMs(2000);
 						pid_stop =1;
-					    motor_ref.motor_run=0;
+					    motor_ref.motor_run=0; 
+						PRINTF("Destination STOP ^^^^^^^^^^^^^^\r\n");
+					  
+					   
+						
 					    
 					}
 							
