@@ -136,6 +136,7 @@ void SysTick_IRQ_Handler  (void)
 	 uint16_t comp_array[2];
 	 uint8_t com_result;
 	 uint8_t pid_stop=0;
+	 uint8_t z=0;
 	// mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 	 
 	 PRINTF("setHome = %d \r\n",setHome);
@@ -196,7 +197,7 @@ if( arithmetic_flag  == 1)
               ABZ_CNT = 1;
 			//  motor_ref.power_on =4;
 			  motor_ref.motor_run=1; 
-			//  PRINTF("motor_ref.power_on= %d \r\n", motor_ref.power_on);
+			  PRINTF("COM RESULT RUN \r\n");
 			//  PRINTF("ABZ_CNT = %d \r\n",com_result);
 			//  PRINTF("total_value = %d \r\n",total_value);
 			
@@ -222,19 +223,59 @@ if( arithmetic_flag  == 1)
 		STOP:		
                     i++;
                     PRINTF("i == %d \r\n",i);
-					if(g_destination_end == capture_width || g_destination_end + 5 > capture_width)
+					
+					//uwStep = HallSensor_GetPinState();
+					//HALLSensor_Detected_BLDC(PWM_Duty);
+					//DelayMs(500);
+					//PRINTF("PWM_Duty == %d \r\n",PWM_Duty);
+
+					
+		             if(i == 1)
+					  {
+					    i=0;
+                        for(z=0;z<50;z++)
+                        {
+                          if(z > 50)
+                          {
+                              PRINTF("z = %d \r\n",z);
+						  }
+                          else if(z < 20)
+                          {
+							  	z=1;
+							    PWM_Duty =PWM_Duty -z ;
+								if(PWM_Duty ==1 ||PWM_Duty ==0||PWM_Duty < 0)
+								{
+
+								}
+								else
+									{
+								        if(PWM_Duty < 0 ||PWM_Duty ==0 )
+								        {
+
+										}
+										else
+										{
+										PRINTF("zPW = %d \r\n",PWM_Duty);
+			                            uwStep = HallSensor_GetPinState();
+			                            HALLSensor_Detected_BLDC(PWM_Duty);
+			                           
+			                            DelayMs(20);
+										}
+									}
+                          }
+                        
+                          
+                        }
+					  }
+					
+					PRINTF("PID PROCESS STOP &&&&&&&&&&&&&&&&&&&&&&&&\r\n");
+                    if((array_data[2] +30  == capture_width || array_data[2]+ 40 > capture_width))
 					{
 						PWM_Duty =0;
 						pid_stop =1;
 					    motor_ref.motor_run=0; 
-						PRINTF("Destination STOP ^^^^^^^^^^^^^^&&\r\n");
+						PRINTF("Destination STOP ^^^^^^^^^^^^^^\r\n");
 					}
-					uwStep = HallSensor_GetPinState();
-					HALLSensor_Detected_BLDC(PWM_Duty);
-					DelayMs(500);
-					//PRINTF("PWM_Duty == %d \r\n",PWM_Duty);
-					
-					PRINTF("PID PROCESS STOP &&&&&&&&&&&&&&&&&&&&&&&&\r\n");
 							
 				}
 		   }
