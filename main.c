@@ -220,14 +220,14 @@ int main(void)
 					   PRINTF("setPositionEnd@@@= %d \r\n",array_data[1]);
 					   arithmetic_flag  = 1;
 				   }
-	                /*ï¿½Ð¶ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½Î»ï¿½ï¿½*/
+	                /*adjued*/
 	                if((home_flag ==1)&&(end_flag ==1))
 	                	{
-							if(setHome > setEnd) //èµ·å§‹ä½ç½®åœ¨æ°´å¹³ç‚¹ï¼Œç£ç¼–ç PWMä½ç½®å›ºå®šï¼Œå…³æœºä¸Šç”µï¼ŒPWMå ç©ºæ¯”ä¸å�?
+							if(setHome > setEnd) //setHome of position is horizonal
 							{
-								judge_home_flag =1; //Ö»èµ·å§‹ç‚¹åœ¨æ°´å¹³ä½ç½�?
+								judge_home_flag =1; //horizonal of flag 
 							}
-							else //setHome < setEnd  //èµ·å§‹ç‚¹ä½ç½®åœ¨åž‚ç›´ä½ç½®ã€?
+							else //setHome < setEnd  //setEnd of position is vertical
 								judge_home_flag =2;
 							
 	                	}
@@ -266,7 +266,7 @@ int main(void)
       {
    				
                keyRunTime=2;
-			   PWM_Duty =60;
+			   PWM_Duty =70;
 			   GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 			  	  
 	#ifdef DEBUG_PRINT 
@@ -283,31 +283,36 @@ int main(void)
                                       
                                           uwStep = HallSensor_GetPinState();
                                           HALLSensor_Detected_BLDC(PWM_Duty);
-                                          PRINTF("i= %d \r\n",i);
+                                          //DelayMs(2);
+                                         PRINTF("i= %d \r\n",i);
                                          
                                  
                                    
-                                  if(i==650)
+                                  if(i==500)//620//650
+                                       motor_ref.motor_run=0;// while(1);
+                                  #if 0
                                   {
-                                   
-                                   PWM_Duty =55;
+                                   for(j=0;j<3;j++)
+                                   {
+                                       
+                                    PWM_Duty =70;
                                    uwStep = HallSensor_GetPinState();
                                    HALLSensor_Detected_BLDC(PWM_Duty);
-                                   PRINTF(" dir =0 stop\r\n");
+                                 //  PRINTF(" dir =0 stop\r\n");
                                    DelayMs(500);
                                   
-                                  
+                                   }
                                    
-                                   PWM_Duty =60;
+                                   PWM_Duty =70;
                                    uwStep = HallSensor_GetPinState();
                                    HALLSensor_Detected_BLDC(PWM_Duty);
                                    
                                     if( arithmetic_flag  ==1);
 								  
                                    motor_ref.motor_run=0;// while(1);
-								  
+
                                   }
-                                 
+                                 #endif
 								  
 					}
 			        else //Dir == 1 向水平方向移�?
@@ -324,7 +329,7 @@ int main(void)
               }
      
           
-     else
+    else
 	{ 
 	    // if(motor_ref.power_on==2||motor_ref.motor_run==1)
              

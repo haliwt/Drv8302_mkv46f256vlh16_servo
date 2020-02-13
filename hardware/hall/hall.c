@@ -170,7 +170,7 @@ void SysTick_IRQ_Handler  (void)
 	   }
 	   com_result = abs(comp_array[1]- comp_array[0]);
 	   
-	  PWM_Duty =60;
+	  PWM_Duty =70;
 
 if( arithmetic_flag  == 1)
   {
@@ -212,25 +212,19 @@ if( arithmetic_flag  == 1)
            }
 		  
 		  /* 限定PWM数值范围 */
-	       if ((judge_home_flag == 1) && (mCurPosValue < 50 )) //ֻ起始点在水平位置
+	       if ((judge_home_flag == 1) && (mCurPosValue < 150 )) //ֻ起始点在水平位置//起点位置，垂直位置,开机时的位置
 		   {
 			
 			
-						PRINTF("home_flag =1 \r\n");
+					PRINTF("home_flag =1 \r\n");
+                    
 		
                    uwStep = HallSensor_GetPinState();
                    HALLSensor_Detected_BLDC(PWM_Duty);
                            
-                         
-					
-					
-                        
-                        
+                  DelayMs(500);
 						
-					    DelayMs(2000);
-						DelayMs(2000);
-					    DelayMs(2000);
-						 PRINTF("Destination STOP ^^^^^^^^^^^^^^\r\n");
+				PRINTF("Destination STOP ^^^^^^^^^^^^^^\r\n");
 						
 					    motor_ref.motor_run=0; 
 					  
@@ -241,7 +235,7 @@ if( arithmetic_flag  == 1)
 							
 				
 		
-		 if((judge_home_flag ==2) &&(mCurPosValue > array_data[1] -10))//起点位置，垂直位置
+		 if((judge_home_flag ==2) &&(mCurPosValue > (setPositionEnd  -10 )))//起点位置，垂直位置,开机时的位置
 		   {
 			      
 				
@@ -253,9 +247,8 @@ if( arithmetic_flag  == 1)
                             HALLSensor_Detected_BLDC(PWM_Duty);
                          
 						
-                        DelayMs(2000);
-						DelayMs(2000);
-					    DelayMs(2000);
+                      //  DelayMs(1000);
+						
 						PRINTF("YYYY STOP ^^^^^^^^^^^^^^\r\n");
 						motor_ref.motor_run=0; 
 					  
