@@ -52,7 +52,7 @@ typedef enum
 #define DOOR_KEY          		PAin(2)   //车门按键，
 #define HALL_SWITCH_KEY         PAin(4)   //有无霍尔切换，按键
 #define WHEEL_KEY          		PAin(5)   //车轮探测按键
-#define WIPERS_KEY          	PEin(30)  //雨刷器按键，按一次一档，再按一次二档，再按一下关闭  
+#define STOP_KEY          	PEin(30)  //雨刷器按键，按一次一档，再按一次二档，再按一下关闭  
 #define DIR_DOWN_KEY       	PEin(29)
 
 
@@ -67,7 +67,7 @@ typedef enum
 #define DOOR_PRES               6      //PTA2,
 #define HALL_PRES               7      //PTA4,
 #define WHEEL_PRES              8      //PTA5,
-#define WIPERS_PRES             9      //PTE30,
+#define STOP_PRES               9      //PTE30,
 #define AIR_PRES                10      //PTE29,
 
 

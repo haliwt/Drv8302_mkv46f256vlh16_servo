@@ -76,7 +76,7 @@ uint16_t Capture_ReadPulse_Value(void)
 		   */
 		  pulseWidth =
 			 (int32_t)(((g_secondChannelOverflowCount - g_firstChannelOverflowCount) * 65536 + capture2Val - capture1Val) + 1) /
-			 (FTM_SOURCE_CLOCK / 1000000);
+			 (FTM_ENC_SOURCE_CLOCK / 1000000);
 
 	   return pulseWidth;
 	}

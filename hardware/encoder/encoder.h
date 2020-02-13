@@ -65,7 +65,7 @@ typedef struct _encoder_t_
 #define FTM_SECOND_CHANNEL_FLAG      kFTM_Chnl7Flag           //kFTM_Chnl5Flag
 
 /* Get source clock for FTM driver */
-#define FTM_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_FastPeriphClk)
+#define FTM_ENC_SOURCE_CLOCK  CLOCK_GetFreq(kCLOCK_FastPeriphClk)
 
 extern int32_t setHome ;
 extern int32_t setEnd ;

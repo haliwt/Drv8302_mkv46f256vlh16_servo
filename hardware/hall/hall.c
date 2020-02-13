@@ -123,152 +123,25 @@ int32_t LocPIDCalc(int32_t NextPoint)
   * 返回参数：目标控制量
   *
   */
-void SysTick_IRQ_Handler  (void)
+void FTM_timer_Init(void)
 {
+   
+ 
+    ftm_config_t ftmInfo;
 
-	 uint32_t total_value;
-	 uint32_t  one_step ;	
-	 static uint8_t i=0;
-     static uint8_t j=0;
-	 int32_t iError,dError;
-	 uint8_t iEr_flag=0;
-	 uint8_t ne_symbol = 0;
-	 uint16_t comp_array[2];
-	 uint8_t com_result;
-	 uint8_t pid_stop=0;
-	 uint8_t z=0,w=0,y=0;
-	// mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-	 
-	 PRINTF("setHome = %d \r\n",setHome);
-	 PRINTF("setEnd= %d \r\n",setEnd); 
-	 #if 0
-	if(Dir == 1) //Dir ==1 顺时针旋转 “下”---Down --往---往水平方向移动
-	  {
-			if (judge_home_flag == 1)   //ֻ起始点在水平位置
-			{
-				
-			   iError =  array_data[0] - mCurPosValue;//setPositionHome;
-               iEr_flag =1;
-				
-			}
-			if(judge_home_flag ==2) //起点位置，垂直位置
-			{
-			   iError =  array_data[1] - mCurPosValue;//setPositionEnd
-			   iEr_flag =2;
-			}
-	  }
-	   PID_Result =iError;
-	   #endif 
-	 //  PRINTF("iError= %d \r\n",iError);
-	  
-		/**/
-	   if(j==1) comp_array[0]=PID_Result;
-	   else if(j==2)
-	   {
-			comp_array[1]=PID_Result;
-			j=0;
-	   }
-	   com_result = abs(comp_array[1]- comp_array[0]);
-	   
-	  PWM_Duty =70;
+    FTM_GetDefaultConfig(&ftmInfo);
 
-if( arithmetic_flag  == 1)
-  {
-		/* 100ms 采样周期,控制周期 */
-		//if(Time_CNT % 50 == 0)
-		
-		  /* 获取速度值:由捕获到的脉冲数除以总的时间 Pul/t */
-		  /* BLDCMotor是4对极,旋转一圈有4个脉冲信号,3相UVW信号线,共12个脉冲信号,每个脉冲边沿计数一次,
-		   * 所以BLDCM旋转一圈,可以捕获到的mCurPosValue
-		   * 每个信号边沿都会捕获到接口定时器的CCR1,每100ms读取捕获到的时间和脉冲数,就可以得到电机的速度值.
-		   */
-		  
-		  // PID_Result = LocPIDCalc(mCurPosValue);
-		   //PRINTF("PID_Result = %d \r\n",iError);
-		    /*-PID_Result 在此语句执行 递减*/
-		total_value =abs(array_data[0])+abs(array_data[1]); //1107 /90=12.3
+    /* Divide FTM clock by 4 */
+    ftmInfo.prescale = kFTM_Prescale_Divide_4;
 
-		one_step = total_value / 90 ;
-	 
-		  
-		   if((com_result!=0)&&(pid_stop ==0))
-		   {
-			  Time_CNT++;
-              ABZ_CNT = 1;
-			//  motor_ref.power_on =4;
-			  motor_ref.motor_run=1; 
-			  PRINTF("COM RESULT RUN \r\n");
-			//  PRINTF("ABZ_CNT = %d \r\n",com_result);
-			//  PRINTF("total_value = %d \r\n",total_value);
-			
-			 // if(Time_CNT == one_step)
-			  {
-				//PRINTF("one_step = %d \r\n",one_step);
-				uwStep = HallSensor_GetPinState();
-		        HALLSensor_Detected_BLDC(PWM_Duty);
-				//DelayMs(10);
-			  }
-		      if(setStop_flag ==1)pid_stop =1;
-           }
-		  
-		  /* 限定PWM数值范围 */
-	       if ((judge_home_flag == 1) && (mCurPosValue < 150 )) //ֻ起始点在水平位置//起点位置，垂直位置,开机时的位置
-		   {
-			
-			
-					PRINTF("home_flag =1 \r\n");
-                    
-		
-                   uwStep = HallSensor_GetPinState();
-                   HALLSensor_Detected_BLDC(PWM_Duty);
-                           
-                  DelayMs(500);
-						
-				PRINTF("Destination STOP ^^^^^^^^^^^^^^\r\n");
-						
-					    motor_ref.motor_run=0; 
-					  
-		             	
-						
-           }  
-					
-							
-				
-		
-		 if((judge_home_flag ==2) &&(mCurPosValue > (setPositionEnd  -10 )))//起点位置，垂直位置,开机时的位置
-		   {
-			      
-				
-                            PRINTF("End_flag =1 \r\n");
-					
-							
-						
-                            uwStep = HallSensor_GetPinState();
-                            HALLSensor_Detected_BLDC(PWM_Duty);
-                         
-						
-                      //  DelayMs(1000);
-						
-						PRINTF("YYYY STOP ^^^^^^^^^^^^^^\r\n");
-						motor_ref.motor_run=0; 
-					  
-		        
+    /* Initialize FTM module */
+    FTM_Init(BOARD_FTM_BASEADDR, &ftmInfo);
 
-				
+    /*
+     * Set timer period.
+     */
+    FTM_SetTimerPeriod(BOARD_FTM_BASEADDR, USEC_TO_COUNT(1000U, FTM_SOURCE_CLOCK));
 
-            }
-		
-		
-  }
-	  //50ms反馈一次数据
-	 // if(Time_CNT % 10 == 0)
-	 // {
-		//PRINTF("Tick position : %d\r\n", mCurPosValue);//Transmit_FB(ptr_FB);
-	 // }
-	  if(Time_CNT == one_step)
-		Time_CNT = 0;
-
-
-
-
+    FTM_EnableInterrupts(BOARD_FTM_BASEADDR, kFTM_TimeOverflowInterruptEnable);
 }
+

@@ -98,7 +98,7 @@ uint8_t KEY_Scan(uint8_t mode)
 	   if(mode == 1) key_up =1;
 	  if(key_up &&(DIR_DOWN_KEY == 1 || START_KEY ==1 ||DIR_UP_KEY ==1 || DIGITAL_ADD_KEY==1||\
 					DIGITAL_REDUCE_KEY==1||DOOR_KEY==1||HALL_SWITCH_KEY==1||\
-					WHEEL_KEY==1|| WIPERS_KEY==1 ))
+					WHEEL_KEY==1|| STOP_KEY==1 ))
 	  
 	   {
 		 DelayMs(10);
@@ -167,12 +167,12 @@ uint8_t KEY_Scan(uint8_t mode)
 			   /* 按键扫描完毕，确定按键按下 */
 			return WHEEL_PRES;
 		 }
-		 else if(WIPERS_KEY==1) 
+		 else if(STOP_KEY==1) 
 		 {
 			  /* 等待按键弹开，退出按键扫描函数 */
-			 while(WIPERS_KEY==1);
+			 while(STOP_KEY==1);
 			   /* 按键扫描完毕，确定按键按下 */
-			return WIPERS_PRES;
+			return STOP_PRES;
 		 }
 		 #if 0
 		 else if(AIR_KEY==1)		 
@@ -186,7 +186,7 @@ uint8_t KEY_Scan(uint8_t mode)
 	   }
 	  else if(DIR_DOWN_KEY == 0 && START_KEY == 0 && DIR_UP_KEY==0 && DIGITAL_ADD_KEY==0 &&\
 				  DIGITAL_REDUCE_KEY==0 &&DOOR_KEY==0 && HALL_SWITCH_KEY==0 && \
-					 WHEEL_KEY == 0 && WIPERS_KEY== 0 ) 
+					 WHEEL_KEY == 0 && STOP_KEY== 0 ) 
       {
         key_up = 1;
       }

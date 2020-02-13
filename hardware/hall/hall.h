@@ -6,6 +6,9 @@
 #include "bldc.h"
 #include "encoder.h"
 #include "output.h"
+#include "fsl_ftm.h"
+
+
 
 /* ���Ͷ��� ------------------------------------------------------------------*/
 typedef struct {
@@ -65,6 +68,29 @@ extern uint32_t ABZ_CNT;
 
 extern int32_t PID_Result ;
 
+/*******************************************************************************
+ * Definitions
+ ******************************************************************************/
+/* The Flextimer instance/channel used for board */
+#define BOARD_FTM_BASEADDR FTM0
+
+/* Interrupt number and interrupt handler for the FTM instance used */
+#define BOARD_FTM_IRQ_NUM FTM0_IRQn
+#define BOARD_FTM_HANDLER FTM0_IRQHandler
+
+/* Get source clock for FTM driver */
+#define FTM_SOURCE_CLOCK (CLOCK_GetFreq(kCLOCK_FastPeriphClk) / 4)
+
+/*******************************************************************************
+ * Prototypes
+ ******************************************************************************/
+
+/*******************************************************************************
+ * Variables
+ ******************************************************************************/
+
+
+
 extern volatile uint16_t g_destination_home; 
 extern volatile uint16_t g_destination_end; 
 
@@ -77,7 +103,7 @@ void IncPIDInit(void) ;    //PID ��ʼ������
 
 int32_t LocPIDCalc(int32_t NextPoint);  //λ��PID����
 
-void SysTick_IRQ_Handler  (void);
+void FTM_timer_Init (void);
 
 
 
