@@ -54,6 +54,9 @@ typedef struct
 #define  TARGET_PULSE  1000
 
 extern int32_t array_data[4];
+//volatile bool ftmIsrFlag           = false;
+//volatile uint32_t milisecondCounts = 0U;
+
 
 /* ��չ���� ------------------------------------------------------------------*/
 
@@ -72,14 +75,14 @@ extern int32_t PID_Result ;
  * Definitions
  ******************************************************************************/
 /* The Flextimer instance/channel used for board */
-#define BOARD_FTM_BASEADDR FTM0
+#define BOARD_FTM_BASEADDR 		FTM0
 
 /* Interrupt number and interrupt handler for the FTM instance used */
-#define BOARD_FTM_IRQ_NUM FTM0_IRQn
-#define BOARD_FTM_HANDLER FTM0_IRQHandler
+#define BOARD_FTM_IRQ_NUM 		FTM0_IRQn
+#define BOARD_FTM_HANDLER 		FTM0_IRQHandler
 
 /* Get source clock for FTM driver */
-#define FTM_SOURCE_CLOCK (CLOCK_GetFreq(kCLOCK_FastPeriphClk) / 4)
+#define FTM_SOURCE_CLOCK (CLOCK_GetFreq(kCLOCK_FastPeriphClk) / 4) //84MHz / 4 = 21MHz
 
 /*******************************************************************************
  * Prototypes
@@ -103,7 +106,7 @@ void IncPIDInit(void) ;    //PID ��ʼ������
 
 int32_t LocPIDCalc(int32_t NextPoint);  //λ��PID����
 
-void FTM_timer_Init (void);
+void FTM_Timer_Init (void);
 
 
 

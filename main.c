@@ -76,8 +76,11 @@ int32_t array_data[4]={0xfff,0xfff,0xfff,0xfff};
 int32_t PID_Result;
 
 volatile int16_t  capture_width;
-//__IO uint32_t PWM_ChangeFlag = 0;
-//__IO int32_t CaptureNumber = 0;      // ï¿½ï¿½ï¿½ë²¶ï¿½ï¿½ï¿½ï¿½
+
+volatile bool ftmIsrFlag           = false;
+volatile uint32_t milisecondCounts = 0U;
+
+
 
 
 
@@ -105,10 +108,10 @@ int main(void)
      uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
      uint8_t ucKeyCode=0;
     
-	 static uint8_t keyRunTime=0;
-     static uint8_t rem_times = 0;
-	 uint8_t down_run =0;
-	 uint32_t i=0,j=0;
+	
+    
+	
+	 uint32_t i=0;
     
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -119,7 +122,8 @@ int main(void)
      LED_Init();
      KEY_Init();
      DelayInit();
-     HALL_Init();
+     HALL_Init();	 
+	 FTM_Timer_Init();
   //   Capture_Input_Init();
 
    
@@ -253,7 +257,7 @@ int main(void)
    if(motor_ref.motor_run == 1)
    {
    				
-               keyRunTime=2;
+             
 			   PWM_Duty =70;
 			  // GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 			  	  
@@ -359,7 +363,7 @@ int main(void)
                    
 				   motor_ref.motor_run ++ ;
                    motor_ref.power_on ++ ;
-                   keyRunTime = 1;
+               
                    setRun_flag = 0;
                    setStop_flag=0;
               
@@ -382,7 +386,7 @@ int main(void)
 				  break;
 		
 				
-                 UART_WriteBlocking(DEMO_UART, printx2, sizeof(printx2) - 1);
+                
 			   
 			
            	  break;
@@ -433,7 +437,22 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
 #endif
 }
 
-
+/******************************************************************************
+ *
+ * Function Name:void BOARD_FTM_HANDLER(void)
+ * Function Active: FTM timer interrupt
+ * @brief Interrupt service fuction of switch.
+ *
+ * This function toggles the LED
+ *
+******************************************************************************/
+void BOARD_FTM_HANDLER(void)
+{
+    /* Clear interrupt flag.*/
+    FTM_ClearStatusFlags(BOARD_FTM_BASEADDR, kFTM_TimeOverflowFlag);
+    ftmIsrFlag = true;
+    __DSB();
+}
 
 
 

@@ -48,7 +48,7 @@
 
 /*MCG_S=只读寄存器 初始值：0x10 */
 #define MCG_S_IRCST_VAL             ((MCG->S & MCG_S_IRCST_MASK) >> MCG_S_IRCST_SHIFT)
-#define MCG_S_CLKST_VAL             (((uint32_t)MCG->S & (uint32_t)MCG_S_CLKST_MASK) >> (uint32_t)MCG_S_CLKST_SHIFT)
+#define MCG_S_CLKST_VAL             (((uint32_t)MCG->S & (uint32_t)MCG_S_CLKST_MASK) >> (uint32_t)MCG_S_CLKST_SHIFT)//MCG->S = 0X10 & 0X0C >> 0X2
 #define MCG_S_IREFST_VAL            (((uint32_t)MCG->S & (uint32_t)MCG_S_IREFST_MASK) >> (uint32_t)MCG_S_IREFST_SHIFT)
 #define MCG_S_PLLST_VAL             ((MCG->S & MCG_S_PLLST_MASK) >> MCG_S_PLLST_SHIFT)
 #define MCG_C1_FRDIV_VAL            ((MCG->C1 & MCG_C1_FRDIV_MASK) >> MCG_C1_FRDIV_SHIFT)
@@ -71,11 +71,11 @@
 
 
 /* 设置 SIM->CLKDIV1 = 0x11070000U; */
-#define SIM_CLKDIV1_OUTDIV1_VAL ((SIM->CLKDIV1 & SIM_CLKDIV1_OUTDIV1_MASK) >> SIM_CLKDIV1_OUTDIV1_SHIFT)
-#define SIM_CLKDIV1_OUTDIV2_VAL ((SIM->CLKDIV1 & SIM_CLKDIV1_OUTDIV2_MASK) >> SIM_CLKDIV1_OUTDIV2_SHIFT)
-#define SIM_CLKDIV1_OUTDIV4_VAL ((SIM->CLKDIV1 & SIM_CLKDIV1_OUTDIV4_MASK) >> SIM_CLKDIV1_OUTDIV4_SHIFT)
-#define SIM_SOPT1_OSC32KSEL_VAL ((SIM->SOPT1 & SIM_SOPT1_OSC32KSEL_MASK) >> SIM_SOPT1_OSC32KSEL_SHIFT)
-#define MCGOUT_TO_CORE_DIVIDER           (((SIM->CLKDIV1 & SIM_CLKDIV1_OUTDIV1_MASK)>>SIM_CLKDIV1_OUTDIV1_SHIFT) + 1) //WT.EDIT
+#define SIM_CLKDIV1_OUTDIV1_VAL 		((SIM->CLKDIV1 & SIM_CLKDIV1_OUTDIV1_MASK) >> SIM_CLKDIV1_OUTDIV1_SHIFT)
+#define SIM_CLKDIV1_OUTDIV2_VAL 		((SIM->CLKDIV1 & SIM_CLKDIV1_OUTDIV2_MASK) >> SIM_CLKDIV1_OUTDIV2_SHIFT)
+#define SIM_CLKDIV1_OUTDIV4_VAL 		((SIM->CLKDIV1 & SIM_CLKDIV1_OUTDIV4_MASK) >> SIM_CLKDIV1_OUTDIV4_SHIFT)
+#define SIM_SOPT1_OSC32KSEL_VAL 		((SIM->SOPT1 & SIM_SOPT1_OSC32KSEL_MASK) >> SIM_SOPT1_OSC32KSEL_SHIFT)
+#define MCGOUT_TO_CORE_DIVIDER          (((SIM->CLKDIV1 & SIM_CLKDIV1_OUTDIV1_MASK)>>SIM_CLKDIV1_OUTDIV1_SHIFT) + 1) //WT.EDIT
 
 #define MCGOUT_TO_BUS_DIVIDER  (((SIM->CLKDIV1 & SIM_CLKDIV1_OUTDIV2_MASK)>>SIM_CLKDIV1_OUTDIV2_SHIFT) + 1) //WT.EDIT
 
@@ -449,21 +449,19 @@ uint32_t CLOCK_GetCoreSysClkFreq(void)
  */
 uint32_t CLOCK_GetFreq(clock_name_t clockName)
 {
-    uint32_t freq,clock;
-    clock = SystemCoreClock * MCGOUT_TO_CORE_DIVIDER;
-  
+     uint32_t freq;
 
     switch (clockName)
     {
-        case kCLOCK_CoreSysClk:
+        case kCLOCK_CoreSysClk: /*core/system clock  84MHz*/
             freq = CLOCK_GetOutClkFreq() / (SIM_CLKDIV1_OUTDIV1_VAL + 1);
             break;
-        case kCLOCK_FastPeriphClk:
-            freq = CLOCK_GetOutClkFreq() / (SIM_CLKDIV1_OUTDIV2_VAL + 1); //CLOCK_GetPll0Freq() / (0x10 +1) =  
+        case kCLOCK_FastPeriphClk:/*fast peripheral clock 84MHz */
+            freq = CLOCK_GetOutClkFreq() / (SIM_CLKDIV1_OUTDIV2_VAL + 1);
             break;
-        case kCLOCK_BusClk:
-             clock = clock / MCGOUT_TO_BUS_DIVIDER;
-             freq = clock;
+        case kCLOCK_BusClk:/*Bus clock 21MHz*/
+             freq = CLOCK_GetOutClkFreq() / (SIM_CLKDIV1_OUTDIV4_VAL + 1);
+             break;
         case kCLOCK_FlashClk:
             freq = CLOCK_GetOutClkFreq() / (SIM_CLKDIV1_OUTDIV4_VAL + 1);
             break;
@@ -483,7 +481,7 @@ uint32_t CLOCK_GetFreq(clock_name_t clockName)
             freq = CLOCK_GetPll0Freq();
             break;
         case kCLOCK_LpoClk:
-			 freq = LPO_CLK_FREQ;
+            freq = LPO_CLK_FREQ;
             break;
         case kCLOCK_Osc0ErClk:
             freq = CLOCK_GetOsc0ErClkDivFreq();
@@ -527,16 +525,16 @@ uint32_t CLOCK_GetOutClkFreq(void)
 
     switch (clkst)
     {
-        case (uint32_t)kMCG_ClkOutStatPll:
+        case (uint32_t)kMCG_ClkOutStatPll: // 0X03
             mcgoutclk = CLOCK_GetPll0Freq();
             break;
-        case (uint32_t)kMCG_ClkOutStatFll:
+        case (uint32_t)kMCG_ClkOutStatFll: //0X00
             mcgoutclk = CLOCK_GetFllFreq();
             break;
-        case (uint32_t)kMCG_ClkOutStatInt:
+        case (uint32_t)kMCG_ClkOutStatInt://0X01  internal clock
             mcgoutclk = CLOCK_GetInternalRefClkSelectFreq();
             break;
-        case (uint32_t)kMCG_ClkOutStatExt:
+        case (uint32_t)kMCG_ClkOutStatExt: //0X02
             mcgoutclk = CLOCK_GetMcgExtClkFreq();
             break;
         default:

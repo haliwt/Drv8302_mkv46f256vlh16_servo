@@ -117,13 +117,13 @@ int32_t LocPIDCalc(int32_t NextPoint)
 
 /*******************************************************
   *
-  * Function Name:PID 
+  * Function Name:FTM_Timer
   * Function:闭环PID,计算
   * 输入参数：当前角度值
   * 返回参数：目标控制量
   *
   */
-void FTM_timer_Init(void)
+void FTM_Timer_Init(void)
 {
    
  

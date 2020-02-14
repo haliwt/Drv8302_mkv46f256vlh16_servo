@@ -240,9 +240,9 @@ extern volatile uint32_t g_xtal32Freq;
 #define LPO_CLK_FREQ 1000U
 
 /*! @brief Peripherals clock source definition. */
-#define SYS_CLK kCLOCK_CoreSysClk
-#define BUS_CLK kCLOCK_BusClk
-#define FAST_CLK kCLOCK_FastPeriphClk
+#define SYS_CLK 	kCLOCK_CoreSysClk
+#define BUS_CLK 	kCLOCK_BusClk
+#define FAST_CLK  	kCLOCK_FastPeriphClk
 
 #define I2C0_CLK_SRC BUS_CLK
 #define DSPI0_CLK_SRC FAST_CLK
