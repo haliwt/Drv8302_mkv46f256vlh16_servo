@@ -107,8 +107,8 @@ int main(void)
     
 	 static uint8_t keyRunTime=0;
      static uint8_t rem_times = 0;
-	 uint8_t down_run =0;
-	 uint32_t i=0,j=0;
+	
+     motor_ref.Dir_flag=3;
     
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -143,13 +143,17 @@ int main(void)
          ucKeyCode = KEY_Scan(0);
        
 		
-	    capture_width =Capture_ReadPulse_Value(); 
+	  //  capture_width =Capture_ReadPulse_Value(); 
+        #ifdef DEBUG_PRINT 
         PRINTF("Cpw = %d\r\n", capture_width);
-		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+        #endif
+	//	mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+        #ifdef DEBUG_PRINT 
         PRINTF("Current position : %d\r\n", mCurPosValue);
+        #endif
 	
 		
-	#if 1	
+	#if 0	
 		
       /***************************Zerio AND Point***************************************************************/
 	   if((rem_times <4)&&(en_t.en_interrupt_flag == 1 ))
@@ -220,14 +224,14 @@ int main(void)
 					   PRINTF("setPositionEnd@@@= %d \r\n",array_data[1]);
 					   arithmetic_flag  = 1;
 				   }
-	                /*ï¿½Ð¶ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½Î»ï¿½ï¿½*/
+	                /*adjued*/
 	                if((home_flag ==1)&&(end_flag ==1))
 	                	{
-							if(setHome > setEnd) //èµ·å§‹ä½ç½®åœ¨æ°´å¹³ç‚¹ï¼Œç£ç¼–ç PWMä½ç½®å›ºå®šï¼Œå…³æœºä¸Šç”µï¼ŒPWMå ç©ºæ¯”ä¸å�?
+							if(setHome > setEnd) //setHome of position is horizonal
 							{
-								judge_home_flag =1; //Ö»èµ·å§‹ç‚¹åœ¨æ°´å¹³ä½ç½�?
+								judge_home_flag =1; //horizonal of flag 
 							}
-							else //setHome < setEnd  //èµ·å§‹ç‚¹ä½ç½®åœ¨åž‚ç›´ä½ç½®ã€?
+							else //setHome < setEnd  //setEnd of position is vertical
 								judge_home_flag =2;
 							
 	                	}
@@ -265,8 +269,8 @@ int main(void)
       if(motor_ref.motor_run == 1)
       {
    				
-               keyRunTime=2;
-			   PWM_Duty =60;
+            
+			   PWM_Duty =70;
 			   GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 			  	  
 	#ifdef DEBUG_PRINT 
@@ -278,62 +282,33 @@ int main(void)
                     if(Dir == 0) //向垂直方向移�?
                     {
 						
-                               
-                                          i++;
-                                      
-                                          uwStep = HallSensor_GetPinState();
-                                          HALLSensor_Detected_BLDC(PWM_Duty);
-                                          PRINTF("i= %d \r\n",i);
-                                         
+                        uwStep = HallSensor_GetPinState();
+                        HALLSensor_Detected_BLDC(PWM_Duty);
+                        motor_ref.Dir_flag=0;
+                       
+                       
                                  
-                                   
-                                  if(i==650)
-                                  {
-                                   
-                                   PWM_Duty =55;
-                                   uwStep = HallSensor_GetPinState();
-                                   HALLSensor_Detected_BLDC(PWM_Duty);
-                                   PRINTF(" dir =0 stop\r\n");
-                                   DelayMs(500);
-                                  
-                                  
-                                   
-                                   PWM_Duty =60;
-                                   uwStep = HallSensor_GetPinState();
-                                   HALLSensor_Detected_BLDC(PWM_Duty);
-                                   
-                                    if( arithmetic_flag  ==1);
-								  
-                                   motor_ref.motor_run=0;// while(1);
-								  
-                                  }
-                                 
-								  
-					}
+                     }
 			        else //Dir == 1 向水平方向移�?
 		        	{
 					
-						 SysTick_IRQ_Handler ();  
-					     if(ABZ_CNT == 0)
-					     {
+						
 							 uwStep = HallSensor_GetPinState();
 			          		 HALLSensor_Detected_BLDC(PWM_Duty);
-					     }
-						
+                             motor_ref.Dir_flag=1;
+					     
 					}
-              }
-     
-          
+       }
      else
-	{ 
+	 { 
 	    // if(motor_ref.power_on==2||motor_ref.motor_run==1)
              
-				  
-	  PRINTF("Motor Stop ! \r\n");
-		// PMW_AllClose_ABC_Channel();
+	  motor_ref.motor_run = 0;		  
+	  GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
       DelayMs(50);
       GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
       DelayMs(50);
+      PRINTF("Motor Stop ! \r\n");
               
      }
             
@@ -346,7 +321,7 @@ int main(void)
             { 
                  
                   case DIR_DOWN_PRES ://Ë³Ê±ï¿½ï¿½---ï¿½ï¿½ï¿½ï¿½--ï¿½ï¿½ï¿½Â¡ï¿½-Ë®Æ½ï¿½ï¿½ï¿½ï¿½
-				  	 Dir = 1;
+				  	// Dir = 1;
 					 keyRunTime = 1;
 					  setRun_flag = 0;
 					  setStop_flag=0;
@@ -354,7 +329,7 @@ int main(void)
                     if(Dir == 0) //Ë³Ê±ï¿½ï¿½ï¿½ï¿½×ª
 	   			    {
 
-                        if((motor_ref.power_on ==2)||(motor_ref.motor_run == 1))//motor is runing
+                        if(motor_ref.motor_run == 1)//motor is runing
                         {
                             if(motor_ref.Dir_flag == 0)
                             {
@@ -371,8 +346,7 @@ int main(void)
                             }
                           
                         }
-						else
-							Dir = 1;
+						
                      }
                       else
                       {
@@ -394,8 +368,7 @@ int main(void)
                    keyRunTime = 1;
                    setRun_flag = 0;
                    setStop_flag=0;
-                    i=0;
-                   j=0;
+                 
 				  PRINTF("Run = %d \r\n",setRun_flag);
                   PRINTF("keysetStop_flag = %d\r\n",setStop_flag);
                  if(motor_ref.motor_run == 1)
@@ -406,7 +379,7 @@ int main(void)
     			  }
 				  else 
 				  {
-					  setRun_flag = 1;
+					  setRun_flag = 0;
 					  motor_ref.motor_run = 0;
                       motor_ref.power_on =0;
                       UART_WriteBlocking(DEMO_UART, printx4, sizeof(printx4) - 1);
@@ -415,7 +388,7 @@ int main(void)
 				  break;
 		
 				 case DIR_UP_PRES: //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª Dir = 0;ï¿½ï¿½ï¿½Ï¡ï¿½--ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½
-				    Dir = 0 ; //ï¿½ï¿½Ê±ï¿½ï¿½
+				   // Dir = 0 ; //ï¿½ï¿½Ê±ï¿½ï¿½
 					keyRunTime = 1;
                    setRun_flag = 0;
 				   setStop_flag=0;
@@ -424,7 +397,7 @@ int main(void)
 			     if(Dir==1) // Dir = 0; //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª
 				   {
 	               
-	                 if((motor_ref.power_on == 2)||(motor_ref.motor_run == 1)) //motor is runing
+	                 if(motor_ref.motor_run == 1) //motor is runing
 	                 {
 	                    if(motor_ref.Dir_flag ==1)
 	                    {
@@ -440,8 +413,7 @@ int main(void)
 	                      motor_ref.Dir_flag = 0;
 	                      Dir =0;
 	                    }
-						else
-							Dir = 0;
+						
 	                  
 	                  }
                    }
@@ -459,6 +431,10 @@ int main(void)
 			   
 			
            		break;
+				case MOTOR_STOP_PRES:
+                   
+					 motor_ref.motor_run = 0;
+                 break;
             default :
               
       

@@ -59,14 +59,14 @@ typedef enum
 
 
 //#define BRAKE_PRES              1      //PTA1
-#define DIR_DOWN_PRES          1      //
+#define DIR_DOWN_PRES           1      //
 #define START_PRES              2      //PTE25
-#define DIR_UP_PRES                3      //PTE24, DIR KEY
+#define DIR_UP_PRES             3      //PTE24, DIR KEY
 #define DIGITAL_ADD_PRES        4      //PTA12,
 #define DIGITAL_REDUCE_PRES     5      //PTA13,
 #define DOOR_PRES               6      //PTA2,
 #define HALL_PRES               7      //PTA4,
-#define WHEEL_PRES              8      //PTA5,
+#define MOTOR_STOP_PRES              8      //PTA5,
 #define WIPERS_PRES             9      //PTE30,
 #define AIR_PRES                10      //PTE29,
 
