@@ -104,7 +104,7 @@ int main(void)
      uint8_t printx4[]="key motor run = 0 ^^^^ \r\n";
      uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
      uint8_t ucKeyCode=0;
-    
+     uint8_t RxBuffer[8],i;
 	 static uint8_t keyRunTime=0;
      static uint8_t rem_times = 0;
 	
@@ -142,12 +142,17 @@ int main(void)
    {
          ucKeyCode = KEY_Scan(0);
        
-		
-	  //  capture_width =Capture_ReadPulse_Value(); 
+		UART_ReadBlocking(DEMO_UART, RxBuffer, 8);
+        for(i=0;i<8;i++)
+        PRINTF("RxBuffer_0 = %x \n\r",RxBuffer[i]);
+       
+        //UART_WriteBlocking(DEMO_UART, RxBuffer, 8);
+        
+	    capture_width =Capture_ReadPulse_Value(); 
         #ifdef DEBUG_PRINT 
         PRINTF("Cpw = %d\r\n", capture_width);
         #endif
-	//	mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
         #ifdef DEBUG_PRINT 
         PRINTF("Current position : %d\r\n", mCurPosValue);
         #endif
@@ -279,7 +284,7 @@ int main(void)
              
 
               
-                    if(Dir == 0) //向垂直方向移�?
+                    if(Dir == 0) //Vertial
                     {
 						
                         uwStep = HallSensor_GetPinState();
@@ -289,7 +294,7 @@ int main(void)
                        
                                  
                      }
-			        else //Dir == 1 向水平方向移�?
+			        else //Dir == 1 Horizintal
 		        	{
 					
 						
@@ -402,7 +407,7 @@ int main(void)
 	                    if(motor_ref.Dir_flag ==1)
 	                    {
 
-	                       PWM_Duty = 10;
+	                      PWM_Duty = 10;
 						  uwStep = HallSensor_GetPinState();
 			              HALLSensor_Detected_BLDC( PWM_Duty);
 						   PWM_Duty = 5;
