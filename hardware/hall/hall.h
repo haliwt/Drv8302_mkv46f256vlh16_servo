@@ -70,14 +70,14 @@ extern volatile uint16_t g_destination_end;
 
 
 
+
 void ENCODER_Init(void);
-void IncPIDInit(void) ;    //PID ��ʼ������
 
 
 
-int32_t LocPIDCalc(int32_t NextPoint);  //λ��PID����
 
-void SysTick_IRQ_Handler  (void);
+
+
 
 
 

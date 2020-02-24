@@ -56,7 +56,6 @@ encoder_t en_t;
 volatile uint32_t g_EncIndexCounter = 0U;
 
 
-//__IO uint16_t	PWM_Duty; 
 
 int32_t setHome = 0xfff;
 int32_t setEnd=0xfff;
@@ -74,6 +73,7 @@ int32_t array_data[4]={0xfff,0xfff,0xfff,0xfff};
 
 
 int32_t PID_Result;
+PID_TypeDef  sPID; 
 
 volatile int16_t  capture_width;
 //__IO uint32_t PWM_ChangeFlag = 0;
@@ -98,17 +98,18 @@ int main(void)
 
  
      enc_config_t mEncConfigStruct;
-	 
+	 int32_t iError,dError_sum,last_iError;
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
      uint8_t printx4[]="key motor run = 0 ^^^^ \r\n";
      uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
-     uint8_t ucKeyCode=0;
-     uint8_t RxBuffer[8],i;
+     uint8_t ucKeyCode=0,KP,KI,KD;
+     uint8_t RxBuffer[3],i;
 	 static uint8_t keyRunTime=0;
      static uint8_t rem_times = 0;
 	
      motor_ref.Dir_flag=3;
+	 uint32_t mDiffPosValue;
     
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -136,26 +137,24 @@ int main(void)
     ENC_Init(DEMO_ENC_BASEADDR, &mEncConfigStruct);
     ENC_DoSoftwareLoadInitialPositionValue(DEMO_ENC_BASEADDR); /* Update the position counter with initial value. */
     #endif
-	
+	setRun_flag=3;
+    PWM_Duty =70;
 
    while(1)
    {
-         ucKeyCode = KEY_Scan(0);
-       
-		UART_ReadBlocking(DEMO_UART, RxBuffer, 8);
-        for(i=0;i<8;i++)
-        PRINTF("RxBuffer_0 = %x \n\r",RxBuffer[i]);
+       ucKeyCode = KEY_Scan(0);
        
         //UART_WriteBlocking(DEMO_UART, RxBuffer, 8);
         
-	    capture_width =Capture_ReadPulse_Value(); 
+	    //capture_width =Capture_ReadPulse_Value(); 
         #ifdef DEBUG_PRINT 
         PRINTF("Cpw = %d\r\n", capture_width);
         #endif
-		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
         #ifdef DEBUG_PRINT 
         PRINTF("Current position : %d\r\n", mCurPosValue);
         #endif
+		mDiffPosValue=(int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);/*differential value DK*/
 	
 		
 	#if 0	
@@ -274,8 +273,8 @@ int main(void)
       if(motor_ref.motor_run == 1)
       {
    				
-            
-			   PWM_Duty =70;
+               Time_CNT++;
+			  // PWM_Duty =70;
 			   GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 			  	  
 	#ifdef DEBUG_PRINT 
@@ -292,34 +291,62 @@ int main(void)
                         motor_ref.Dir_flag=0;
                        
                        
-                                 
                      }
 			        else //Dir == 1 Horizintal
 		        	{
-					
-						
-							 uwStep = HallSensor_GetPinState();
-			          		 HALLSensor_Detected_BLDC(PWM_Duty);
-                             motor_ref.Dir_flag=1;
+					 uwStep = HallSensor_GetPinState();
+	          		 HALLSensor_Detected_BLDC(PWM_Duty);
+                     motor_ref.Dir_flag=1;
 					     
 					}
-       }
-     else
-	 { 
-	    // if(motor_ref.power_on==2||motor_ref.motor_run==1)
-             
-	  motor_ref.motor_run = 0;		  
-	  GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
-      DelayMs(50);
-      GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
-      DelayMs(50);
-      PRINTF("Motor Stop ! \r\n");
-              
-     }
+					/* 100ms 检测PID */
+    				if(Time_CNT % 100 == 0)
+    				{
+  						mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
+						iError = mCurPosValue - sPID.SetPoint ; //
+						if(iError >=0)
+						{
+
+						}
+						else{
+							  
+							}
+						dError_sum += iError; /*误差累计和*/
+						if(dError_sum > 1000)dError_sum =1000; //积分限幅
+						if(dError_sum < -1000)dError_sum = -1000; 
+						PWM_Duty = iError *KP + dError_sum * KI + (iError - last_iError)*KD;
+						last_iError = iError;
+						
+						
+					}
+					if(Time_CNT == 100)
+						Time_CNT = 0;
+
+		}else{ 
+				    // if(motor_ref.power_on==2||motor_ref.motor_run==1)
+			             
+				  motor_ref.motor_run = 0;		  
+				  GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
+			      DelayMs(50);
+			      GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
+			      DelayMs(50);
+			      PRINTF("Motor Stop ! \r\n");
+                  if(setRun_flag == 0){
+                          UART_ReadBlocking(DEMO_UART, RxBuffer, 3);
+                          for(i=0;i<3;i++)
+                          {
+                              KP=RxBuffer[0];
+                              KI=RxBuffer[1];
+                              KD=RxBuffer[2];
+                              PRINTF("KP KI KD = %x %x %x \n\r",KP,KI,KD);
+                          }
+       
+                      }
+     			}
             
         
    
-       /*Key process*/  
+     /**********8Key process********************/  
 		if(ucKeyCode !=KEY_UP) 
 		{
            switch(ucKeyCode)

@@ -77,16 +77,18 @@ void BOARD_InitPins(void)
 	/* PORTD5 (pin 62) is configured as FlexPWM_B2 */
 	 PORT_SetPinMux(PORTD, 5U, kPORT_MuxAlt5);
 
-
+     /*解码芯片脚位配置*/
 	 /* PORTC1 (pin 71) is configured as XBARIN11 -ENC */
-    PORT_SetPinMux(PORTC, 1U, kPORT_MuxAlt6);
+    PORT_SetPinMux(PORTC, 1U, kPORT_MuxAlt6);  // PTC1 -> XB_IN11 -> XBARA_OUT44 -> ENC_PHA
 
     /* PORTC2 (pin 72) is configured as XBARIN6 */
-    PORT_SetPinMux(PORTC, 2U, kPORT_MuxAlt6);
+    PORT_SetPinMux(PORTC, 2U, kPORT_MuxAlt6);  // PTC2 -> XB_IN6  -> XBARA_OUT45 -> ENC_PHB
 
     /* PORTC6 (pin 78) is configured as XBARIN3 */
-    PORT_SetPinMux(PORTC, 6U, kPORT_MuxAlt4);
-
+    PORT_SetPinMux(PORTC, 6U, kPORT_MuxAlt4);  // PTC6 -> XB_IN3  -> XBARA_OUT46 -> ENC_INDEX
+						                      // XBARA_OUT47 -> ENC_HOME
+						                      // XBARA_OUT48 -> ENC_TRIGGER(Capture)
+    /*USART of PORT*/
     /* PORTE0 (pin 1) is configured as UART1_TX */
     PORT_SetPinMux(PORTE, 0U, kPORT_MuxAlt3);
 
@@ -118,15 +120,17 @@ void BOARD_InitPins(void)
                   /* UART 1 receive data source select: UART1_RX pin. */
                   | SIM_SOPT5_UART1RXSRC(SOPT5_UART1RXSRC_UART_RX));
 
-	   /* XBARIN6 input pin output assigned to XBARA_IN6 input is connected
+	  /* XBARIN6 input pin output assigned to XBARA_IN6 input is connected
      * to XBARA_OUT44 output assigned to ENC0 quadrature waveform phase A */
     XBARA_SetSignalsConnection(XBARA, kXBARA_InputXbarIn6, kXBARA_OutputEnc0PhA);
     /* XBARIN11 input pin output assigned to XBARA_IN11 input is connected
      * to XBARA_OUT45 output assigned to ENC0 quadrature waveform phase B */
     XBARA_SetSignalsConnection(XBARA, kXBARA_InputXbarIn11, kXBARA_OutputEnc0PhB);
-    /* XBARIN3 input pin output assigned to XBARA_IN3 input is connected
-     * to XBARA_OUT46 output assigned to ENC0 refresh/reload */
-    XBARA_SetSignalsConnection(XBARA, kXBARA_InputXbarIn3, kXBARA_OutputEnc0Index);
+    /* XBARIN3 input pin output assigned to XBARA_IN3 input is connected*/
+    /**< XBARA_OUT46 output assigned to ENC0 refresh/reload */
+   // XBARA_SetSignalsConnection(XBARA, kXBARA_InputXbarIn3, kXBARA_OutputEnc0Index);
+	 /**< XBARA_OUT47 output assigned to ENC0 home position */
+    XBARA_SetSignalsConnection(XBARA, kXBARA_InputXbarIn3, kXBARA_OutputEnc0Home);//edit 2020-02-24
 
                   
 }
