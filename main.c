@@ -41,7 +41,7 @@
 #include "encoder.h"
 #include "fsl_xbara.h"
 #include "fsl_enc.h"
-//#include "port.c"
+//#include "arm_math.h"
 
 /*******************************************************************************
  * Definitions
@@ -107,6 +107,7 @@ int main(void)
      uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
      uint8_t ucKeyCode=0,KP,KI,KD;
      uint8_t RxBuffer[4],i;
+	
 	 static uint8_t keyRunTime=0;
      static uint8_t rem_times = 0;
 	
@@ -275,32 +276,21 @@ int main(void)
       {
    				
          GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
-         Time_CNT++;
-	     if(Dir == 0) //Vertial
-              {
-                  
-                  uwStep = HallSensor_GetPinState();
-                  HALLSensor_Detected_BLDC(PWM_Duty);
-                  motor_ref.Dir_flag=0;
-                 // PWM_Duty = PID_PWM_Duty;
-                 
-               }
-               else //Dir == 1 Horizintal
-              {
-               
-               uwStep = HallSensor_GetPinState();
-               HALLSensor_Detected_BLDC(PWM_Duty);
-               motor_ref.Dir_flag=1;
-              
-            
-                   
-              }
-				/* 100ms arithmetic PID */
-    		  if(Time_CNT % 100 == 0)
-    				{
-  						mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
+         
+	      uwStep = HallSensor_GetPinState();
+          HALLSensor_Detected_BLDC(PWM_Duty);
+          motor_ref.Dir_flag=0;
+         // PWM_Duty = PID_PWM_Duty;
+          Time_CNT++;
+             
+        /* 100ms arithmetic PID */
+    	if(Time_CNT % 100 == 0){
+
+						mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 						//iError = mCurPosValue - sPID.SetPoint ; //
 						iError = 60;
+						if((iError<5 )&& (iError>-5)) //�ű�������
+    						iError = 0;
 						if(iError >=0)//CW
 						{
 							
@@ -311,89 +301,85 @@ int main(void)
 						dError_sum += iError; /*����ۼƺ�*/
 						if(dError_sum > 1000)dError_sum =1000; //�����޷�
 						if(dError_sum < -1000)dError_sum = -1000; 
-						PID_PWM_Duty = iError *KP + dError_sum * (KI/1000) + (iError - last_iError)*KD;
+						PID_PWM_Duty = iError *KP + dError_sum *(float)(KI/10) + (iError - last_iError)*KD;//proportion + itegral + differential
 						PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
 						if(PID_PWM_Duty >=100)PID_PWM_Duty=100;
 						if(PID_PWM_Duty < 0)PID_PWM_Duty =0;
 						 
 						last_iError = iError;
 						PWM_Duty = PID_PWM_Duty;
-						
-						
-					}
-					if(Time_CNT == 100)
-						Time_CNT = 0;
-					 
-			
+		}
+	   if(Time_CNT == 100)
+			Time_CNT = 0;
+	} 
+    else { 
 
-		} 
-        else { 
-				    
-			             	  
-				  GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
-			      DelayMs(50);
-			      GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
-			      DelayMs(50);
-			     
-                  if( motor_ref.motor_run == 3){
-                          UART_ReadBlocking(DEMO_UART, RxBuffer, 4);
-                          for(i=0;i<4;i++)
-                          {
-                              KP=RxBuffer[0];
-                              KI=RxBuffer[1];
-                              KD=RxBuffer[2];
-                              motor_ref.motor_run =RxBuffer[3];
-                              PRINTF("KP KI KD = %d %d %d \n\r",KP,KI,KD);
-                             
-                          }
-       
-                 }
-                 PRINTF("Motor Stop ! \r\n");
-                 PRINTF("motor_run = %d \r\n",motor_ref.motor_run );
+		  GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
+	      DelayMs(50);
+	      GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
+	      DelayMs(50);
+	     
+          if( motor_ref.motor_run == 3){
+		  	
+                  UART_ReadBlocking(DEMO_UART, RxBuffer, 4);
+                  for(i=0;i<5;i++)
+                  {
+                      KP=RxBuffer[0];
+                      KI=RxBuffer[1];
+					  KD=RxBuffer[2];
+                      motor_ref.motor_run =RxBuffer[3];
+                      PRINTF("KP KI KD = %d %d %d \n\r",KP,KI,KD);
+                     
+                  }
+
+         }
+         PRINTF("Motor Stop ! \r\n");
+         PRINTF("motor_run = %d \r\n",motor_ref.motor_run );
                 
-     	}
+    }
             
     
    
-     /**********8Key process********************/  
-		if(ucKeyCode !=KEY_UP) 
-		{
-           switch(ucKeyCode)
-            { 
+   /**********8Key process********************/  
+   if(ucKeyCode !=KEY_UP){
+
+		switch(ucKeyCode){ 
                  
-                  case DIR_DOWN_PRES ://Ë³Ê±ï¿½ï¿½---ï¿½ï¿½ï¿½ï¿½--ï¿½ï¿½ï¿½Â¡ï¿½-Ë®Æ½ï¿½ï¿½ï¿½ï¿½
+                  case DIR_DOWN_PRES ://Dir =1
 				  	// Dir = 1;
-					 keyRunTime = 1;
-					  setRun_flag = 0;
-					  setStop_flag=0;
+			
 				     PRINTF("Right Key: %d\r\n", setRun_flag);
-                    if(Dir == 0) //Ë³Ê±ï¿½ï¿½ï¿½ï¿½×ª
+                    if(Dir == 0) //
 	   			    {
 
-                        if(motor_ref.motor_run == 1)//motor is runing
+                        if((motor_ref.motor_run == 1)&&(motor_ref.Dir_flag == 0))//motor is runing
                         {
-                            if(motor_ref.Dir_flag == 0)
-                            {
-                               PWM_Duty= 10;
+                            
+                              PWM_Duty= 10;
 							  uwStep = HallSensor_GetPinState();
 				              HALLSensor_Detected_BLDC( PWM_Duty);
 							   PWM_Duty = 5;
 							  uwStep = HallSensor_GetPinState();
 							  HALLSensor_Detected_BLDC( PWM_Duty);
                               DelayMs(30);
-                              motor_ref.power_on = 1;
+                         
                               motor_ref.Dir_flag =1;
                               Dir =1;
-                            }
+                            
                           
                         }
+						else 
+						{
+							Dir=1;
+                       		 motor_ref.Dir_flag =1;
+						}
 						
                      }
                       else
                       {
                         Dir=1;
                         motor_ref.Dir_flag =1;
-                        motor_ref.power_on = 1;
+                       
                        
                       
                       }
@@ -430,19 +416,15 @@ int main(void)
 		
 				 case DIR_UP_PRES: //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª Dir = 0;ï¿½ï¿½ï¿½Ï¡ï¿½--ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½
 				   // Dir = 0 ; //ï¿½ï¿½Ê±ï¿½ï¿½
-					keyRunTime = 1;
-                   setRun_flag = 0;
-				   setStop_flag=0;
+				
 				   PRINTF("key setRun_flag: %d\r\n", setRun_flag);
 	  			
 			     if(Dir==1) // Dir = 0; //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª
 				   {
 	               
-	                 if(motor_ref.motor_run == 1) //motor is runing
+	                 if((motor_ref.motor_run == 1) &&(motor_ref.Dir_flag ==1))//motor is runing
 	                 {
-	                    if(motor_ref.Dir_flag ==1)
-	                    {
-
+	                   
 	                      PWM_Duty = 10;
 						  uwStep = HallSensor_GetPinState();
 			              HALLSensor_Detected_BLDC( PWM_Duty);
@@ -450,23 +432,26 @@ int main(void)
 						  uwStep = HallSensor_GetPinState();
 						  HALLSensor_Detected_BLDC( PWM_Duty);
 	                      DelayMs(30);
-	                      motor_ref.power_on = 1;
+	                   
 	                      motor_ref.Dir_flag = 0;
 	                      Dir =0;
-	                    }
+	                    
+	                 }
+						else
+						{
+						  Dir =0;
+						  motor_ref.Dir_flag = 0;
+	                     
+						}
 						
-	                  
-	                  }
-                   }
-	                  else
+	               }
+	               else
 	                  {
 	                     
 	                     Dir = 0;
 	                    
 	                     motor_ref.Dir_flag = 0;
-	                     motor_ref.power_on = 1;
-	                     
-
+	                  
 	                  }
                  UART_WriteBlocking(DEMO_UART, printx2, sizeof(printx2) - 1);
 			   
@@ -487,9 +472,9 @@ int main(void)
 			
         }
         
-	   }
+	}
 
-   }//end while(1)
+  }//end while(1)
 }
 /******************************************************************************
  *
