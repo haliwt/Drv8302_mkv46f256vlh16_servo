@@ -157,7 +157,7 @@ uint8_t KEY_Scan(uint8_t mode)
 			 /* 等待按键弹开，退出按键扫描函数 */
 		   while(HALL_SWITCH_KEY==1);
 			   /* 按键扫描完毕，确定按键按下 */
-		   return HALL_PRES;
+		   return USART_RT_PRES;
 		 }
 		 
 		 else if(WHEEL_KEY==1) 

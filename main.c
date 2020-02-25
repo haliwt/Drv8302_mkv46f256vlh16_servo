@@ -73,7 +73,9 @@ int32_t array_data[4]={0xfff,0xfff,0xfff,0xfff};
 
 
 int32_t PID_Result;
-PID_TypeDef  sPID; 
+PID_TypeDef  sPID;
+__IO uint16_t  PID_PWM_Duty;
+
 
 volatile int16_t  capture_width;
 //__IO uint32_t PWM_ChangeFlag = 0;
@@ -104,7 +106,7 @@ int main(void)
      uint8_t printx4[]="key motor run = 0 ^^^^ \r\n";
      uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
      uint8_t ucKeyCode=0,KP,KI,KD;
-     uint8_t RxBuffer[3],i;
+     uint8_t RxBuffer[4],i;
 	 static uint8_t keyRunTime=0;
      static uint8_t rem_times = 0;
 	
@@ -137,16 +139,15 @@ int main(void)
     ENC_Init(DEMO_ENC_BASEADDR, &mEncConfigStruct);
     ENC_DoSoftwareLoadInitialPositionValue(DEMO_ENC_BASEADDR); /* Update the position counter with initial value. */
     #endif
-	setRun_flag=3;
+	Dir =3;
+	motor_ref.Dir_flag=2;
     PWM_Duty =70;
 
    while(1)
    {
        ucKeyCode = KEY_Scan(0);
        
-        //UART_WriteBlocking(DEMO_UART, RxBuffer, 8);
-        
-	    //capture_width =Capture_ReadPulse_Value(); 
+       
         #ifdef DEBUG_PRINT 
         PRINTF("Cpw = %d\r\n", capture_width);
         #endif
@@ -274,7 +275,7 @@ int main(void)
       {
    				
                Time_CNT++;
-			  // PWM_Duty =70;
+			   PWM_Duty =70;
 			   GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 			  	  
 	#ifdef DEBUG_PRINT 
@@ -285,25 +286,29 @@ int main(void)
               
                     if(Dir == 0) //Vertial
                     {
-						
+						PWM_Duty = PID_PWM_Duty;
                         uwStep = HallSensor_GetPinState();
                         HALLSensor_Detected_BLDC(PWM_Duty);
                         motor_ref.Dir_flag=0;
-                       
+                        
                        
                      }
 			        else //Dir == 1 Horizintal
 		        	{
+                     PWM_Duty = PID_PWM_Duty;
 					 uwStep = HallSensor_GetPinState();
 	          		 HALLSensor_Detected_BLDC(PWM_Duty);
                      motor_ref.Dir_flag=1;
+                   //  PRINTF("Run pwm= %d\r \n",PWM_Duty); 
+                    // PWM_Duty = PID_PWM_Duty;
 					     
 					}
 					/* 100ms 检测PID */
     				if(Time_CNT % 100 == 0)
     				{
   						mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
-						iError = mCurPosValue - sPID.SetPoint ; //
+						//iError = mCurPosValue - sPID.SetPoint ; //
+						iError = 80;
 						if(iError >=0)
 						{
 
@@ -314,7 +319,10 @@ int main(void)
 						dError_sum += iError; /*误差累计和*/
 						if(dError_sum > 1000)dError_sum =1000; //积分限幅
 						if(dError_sum < -1000)dError_sum = -1000; 
-						PWM_Duty = iError *KP + dError_sum * KI + (iError - last_iError)*KD;
+						PID_PWM_Duty = iError *KP + dError_sum * KI + (iError - last_iError)*KD;
+						if(PID_PWM_Duty >=100)PID_PWM_Duty=100;
+						if(PID_PWM_Duty < 0)PID_PWM_Duty =0;
+						PRINTF("PID pwm= %d\r \n",PID_PWM_Duty); 
 						last_iError = iError;
 						
 						
@@ -323,26 +331,32 @@ int main(void)
 						Time_CNT = 0;
 
 		}else{ 
-				    // if(motor_ref.power_on==2||motor_ref.motor_run==1)
-			             
-				  motor_ref.motor_run = 0;		  
+				    
+			             	  
 				  GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
 			      DelayMs(50);
 			      GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
 			      DelayMs(50);
-			      PRINTF("Motor Stop ! \r\n");
-                  if(setRun_flag == 0){
-                          UART_ReadBlocking(DEMO_UART, RxBuffer, 3);
-                          for(i=0;i<3;i++)
+			     
+                  if( motor_ref.motor_run == 3){
+                          UART_ReadBlocking(DEMO_UART, RxBuffer, 4);
+						   //UART_WriteBlocking(DEMO_UART, RxBuffer, 8);
+        				 //capture_width =Capture_ReadPulse_Value(); 
+                          for(i=0;i<4;i++)
                           {
                               KP=RxBuffer[0];
                               KI=RxBuffer[1];
                               KD=RxBuffer[2];
-                              PRINTF("KP KI KD = %x %x %x \n\r",KP,KI,KD);
+                              motor_ref.motor_run =RxBuffer[3];
+                              PRINTF("KP KI KD = %d %d %d \n\r",KP,KI,KD);
+                             
                           }
        
-                      }
-     			}
+                 }
+                 PRINTF("Motor Stop ! \r\n");
+                 PRINTF("motor_run = %d \r\n",motor_ref.motor_run );
+                
+     	}
             
         
    
@@ -465,8 +479,12 @@ int main(void)
            		break;
 				case MOTOR_STOP_PRES:
                    
-					 motor_ref.motor_run = 0;
+					 motor_ref.motor_run = 3;
+                     PRINTF("motor stop = %d \n\r",motor_ref.motor_run);
                  break;
+				case USART_RT_PRES:
+					 
+				break;
             default :
               
       
