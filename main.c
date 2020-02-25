@@ -271,47 +271,39 @@ int main(void)
 /**************************************************************************************************************************************/
         
      /***********motor run main*********************/
-      if(motor_ref.motor_run == 1)
+     if(motor_ref.motor_run == 1)
       {
    				
-               Time_CNT++;
-			   PWM_Duty =70;
-			   GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
-			  	  
-	#ifdef DEBUG_PRINT 
-             printf("pwm_duty = %d\r \n",pwm_duty); 
-	#endif 
-             
-
+         GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
+         Time_CNT++;
+	     if(Dir == 0) //Vertial
+              {
+                  
+                  uwStep = HallSensor_GetPinState();
+                  HALLSensor_Detected_BLDC(PWM_Duty);
+                  motor_ref.Dir_flag=0;
+                 // PWM_Duty = PID_PWM_Duty;
+                 
+               }
+               else //Dir == 1 Horizintal
+              {
+               
+               uwStep = HallSensor_GetPinState();
+               HALLSensor_Detected_BLDC(PWM_Duty);
+               motor_ref.Dir_flag=1;
               
-                    if(Dir == 0) //Vertial
-                    {
-						PWM_Duty = PID_PWM_Duty;
-                        uwStep = HallSensor_GetPinState();
-                        HALLSensor_Detected_BLDC(PWM_Duty);
-                        motor_ref.Dir_flag=0;
-                        
-                       
-                     }
-			        else //Dir == 1 Horizintal
-		        	{
-                     PWM_Duty = PID_PWM_Duty;
-					 uwStep = HallSensor_GetPinState();
-	          		 HALLSensor_Detected_BLDC(PWM_Duty);
-                     motor_ref.Dir_flag=1;
-                   //  PRINTF("Run pwm= %d\r \n",PWM_Duty); 
-                    // PWM_Duty = PID_PWM_Duty;
-					     
-					}
-					/* 100ms 检测PID */
-    				if(Time_CNT % 100 == 0)
+            
+                   
+              }
+				/* 100ms arithmetic PID */
+    		  if(Time_CNT % 100 == 0)
     				{
   						mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 						//iError = mCurPosValue - sPID.SetPoint ; //
-						iError = 80;
-						if(iError >=0)
+						iError = 60;
+						if(iError >=0)//CW
 						{
-
+							
 						}
 						else{
 							  
@@ -319,18 +311,23 @@ int main(void)
 						dError_sum += iError; /*误差累计和*/
 						if(dError_sum > 1000)dError_sum =1000; //积分限幅
 						if(dError_sum < -1000)dError_sum = -1000; 
-						PID_PWM_Duty = iError *KP + dError_sum * KI + (iError - last_iError)*KD;
+						PID_PWM_Duty = iError *KP + dError_sum * (KI/1000) + (iError - last_iError)*KD;
+						PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
 						if(PID_PWM_Duty >=100)PID_PWM_Duty=100;
 						if(PID_PWM_Duty < 0)PID_PWM_Duty =0;
-						PRINTF("PID pwm= %d\r \n",PID_PWM_Duty); 
+						 
 						last_iError = iError;
+						PWM_Duty = PID_PWM_Duty;
 						
 						
 					}
 					if(Time_CNT == 100)
 						Time_CNT = 0;
+					 
+			
 
-		}else{ 
+		} 
+        else { 
 				    
 			             	  
 				  GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
@@ -340,8 +337,6 @@ int main(void)
 			     
                   if( motor_ref.motor_run == 3){
                           UART_ReadBlocking(DEMO_UART, RxBuffer, 4);
-						   //UART_WriteBlocking(DEMO_UART, RxBuffer, 8);
-        				 //capture_width =Capture_ReadPulse_Value(); 
                           for(i=0;i<4;i++)
                           {
                               KP=RxBuffer[0];
@@ -358,7 +353,7 @@ int main(void)
                 
      	}
             
-        
+    
    
      /**********8Key process********************/  
 		if(ucKeyCode !=KEY_UP) 
