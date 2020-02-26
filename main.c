@@ -73,8 +73,10 @@ int main(void)
      uint8_t ucKeyCode=0,kp,ki,kd;
      uint8_t RxBuffer[4],i;
 	 float KP,KI,KD;
-     uint32_t Time_CNT;
-	 uint32_t mDiffPosValue,mCurPosValue;
+     uint16_t Time_CNT,EnBuf[5];
+	 uint32_t mCurPosValue,eIn_n;
+	 volatile int32_t hall_pul;
+	 
     
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -109,43 +111,73 @@ int main(void)
    {
        ucKeyCode = KEY_Scan(0);
        
-       
-        #ifdef DEBUG_PRINT 
-       // PRINTF("Cpw = %d\r\n", capture_width);
-        #endif
-		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
-        #ifdef DEBUG_PRINT 
-        PRINTF("Cpos : %d\r\n", mCurPosValue);
-        #endif
-		mDiffPosValue=(int16_t)ENC_GetPositionDifferenceValue(DEMO_ENC_BASEADDR);/*differential value DK*/
-		#ifdef DEBUG_PRINT 
-        PRINTF("Di = %d\r\n", mDiffPosValue);
-        PRINTF("Re %d\r\n", ENC_GetRevolutionValue(DEMO_ENC_BASEADDR));
-        PRINTF("CPHod: %d\r\n", ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR));
-        #endif
-		if(HALL_Pulse >=0)
-	    PRINTF("HallN= %d\r\n", HALL_Pulse );
-		else 
-		PRINTF("-HallN=- %d\r\n", HALL_Pulse );
+      
+	#ifdef DEBUG_PRINT 
+		   PRINTF("CPHod: %d\r\n", ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR));
+	#endif
 			
 		
-#if 0
-		
-      /***********Position :Home and End*****************/
+#if 1
+	 /***********Position :Home and End*****************/
+        if(en_t.eInit_n ==0){
+                 
+				PWM_Duty =100;
+                eIn_n ++;
+				hall_pul= HALL_Pulse;
+				if(HALL_Pulse >=0)
+			    PRINTF("HallN= %d\r\n", HALL_Pulse );
+				else 
+				PRINTF("-HallN=- %d\r\n", HALL_Pulse );
+
+
+				if(eIn_n>1000){
+                   
+                   
+                  
+                  EnBuf[0]= ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+                  DelayMs(60);
+                  EnBuf[1]= ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+                  EnBuf[2]= ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+              
+				  EnBuf[4]= ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+                 
+
+			    
+                  if(EnBuf[0]==EnBuf[4]){
+                      
+                      //PMW_AllClose_ABC_Channel();
+                      motor_ref.motor_run = 0;
+                      eIn_n=0;
+                        
+                  }
+                }
+                
+				
+				
+        }
 	  
 	   
 #endif 
          
-/**************************************************************************************************************************************/
-        
-     /***********motor run main*********************/
+    /***********motor run main*********************/
      if(motor_ref.motor_run == 1)
       {
-   		   PWM_Duty =95;	
-       //  GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
+   		    PWM_Duty =95;
+		   #ifdef DRV8302 
+            GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
+		   #endif 
+		  
+         
          
 	      uwStep = HallSensor_GetPinState();
           HALLSensor_Detected_BLDC(PWM_Duty);
+          
+                    mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
+                    #ifdef DEBUG_PRINT 
+                     PRINTF("CurrPos : %d\r\n", mCurPosValue);
+                    #endif
+					
+                
         
          // PWM_Duty = PID_PWM_Duty;
           Time_CNT++;
@@ -178,11 +210,15 @@ int main(void)
 		}
 	   if(Time_CNT == 100)
 			Time_CNT = 0;
+
+              
 #endif 
 	} 
     else { 
             PMW_AllClose_ABC_Channel();
-		 // GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
+			#ifdef DRV8302
+		 	GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
+		    #endif 
 	      DelayMs(50);
 	      GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
 	      DelayMs(50);
@@ -362,7 +398,9 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
 	
     motor_ref.motor_run = 0;
 	PMW_AllClose_ABC_Channel();
-    //GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
+	#ifdef DRV8302
+    GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
+    #endif 
 	PRINTF("interrupte has happed  \r\n");
 	                  
 /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping

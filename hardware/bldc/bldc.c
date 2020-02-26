@@ -336,6 +336,7 @@ void HALLSensor_Detected_BLDC(uint16_t duty)
     
  default :
         break;
+		
   }
  
   

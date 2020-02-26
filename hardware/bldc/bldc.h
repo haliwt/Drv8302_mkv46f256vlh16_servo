@@ -64,7 +64,7 @@ extern __IO uint16_t   PWM_Duty;   //占空比
 extern __IO uint16_t  PID_PWM_Duty ;
 
 extern __IO int8_t Dir;
-extern uint16_t SPEED_VALUE ;   //速度值
+
 
 extern __IO int32_t HALL_Pulse;  
 
