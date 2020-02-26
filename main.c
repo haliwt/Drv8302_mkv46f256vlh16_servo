@@ -105,8 +105,9 @@ int main(void)
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
      uint8_t printx4[]="key motor run = 0 ^^^^ \r\n";
      uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
-     uint8_t ucKeyCode=0,KP,KI,KD;
+     uint8_t ucKeyCode=0,kp,ki,kd;
      uint8_t RxBuffer[4],i;
+	 float KP,KI,KD;
 	
 	 static uint8_t keyRunTime=0;
      static uint8_t rem_times = 0;
@@ -157,6 +158,9 @@ int main(void)
         PRINTF("Current position : %d\r\n", mCurPosValue);
         #endif
 		mDiffPosValue=(int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);/*differential value DK*/
+		#ifdef DEBUG_PRINT 
+        PRINTF("Differential = %d\r\n", mDiffPosValue);
+        #endif
 	
 		
 	#if 0	
@@ -274,15 +278,15 @@ int main(void)
      /***********motor run main*********************/
      if(motor_ref.motor_run == 1)
       {
-   				
-         GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
+   		  PWM_Duty =95;	
+       //  GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
          
 	      uwStep = HallSensor_GetPinState();
           HALLSensor_Detected_BLDC(PWM_Duty);
-          motor_ref.Dir_flag=0;
+        
          // PWM_Duty = PID_PWM_Duty;
           Time_CNT++;
-             
+#if 1    
         /* 100ms arithmetic PID */
     	if(Time_CNT % 100 == 0){
 
@@ -301,7 +305,7 @@ int main(void)
 						dError_sum += iError; /*误差累计和*/
 						if(dError_sum > 1000)dError_sum =1000; //积分限幅
 						if(dError_sum < -1000)dError_sum = -1000; 
-						PID_PWM_Duty = iError *KP + dError_sum *(float)(KI/10) + (iError - last_iError)*KD;//proportion + itegral + differential
+						PID_PWM_Duty = iError *KP + dError_sum * KI + (iError - last_iError)*KD;//proportion + itegral + differential
 						PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
 						if(PID_PWM_Duty >=100)PID_PWM_Duty=100;
 						if(PID_PWM_Duty < 0)PID_PWM_Duty =0;
@@ -311,10 +315,11 @@ int main(void)
 		}
 	   if(Time_CNT == 100)
 			Time_CNT = 0;
+#endif 
 	} 
     else { 
-
-		  GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
+            PMW_AllClose_ABC_Channel();
+		 // GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
 	      DelayMs(50);
 	      GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
 	      DelayMs(50);
@@ -324,11 +329,14 @@ int main(void)
                   UART_ReadBlocking(DEMO_UART, RxBuffer, 4);
                   for(i=0;i<5;i++)
                   {
-                      KP=RxBuffer[0];
-                      KI=RxBuffer[1];
-					  KD=RxBuffer[2];
+                      kp=RxBuffer[0];
+                      ki=RxBuffer[1];
+					  kd=RxBuffer[2];
                       motor_ref.motor_run =RxBuffer[3];
-                      PRINTF("KP KI KD = %d %d %d \n\r",KP,KI,KD);
+                      PRINTF("KP KI KD = %d %d %d \n\r",kp,ki,kd);
+                      KP = (float)kp/10;
+                      KI = (float)ki/100;
+                      KD = (float)kd/10;
                      
                   }
 
@@ -343,7 +351,7 @@ int main(void)
    /**********8Key process********************/  
    if(ucKeyCode !=KEY_UP){
 
-		switch(ucKeyCode){ 
+	  switch(ucKeyCode){ 
                  
                   case DIR_DOWN_PRES ://Dir =1
 				  	// Dir = 1;
@@ -494,7 +502,8 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
    
 	en_t.en_interrupt_flag=1;
     motor_ref.motor_run = 0;
-    GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
+	PMW_AllClose_ABC_Channel();
+    //GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
 	PRINTF("interrupte has happed  \r\n");
 	                  
 /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping

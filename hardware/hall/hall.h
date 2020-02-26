@@ -7,23 +7,20 @@
 #include "encoder.h"
 #include "output.h"
 
-/* ï¿½ï¿½ï¿½Í¶ï¿½ï¿½ï¿½ ------------------------------------------------------------------*/
+/* BLDC of struct */
 typedef struct {
-  __IO int32_t  uwStep ;  	  // ï¿½ï¿½ï¿½ï¿½ï¿½×ª×´Ì?
-  __IO int32_t  Dir ;        	// ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿?
-  __IO int32_t  Position;		  // ï¿½ï¿½ï¿½Î»ï¿½ï¿?
-  __IO int32_t  Speed;		    // ï¿½ï¿½ï¿½ï¿½Ù¶ï¿?
-  __IO uint16_t PWM_Duty; 	  // ï¿½ï¿½ï¿½Õ¼ï¿½Õ±ï¿?
-  __IO int32_t  Hall_Period;  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-  __IO int32_t  Hall_PulNum;  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-  __IO int32_t  Lock_Time;    // ï¿½ï¿½ï¿½ï¿½ï¿½×ªÊ±ï¿½ï¿?
+  __IO int32_t  uwStep ;  	  // µç»úÐý×ª×´Ì¬
+  __IO int32_t  Dir ;        	// µç»úÐý×ª·½Ïò
+  __IO int32_t  Position;		  // µç»úÎ»ÖÃ
+  __IO int32_t  Speed;		    // µç»úËÙ¶È
+  __IO uint16_t PWM_Duty; 	  // µç»úÕ¼¿Õ±È
+  __IO int32_t  Hall_Period;  // »ô¶û´«¸ÐÆ÷´¥·¢ÖÜÆÚ
+  __IO int32_t  Hall_PulNum;  // »ô¶û´«¸ÐÆ÷Âö³åÊý
+  __IO int32_t  Lock_Time;    // µç»ú¶Â×ªÊ±¼ä
 }BLDC_Typedef;
 
 
-
-
-
-/* Ë½ï¿½ï¿½ï¿½ï¿½ï¿½Í¶ï¿½ï¿½ï¿½ --------------------------------------------------------------*/
+/* PID struct*/
 typedef struct 
 {
   __IO int32_t  SetPoint;                                 //ï¿½è¶¨Ä¿ï¿½ï¿½ Desired Value

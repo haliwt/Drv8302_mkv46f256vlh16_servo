@@ -6,7 +6,7 @@
 #include "board.h"
 #include "fsl_debug_console.h"
 #include "fsl_gpio.h"
-
+#include "hall.h"
 
 
 

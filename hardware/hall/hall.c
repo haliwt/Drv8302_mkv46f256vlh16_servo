@@ -4,7 +4,7 @@
 uint32_t mCurPosValue;
 
 
-BLDC_Typedef BLDCMotor = {0,CW,0,0,100,0,0,0}; //CW = - 
+
 
 
 

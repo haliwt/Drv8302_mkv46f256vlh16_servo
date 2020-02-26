@@ -14,6 +14,7 @@ __IO int8_t Dir; //电机方向
 
 
 __IO uint16_t  PWM_Duty= 20;	 //占空比
+BLDC_Typedef BLDCMotor = {0,CW,0,0,100,0,0,0}; //
 
 
 /**********************************************************
@@ -201,7 +202,7 @@ static void PWM_DRV_Init3PhPwm(void)
     uint16_t deadTimeVal;
     pwm_signal_param_t pwmSignal[2];
     uint32_t pwmSourceClockInHz;
-    uint32_t pwmFrequencyInHz = 20000;//1300; //1.3KHZ
+    uint32_t pwmFrequencyInHz = 60000;//edit 2020.02.25//20000; //1.3KHZ
 
 
     pwmSourceClockInHz = PWM_SRC_CLK_FREQ;
@@ -257,10 +258,13 @@ void HALLSensor_Detected_BLDC(uint16_t duty)
  // uwStep = HallSensor_GetPinState();
  // PRINTF("uwStep = %d\n",uwStep);
   // __IO uint32_t tmp = 0; 
- if(Dir == 0) //逆时针方向 -0
+  if(Dir == 0) //逆时针方向 -0
   {
     uwStep = (uint32_t)7 - uwStep;        // 逆时针 CW = 7 - CCW;
+    BLDCMotor.Hall_PulNum ++; 
   }
+  else
+  	 BLDCMotor.Hall_PulNum --; 
  
   /*---- six step changed phase */
   /*---- 1(001,U),IC2(010,V),IC3(100,W) ----*/
