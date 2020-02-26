@@ -68,13 +68,12 @@ int main(void)
 	 int32_t iError,dError_sum,last_iError;
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
-     uint8_t printx4[]="key motor run = 0 ^^^^ \r\n";
-     uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
+ 
      uint8_t ucKeyCode=0,kp,ki,kd;
      uint8_t RxBuffer[4],i,z=0;
 	 float KP,KI,KD;
-     volatile uint16_t Time_CNT,EnBuf[5];
-	 uint32_t mCurPosValue,eIn_n;
+     volatile uint16_t Time_CNT,EnBuf[2]={0,0xff};
+	 uint32_t mCurPosValue,eIn_n=0;
 	 int16_t end0,end4,j=0;
 
 	 
@@ -105,8 +104,8 @@ int main(void)
     ENC_Init(DEMO_ENC_BASEADDR, &mEncConfigStruct);
     ENC_DoSoftwareLoadInitialPositionValue(DEMO_ENC_BASEADDR); /* Update the position counter with initial value. */
     #endif
-	Dir =3;
-    PWM_Duty =70;
+	
+    
 
    while(1)
    {
@@ -130,7 +129,7 @@ int main(void)
 				PRINTF("-HallN=- %d\r\n", HALL_Pulse );
 
 
-				if(eIn_n % 20 == 0){
+				if(eIn_n > 20 ){
                    
 						   j++;
 
@@ -145,15 +144,20 @@ int main(void)
 						  			
 						   			}
 
-						   if(j==2)j=0;
+						   if(j==3)j=0;
 
 
 					      if(EnBuf[0]==EnBuf[1]){
                              
-                            z++;
-							if(z==1) EnBuf[0]= 0xff;
-                              else{
-	                      
+                             z++;
+                             if(z==1) {
+                             
+                             	EnBuf[1]= 0xfff;
+                             	PRINTF("Z==1 ZZZZZZZZZZZ \n\r");
+                              }
+							 else
+                              {
+	                            PRINTF("Z==2 ############# \n\r");
                                 PMW_AllClose_ABC_Channel();
                                 motor_ref.motor_run = 0;
                                 eIn_n=0;
@@ -162,7 +166,7 @@ int main(void)
                         	}
                         
                 }
-                if(eIn_n==20)eIn_n =0;
+                if(eIn_n > 20)eIn_n =0;
                 
 				
 				
@@ -308,11 +312,10 @@ int main(void)
         		
                  case START_PRES:
                    
-				   motor_ref.motor_run ++ ;
-                   motor_ref.power_on ++ ;
+				   motor_ref.motor_run =1;
                 
-                   PRINTF("START_KEY \n\r");
-                
+                   PRINTF("START_KEY @@@@@@@@@@@@@@@@@@@@@@@@@\n\r");
+#if 0
                  if(motor_ref.motor_run == 1)
     			  {
                       motor_ref.power_on =1;
@@ -326,7 +329,7 @@ int main(void)
                       motor_ref.power_on =0;
                       UART_WriteBlocking(DEMO_UART, printx4, sizeof(printx4) - 1);
 				  }
-                 
+#endif              
 				  break;
 		
 				 case DIR_UP_PRES: //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª Dir = 0;ï¿½ï¿½ï¿½Ï¡ï¿½--ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½
