@@ -12,31 +12,8 @@
 
 typedef struct _encoder_t_
 {
-  volatile int16_t  en_add_value;
-  volatile int16_t  en_reduce_value;
- // volatile int16_t  capture_width;
-
-  volatile int16_t captureVal_1;
-  volatile int16_t captureVal_2;
-
-   uint16_t drv8302_adc_value;
-
-   
-   uint16_t mCurVelValue;
-   uint16_t mCurRevValue;
-   
-  
-   uint8_t arrayPos[2];
-
-  uint8_t firstPowerOn;
-
-  uint32_t PulseWidth;
-
- 
-  uint8_t en_interrupt_flag;
-  
-  uint8_t sethome_flag;
-  uint8_t setend_flag;
+  uint16_t Home;
+  uint16_t End;
 
  }encoder_t;
 
@@ -67,25 +44,8 @@ typedef struct _encoder_t_
 /* Get source clock for FTM driver */
 #define FTM_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_FastPeriphClk)
 
-extern int32_t setHome ;
-extern int32_t setEnd ;
 
-extern int16_t setPositionHome;
-extern int16_t setPositionEnd;
-
-extern uint8_t setRun_flag;
-extern uint8_t setStop_flag;
 extern uint32_t mCurPosValue;
-
-extern uint8_t home_flag;
-extern uint8_t end_flag;
-extern uint8_t judge_home_flag ; //判断起始点的位置，1=水平， 2=垂直位置
-
-extern volatile int16_t  capture_width;
-
-
-  
-
 void Capture_Input_Init(void);
 uint16_t Capture_ReadPulse_Value(void);
 void ENC_SetPositionZero(ENC_Type *base, uint32_t value);

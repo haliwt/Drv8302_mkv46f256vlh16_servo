@@ -14,8 +14,9 @@ __IO int8_t Dir; //电机方向
 
 
 __IO uint16_t  PWM_Duty= 20;	 //占空比
-BLDC_Typedef BLDCMotor = {0,CW,0,0,100,0,0,0}; //
 
+
+//
 
 /**********************************************************
  *
@@ -256,20 +257,19 @@ void HALLSensor_Detected_BLDC(uint16_t duty)
       
 
  // uwStep = HallSensor_GetPinState();
- // PRINTF("uwStep = %d\n",uwStep);
-  // __IO uint32_t tmp = 0; 
+
   if(Dir == 0) //逆时针方向 -0
   {
     uwStep = (uint32_t)7 - uwStep;        // 逆时针 CW = 7 - CCW;
-    BLDCMotor.Hall_PulNum ++; 
+    HALL_Pulse ++; 
   }
   else
-  	 BLDCMotor.Hall_PulNum --; 
+  	 HALL_Pulse --; 
  
   /*---- six step changed phase */
   /*---- 1(001,U),IC2(010,V),IC3(100,W) ----*/
 #ifdef DEBUG_PRINT
-   PRINTF("uwStep = %d\n",uwStep);
+  // PRINTF("uwStep = %d\n",uwStep);
 #endif 
  switch(uwStep)//switch(BLDCMotor.uwStep)
  {

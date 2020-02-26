@@ -29,17 +29,31 @@
 
 
 
-#define CCW                              (int8_t)(1)
-#define CW                               (int8_t)(-1)
+#define CCW               (int8_t)(1)
+#define CW                (int8_t)(-1)
 
 
-
-#define  PWMA_INIT_ON                    1
-
-#define IRFP4768PbF          0
-//#define DEBUG_PRINT          2
+#define DEBUG_PRINT         1
 
 
+/* BLDC of struct */
+typedef struct _BLDC_Typedef_{
+  __IO int32_t  uwStep ;  	  // 电机旋转状态
+  __IO int32_t  Dir ;        	// 电机旋转方向
+  __IO int32_t  Position;		  // 电机位置
+  __IO int32_t  Speed;		    // 电机速度
+  __IO uint16_t PWM_Duty; 	  // 电机占空比
+  __IO int32_t  Hall_Period;  // 霍尔传感器触发周期
+  __IO int32_t  Hall_PulNum;  // 霍尔传感器脉冲数
+  __IO int32_t  Lock_Time;    // 电机堵转时间
+}BLDC_Typedef;
+
+
+typedef enum
+{
+  GPIO_PIN_RESET = 0,
+  GPIO_PIN_SET
+}GPIO_PinState;
 
 
 
@@ -52,13 +66,9 @@ extern __IO uint16_t  PID_PWM_Duty ;
 extern __IO int8_t Dir;
 extern uint16_t SPEED_VALUE ;   //速度值
 
+extern __IO int32_t HALL_Pulse;  
 
 
-typedef enum
-{
-  GPIO_PIN_RESET = 0,
-  GPIO_PIN_SET
-}GPIO_PinState;
 
 void HALL_Init(void);
 

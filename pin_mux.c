@@ -128,9 +128,9 @@ void BOARD_InitPins(void)
     XBARA_SetSignalsConnection(XBARA, kXBARA_InputXbarIn11, kXBARA_OutputEnc0PhB);
     /* XBARIN3 input pin output assigned to XBARA_IN3 input is connected*/
     /**< XBARA_OUT46 output assigned to ENC0 refresh/reload */
-   // XBARA_SetSignalsConnection(XBARA, kXBARA_InputXbarIn3, kXBARA_OutputEnc0Index);
+    XBARA_SetSignalsConnection(XBARA, kXBARA_InputXbarIn3, kXBARA_OutputEnc0Index);
 	 /**< XBARA_OUT47 output assigned to ENC0 home position */
-    XBARA_SetSignalsConnection(XBARA, kXBARA_InputXbarIn3, kXBARA_OutputEnc0Home);//edit 2020-02-24
+  //  XBARA_SetSignalsConnection(XBARA, kXBARA_InputXbarIn3, kXBARA_OutputEnc0Home);//edit 2020-02-24
 
                   
 }

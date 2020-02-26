@@ -7,17 +7,6 @@
 #include "encoder.h"
 #include "output.h"
 
-/* BLDC of struct */
-typedef struct {
-  __IO int32_t  uwStep ;  	  // 电机旋转状态
-  __IO int32_t  Dir ;        	// 电机旋转方向
-  __IO int32_t  Position;		  // 电机位置
-  __IO int32_t  Speed;		    // 电机速度
-  __IO uint16_t PWM_Duty; 	  // 电机占空比
-  __IO int32_t  Hall_Period;  // 霍尔传感器触发周期
-  __IO int32_t  Hall_PulNum;  // 霍尔传感器脉冲数
-  __IO int32_t  Lock_Time;    // 电机堵转时间
-}BLDC_Typedef;
 
 
 /* PID struct*/
@@ -33,7 +22,7 @@ typedef struct
 }PID_TypeDef;
 
 
-//#define  SysTick_IRQ_Handler            SysTick_Handler     
+   
 
 
 #define  P_DATA      0.1f//0.85f                                // P锟斤拷锟斤拷
@@ -62,13 +51,6 @@ extern uint32_t ABZ_CNT;
 
 extern int32_t PID_Result ;
 
-extern volatile uint16_t g_destination_home; 
-extern volatile uint16_t g_destination_end; 
-
-
-
-
-void ENCODER_Init(void);
 
 
 
