@@ -71,11 +71,12 @@ int main(void)
      uint8_t printx4[]="key motor run = 0 ^^^^ \r\n";
      uint8_t printx5[]="key motor run  = 1 $$$$ \r\n";
      uint8_t ucKeyCode=0,kp,ki,kd;
-     uint8_t RxBuffer[4],i;
+     uint8_t RxBuffer[4],i,z=0;
 	 float KP,KI,KD;
-     uint16_t Time_CNT,EnBuf[5];
+     volatile uint16_t Time_CNT,EnBuf[5];
 	 uint32_t mCurPosValue,eIn_n;
-	 volatile int32_t hall_pul;
+	 int16_t end0,end4,j=0;
+
 	 
     
     XBARA_Init(XBARA);
@@ -121,36 +122,47 @@ int main(void)
 	 /***********Position :Home and End*****************/
         if(en_t.eInit_n ==0){
                  
-				PWM_Duty =100;
-                eIn_n ++;
-				hall_pul= HALL_Pulse;
+                
+				
 				if(HALL_Pulse >=0)
 			    PRINTF("HallN= %d\r\n", HALL_Pulse );
 				else 
 				PRINTF("-HallN=- %d\r\n", HALL_Pulse );
 
 
-				if(eIn_n>1000){
+				if(eIn_n % 100==0){
                    
-                   
-                  
-                  EnBuf[0]= ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-                  DelayMs(60);
-                  EnBuf[1]= ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-                  EnBuf[2]= ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-              
-				  EnBuf[4]= ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-                 
+						   j++;
 
-			    
-                  if(EnBuf[0]==EnBuf[4]){
-                      
-                      //PMW_AllClose_ABC_Channel();
-                      motor_ref.motor_run = 0;
-                      eIn_n=0;
+                           abs(HALL_Pulse);
+	                       if(j==1){
+	                                EnBuf[0]= ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+	                                end0 = HALL_Pulse;
+ 								   }
+						   else if(j==5){
+						   			EnBuf[1]= ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+	                                end4= HALL_Pulse;
+						  			
+						   			}
+
+						   if(j==5)j=0;
+
+
+					      if(EnBuf[0]==EnBuf[1]){
+                             
+                              z++;
+                              if(z==1) EnBuf[0]= 0xff;
+                              else{
+	                      
+                                PMW_AllClose_ABC_Channel();
+                                motor_ref.motor_run = 0;
+                                eIn_n=0;
+                                z=0;
+                              }
+                        	}
                         
-                  }
                 }
+                if(eIn_n==100)eIn_n =0;
                 
 				
 				
@@ -177,7 +189,7 @@ int main(void)
                      PRINTF("CurrPos : %d\r\n", mCurPosValue);
                     #endif
 					
-                
+             eIn_n ++;    
         
          // PWM_Duty = PID_PWM_Duty;
           Time_CNT++;
@@ -240,7 +252,7 @@ int main(void)
                   }
 
          }
-         PRINTF("Motor Stop ! \r\n");
+         PRINTF("Motor Stop !!!!!!!!!!! \r\n");
          PRINTF("motor_run = %d \r\n",motor_ref.motor_run );
                 
     }

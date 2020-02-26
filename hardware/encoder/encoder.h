@@ -16,7 +16,7 @@ typedef struct _encoder_t_
   int16_t EndPosition;
   int8_t  Home_flag;
   int8_t  End_flag;
-  uint8_t eInit_n;   //初始化起始位置和终点位置的次数
+  uint16_t eInit_n;   //初始化起始位置和终点位置的次数
 
  }encoder_t;
 
