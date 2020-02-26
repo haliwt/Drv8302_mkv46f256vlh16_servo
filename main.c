@@ -130,7 +130,7 @@ int main(void)
 				PRINTF("-HallN=- %d\r\n", HALL_Pulse );
 
 
-				if(eIn_n % 100==0){
+				if(eIn_n % 20 == 0){
                    
 						   j++;
 
@@ -139,19 +139,19 @@ int main(void)
 	                                EnBuf[0]= ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 	                                end0 = HALL_Pulse;
  								   }
-						   else if(j==5){
+						   else if(j==2){
 						   			EnBuf[1]= ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 	                                end4= HALL_Pulse;
 						  			
 						   			}
 
-						   if(j==5)j=0;
+						   if(j==2)j=0;
 
 
 					      if(EnBuf[0]==EnBuf[1]){
                              
-                              z++;
-                              if(z==1) EnBuf[0]= 0xff;
+                            z++;
+							if(z==1) EnBuf[0]= 0xff;
                               else{
 	                      
                                 PMW_AllClose_ABC_Channel();
@@ -162,7 +162,7 @@ int main(void)
                         	}
                         
                 }
-                if(eIn_n==100)eIn_n =0;
+                if(eIn_n==20)eIn_n =0;
                 
 				
 				
