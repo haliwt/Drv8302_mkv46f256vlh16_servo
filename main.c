@@ -69,11 +69,11 @@ int main(void)
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
  
-     uint8_t ucKeyCode=0,kp,ki,kd,z=0;
+     uint8_t ucKeyCode=0,kp,ki,kd,z=0,w=0;
      uint8_t RxBuffer[4],i,judge_n=0;
 	 float KP,KI,KD;
      volatile uint16_t Time_CNT,EnBuf[2]={0,0xff},HEBuf[2];
-	 volatile int32_t mCurPosValue,mHoldPos,eIn_n=0;
+	 volatile int32_t mCurPosValue,mHoldPos,eIn_n=0,H,V;
 	 int16_t j=0;
 
 	 
@@ -105,8 +105,7 @@ int main(void)
     ENC_DoSoftwareLoadInitialPositionValue(DEMO_ENC_BASEADDR); /* Update the position counter with initial value. */
     #endif
 	Dir=3;
-    en_t.Horizon_Position = 0xffff;
-	en_t.Vertical_Position = 0xffff;
+   
 	
    while(1)
    {
@@ -200,6 +199,7 @@ int main(void)
 				
 				
         }
+
 	  
 	   
 #endif 
@@ -223,27 +223,7 @@ int main(void)
                     #ifdef DEBUG_PRINT 
                      PRINTF("CurrPos : %d\r\n", mCurPosValue);
                     #endif
-            if(en_t.eInit_n ==1){
-                 if(Dir == 0)//CCW
-                 {
-                   
-                   
-                   if(abs(mCurPosValue-HEBuf[0]) < 5){
-                       
-                        PMW_AllClose_ABC_Channel();
-                        motor_ref.motor_run =0;
-                     
-                      }
-                      
-                 } 
-                  else{
-                        if(abs(mCurPosValue-HEBuf[1]) < 5){
-                            PMW_AllClose_ABC_Channel();
-                            motor_ref.motor_run =0;
-                          }
-                  }
-                            
-            }    
+               
 					
             
            eIn_n ++;    
@@ -262,11 +242,31 @@ int main(void)
 							 		iError = mCurPosValue - HEBuf[0] ; //
 							}
 						else{
-							  iError = 2000;
-
-						    // if(en_t.eInit_n==0)iError =0;
-							// else
-							// iError = mCurPosValue- en_t.Vertical_Position  ;
+							  if(en_t.eInit_n==0)iError = 0;
+                              else
+                                iError = 2000;
+                              if(en_t.eInit_n ==1){
+                                  
+                                  PRINTF("HB1= %d \n\r",en_t.Vertical_Position);
+							      PRINTF("mCurPosValue= %d \n\r",mCurPosValue);
+							       V = (int32_t)( en_t.Vertical_Position- mCurPosValue);
+								   if(V>=0)
+							      PRINTF("V == %d \n\r",V);
+								   else
+								   	 PRINTF("-V = - %d \n\r",V);
+								    V=abs(V);
+								    PRINTF("abs_V == %d \n\r",V);
+                                   if(V < 5){
+								   	
+										w++;
+										if(w==1)mCurPosValue=0xfff;
+										else
+											{
+												 PMW_AllClose_ABC_Channel();
+			                                     motor_ref.motor_run =0;
+											}
+                                 }
+                              }
 						}
 						iError= abs(iError);
 						PRINTF("iError = %d \r\n",iError);
@@ -289,6 +289,7 @@ int main(void)
                         }
 						last_iError = iError;
 						PWM_Duty = PID_PWM_Duty;
+						
                         
                          
 		}
