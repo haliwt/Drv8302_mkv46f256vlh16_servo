@@ -33,7 +33,7 @@
 #define CW                (int8_t)(-1)
 
 
-#define DEBUG_PRINT         1
+//#define DEBUG_PRINT         1
 
 
 /* BLDC of struct */

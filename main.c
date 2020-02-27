@@ -73,7 +73,7 @@ int main(void)
      uint8_t RxBuffer[4],i,judge_n=0;
 	 float KP,KI,KD;
      volatile uint16_t Time_CNT,EnBuf[2]={0,0xff};
-	 uint32_t mCurPosValue,eIn_n=0;
+	 volatile uint32_t mCurPosValue,mHoldPos,eIn_n=0;
 	 int16_t j=0;
 
 	 
@@ -109,10 +109,10 @@ int main(void)
    while(1)
    {
        ucKeyCode = KEY_Scan(0);
+	   mHoldPos = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
        
-      
 	#ifdef DEBUG_PRINT 
-		   PRINTF("CPHod: %d\r\n", ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR));
+		   PRINTF("CPHod: %d\r\n", mHoldPos);
 	#endif
 			
 		
@@ -121,20 +121,20 @@ int main(void)
         if(en_t.eInit_n ==0){
 			
             PWM_Duty =95;
-            if(eIn_n > 20 ){
+            if(eIn_n > 500 ){
                    
 						   j++;
 
                            abs(HALL_Pulse);
 	                       if(j==1){
-	                                EnBuf[0]= ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+	                                EnBuf[0]=mHoldPos;
 	                                
  								   }
-						   else if(j==2){
-						   			EnBuf[1]= ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+						   else if(j==5){
+						   			EnBuf[1]= mCurPosValue;
 	                               }
 
-						   if(j==2)j=0;
+						   if(j==8)j=0;
 
 							/*judge and setup this Home and End Position */
 					      if(EnBuf[0]==EnBuf[1]){
@@ -187,7 +187,7 @@ int main(void)
                           }
                         
                 }
-                if(eIn_n > 20)eIn_n =0;
+                if(eIn_n > 500)eIn_n =0;
                 
 				
 				
@@ -220,7 +220,7 @@ int main(void)
           Time_CNT++;
 #if 1    
         /* 100ms arithmetic PID */
-    	if(Time_CNT % 100 == 0){
+    	if((Time_CNT % 100 == 0)&&(Time_CNT !=1)){
 
 						mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 						if(Dir == 0)//CCW
