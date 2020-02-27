@@ -121,7 +121,7 @@ int main(void)
         if(en_t.eInit_n ==0){
 			
             PWM_Duty =95;
-            if(eIn_n > 500 ){
+            if(eIn_n > 300 ){
                    
 						   j++;
 
@@ -130,11 +130,11 @@ int main(void)
 	                                EnBuf[0]=mHoldPos;
 	                                
  								   }
-						   else if(j==5){
+						   else if(j==7){
 						   			EnBuf[1]= mCurPosValue;
 	                               }
 
-						   if(j==8)j=0;
+						   if(j==10)j=0;
 
 							/*judge and setup this Home and End Position */
 					      if(EnBuf[0]==EnBuf[1]){
@@ -161,6 +161,7 @@ int main(void)
 														en_t.Horizon_HALL_Pulse =HALL_Pulse;
 												        en_t.Home_flag = 1;
 														en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+														PRINTF("HorizP = %d\r\n",en_t.Horizon_Position);
 										 		}
 												else{
 
@@ -169,6 +170,7 @@ int main(void)
 						                          	 en_t.Vertical_HALL_Pulse = HALL_Pulse;	
 													 en_t.End_flag =1;
 													 en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+													 PRINTF("VertialP = %d\r\n",en_t.Vertical_Position);
 											
 												 	}
 							
@@ -180,6 +182,7 @@ int main(void)
 												en_t.Vertical_HALL_Pulse = HALL_Pulse;
 										        en_t.End_flag = 1;
 												en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+												PRINTF("--VertialP = %d\r\n",en_t.Vertical_Position);
 										 }
 										if(judge_n==2)en_t.eInit_n++;
 										
@@ -187,7 +190,7 @@ int main(void)
                           }
                         
                 }
-                if(eIn_n > 500)eIn_n =0;
+                if(eIn_n > 300)eIn_n =0;
                 
 				
 				
@@ -199,7 +202,11 @@ int main(void)
     /***********motor run main*********************/
      if(motor_ref.motor_run == 1)
       {
-   		 
+   		  if(en_t.eInit_n == 1){ 
+		  	
+		  				PWM_Duty = PID_PWM_Duty;
+						PRINTF("PID_PWM_Duty = %d \r\n",PID_PWM_Duty);
+   		  	}
 		   #ifdef DRV8302 
             GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 		   #endif 
@@ -214,9 +221,10 @@ int main(void)
                      PRINTF("CurrPos : %d\r\n", mCurPosValue);
                     #endif
 					
-             eIn_n ++;    
+            
+           eIn_n ++;    
         
-         // PWM_Duty = PID_PWM_Duty;
+			
           Time_CNT++;
 #if 1    
         /* 100ms arithmetic PID */
@@ -227,7 +235,8 @@ int main(void)
 						iError = mCurPosValue - en_t.Horizon_Position; //
 						else
 							 iError = mCurPosValue - en_t.Vertical_Position;
-						
+						iError= abs(iError);
+						PRINTF("iError = %d \r\n",iError);
 						if((iError<2 )&& (iError>-2)) //´Å±àÂëµÄÎó²î
     						iError = 0;
 						if(iError >=0)//CW
@@ -242,7 +251,7 @@ int main(void)
 						if(dError_sum < -1000)dError_sum = -1000; 
 						PID_PWM_Duty = (int32_t)(iError *KP + dError_sum * KI + (iError - last_iError)*KD);//proportion + itegral + differential
 						PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
-						if(PID_PWM_Duty >=100)PID_PWM_Duty=100;
+						if(PID_PWM_Duty >=100)PID_PWM_Duty=95;
 						if(PID_PWM_Duty <= 0)PID_PWM_Duty =0;
 						 
 						last_iError = iError;
