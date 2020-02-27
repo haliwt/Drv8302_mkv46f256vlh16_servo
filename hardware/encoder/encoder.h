@@ -12,8 +12,8 @@
 
 typedef struct _encoder_t_
 {
-  int16_t Horizon_Position;
-  int16_t Vertical_Position;
+  int32_t Horizon_Position;
+  int32_t Vertical_Position;
   int8_t  Home_flag;
   int8_t  End_flag;
   uint16_t eInit_n;   //初始化起始位置和终点位置的次数
