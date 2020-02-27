@@ -104,9 +104,8 @@ int main(void)
     ENC_Init(DEMO_ENC_BASEADDR, &mEncConfigStruct);
     ENC_DoSoftwareLoadInitialPositionValue(DEMO_ENC_BASEADDR); /* Update the position counter with initial value. */
     #endif
+	Dir=3;
 	
-    
-
    while(1)
    {
        ucKeyCode = KEY_Scan(0);
@@ -120,7 +119,8 @@ int main(void)
 #if 1
 	 /***********Position :Home and End*****************/
         if(en_t.eInit_n ==0){
-                 
+			
+            PWM_Duty =95;
             if(eIn_n > 20 ){
                    
 						   j++;
@@ -136,7 +136,7 @@ int main(void)
 
 						   if(j==2)j=0;
 
-
+							/*judge and setup this Home and End Position */
 					      if(EnBuf[0]==EnBuf[1]){
                              
 	                           z++;
@@ -156,11 +156,22 @@ int main(void)
 										/*set Home position and End position*/
 										 if(HALL_Pulse >=0){
 									    		PRINTF("HallN= %d\r\n", HALL_Pulse );
-												en_t.Horizon_HALL_Pulse =HALL_Pulse;
-										        en_t.Home_flag = 1;
-												if((judge_n==2)&&(en_t.End_flag !=1)){
-													
-							                       en_t.Vertical_HALL_Pulse = HALL_Pulse;	
+												en_t.Horizon_J_n++;
+										 		if(en_t.Horizon_J_n==1){
+														en_t.Horizon_HALL_Pulse =HALL_Pulse;
+												        en_t.Home_flag = 1;
+														en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+										 		}
+												else{
+
+													if((judge_n==2)&&(en_t.End_flag !=1)){
+												
+						                          	 en_t.Vertical_HALL_Pulse = HALL_Pulse;	
+													 en_t.End_flag =1;
+													 en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+											
+												 	}
+							
 												}
 												
 						                 }
@@ -168,6 +179,7 @@ int main(void)
 										        PRINTF("-HallN=- %d\r\n", HALL_Pulse );
 												en_t.Vertical_HALL_Pulse = HALL_Pulse;
 										        en_t.End_flag = 1;
+												en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 										 }
 										if(judge_n==2)en_t.eInit_n++;
 										
@@ -187,7 +199,7 @@ int main(void)
     /***********motor run main*********************/
      if(motor_ref.motor_run == 1)
       {
-   		    PWM_Duty =95;
+   		 
 		   #ifdef DRV8302 
             GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 		   #endif 
@@ -211,9 +223,12 @@ int main(void)
     	if(Time_CNT % 100 == 0){
 
 						mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
-						//iError = mCurPosValue - sPID.SetPoint ; //
-						iError = 60;
-						if((iError<5 )&& (iError>-5)) //´Å±àÂëµÄÎó²î
+						if(Dir == 0)//CCW
+						iError = mCurPosValue - en_t.Horizon_Position; //
+						else
+							 iError = mCurPosValue - en_t.Vertical_Position;
+						
+						if((iError<2 )&& (iError>-2)) //´Å±àÂëµÄÎó²î
     						iError = 0;
 						if(iError >=0)//CW
 						{

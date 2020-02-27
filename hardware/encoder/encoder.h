@@ -12,13 +12,14 @@
 
 typedef struct _encoder_t_
 {
-  int16_t HomePosition;
-  int16_t EndPosition;
+  int16_t Horizon_Position;
+  int16_t Vertical_Position;
   int8_t  Home_flag;
   int8_t  End_flag;
   uint16_t eInit_n;   //初始化起始位置和终点位置的次数
   int16_t Horizon_HALL_Pulse;  //水平位置hall 方向判断
   int16_t Vertical_HALL_Pulse; //垂直位置hall 方向判断
+  uint8_t Horizon_J_n;  //水平判断hall ，方向次数
 
  }encoder_t;
 
