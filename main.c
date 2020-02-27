@@ -63,14 +63,14 @@ __IO uint16_t  PID_PWM_Duty;
 ******************************************************************************/
 int main(void)
 {
-
+    
      enc_config_t mEncConfigStruct;
 	 int32_t iError,dError_sum,last_iError;
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
  
-     uint8_t ucKeyCode=0,kp,ki,kd;
-     uint8_t RxBuffer[4],i,z=0;
+     uint8_t ucKeyCode=0,kp,ki,kd,z=0;
+     uint8_t RxBuffer[4],i,judge_n=0;
 	 float KP,KI,KD;
      volatile uint16_t Time_CNT,EnBuf[2]={0,0xff};
 	 uint32_t mCurPosValue,eIn_n=0;
@@ -121,15 +121,7 @@ int main(void)
 	 /***********Position :Home and End*****************/
         if(en_t.eInit_n ==0){
                  
-                
-				
-				if(HALL_Pulse >=0)
-			    PRINTF("HallN= %d\r\n", HALL_Pulse );
-				else 
-				PRINTF("-HallN=- %d\r\n", HALL_Pulse );
-
-
-				if(eIn_n > 20 ){
+            if(eIn_n > 20 ){
                    
 						   j++;
 
@@ -140,30 +132,47 @@ int main(void)
  								   }
 						   else if(j==2){
 						   			EnBuf[1]= ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-	                                
-						  			
-						   			}
+	                               }
 
 						   if(j==2)j=0;
 
 
 					      if(EnBuf[0]==EnBuf[1]){
                              
-                             z++;
-                           if(z==1) {
-                             
-                                EnBuf[1]= 0xfff;
-								PRINTF("Z==1 ZZZZZZZZZZZ \n\r");
-                             }
-						   else
-                              {
-	                            PRINTF("Z==2 ############# \n\r");
-                                PMW_AllClose_ABC_Channel();
-                                motor_ref.motor_run = 0;
-                                eIn_n=0;
-                                z=0;
-                              }
-                        	}
+	                           z++;
+	                           if(z==1) {
+	                             
+	                                EnBuf[1]= 0xfff;
+									PRINTF("Z==1 ZZZZZZZZZZZ \n\r");
+	                             }
+							   else{
+										judge_n++; /*judge home and end position twice*/
+										PRINTF("Z==2 ############# \n\r");
+		                                PMW_AllClose_ABC_Channel();
+		                                motor_ref.motor_run = 0;
+		                                eIn_n=0;
+		                                z=0;
+										
+										/*set Home position and End position*/
+										 if(HALL_Pulse >=0){
+									    		PRINTF("HallN= %d\r\n", HALL_Pulse );
+												en_t.Horizon_HALL_Pulse =HALL_Pulse;
+										        en_t.Home_flag = 1;
+												if((judge_n==2)&&(en_t.End_flag !=1)){
+													
+							                       en_t.Vertical_HALL_Pulse = HALL_Pulse;	
+												}
+												
+						                 }
+										 else{
+										        PRINTF("-HallN=- %d\r\n", HALL_Pulse );
+												en_t.Vertical_HALL_Pulse = HALL_Pulse;
+										        en_t.End_flag = 1;
+										 }
+										if(judge_n==2)en_t.eInit_n++;
+										
+	                              }
+                          }
                         
                 }
                 if(eIn_n > 20)eIn_n =0;
@@ -268,7 +277,7 @@ int main(void)
 
 	  switch(ucKeyCode){ 
                  
-                  case DIR_DOWN_PRES ://Dir =1
+                  case DIR_CW_PRES ://Dir =1 ,PTE29-CW,KEY1
 				  	// Dir = 1;
 			
                     if(Dir == 0) //
@@ -332,8 +341,8 @@ int main(void)
 #endif              
 				  break;
 		
-				 case DIR_UP_PRES: //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª Dir = 0;ï¿½ï¿½ï¿½Ï¡ï¿½--ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½
-				   // Dir = 0 ; //ï¿½ï¿½Ê±ï¿½ï¿½
+				 case DIR_CCW_PRES: //Dir = 0;PTE24 = CCW,KEY3
+				   // Dir = 0 ; //
 				
 				   PRINTF("DIR =0\r\n");
 	  			

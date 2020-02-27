@@ -58,10 +58,10 @@ typedef enum
 
 
 
-//#define BRAKE_PRES              1      //PTA1
-#define DIR_DOWN_PRES           	1      //PTE29
+//#define BRAKE_PRES                1      //PTA1，顺时针旋转
+#define DIR_CW_PRES           	    1      //PTE29
 #define START_PRES              	2      //PTE25
-#define DIR_UP_PRES             	3      //PTE24, DIR KEY
+#define DIR_CCW_PRES             	3      //PTE24, 逆时针旋转
 #define DIGITAL_ADD_PRES        	4      //PTA12,
 #define DIGITAL_REDUCE_PRES     	5      //PTA13,
 #define DOOR_PRES               	6      //PTA2,
