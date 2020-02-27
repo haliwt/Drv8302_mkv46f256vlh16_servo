@@ -74,7 +74,7 @@ int main(void)
 	 float KP,KI,KD;
      volatile uint16_t Time_CNT,EnBuf[2]={0,0xff};
 	 uint32_t mCurPosValue,eIn_n=0;
-	 int16_t end0,end4,j=0;
+	 int16_t j=0;
 
 	 
     
@@ -136,26 +136,26 @@ int main(void)
                            abs(HALL_Pulse);
 	                       if(j==1){
 	                                EnBuf[0]= ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-	                                end0 = HALL_Pulse;
+	                                
  								   }
 						   else if(j==2){
 						   			EnBuf[1]= ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-	                                end4= HALL_Pulse;
+	                                
 						  			
 						   			}
 
-						   if(j==3)j=0;
+						   if(j==2)j=0;
 
 
 					      if(EnBuf[0]==EnBuf[1]){
                              
                              z++;
-                             if(z==1) {
+                           if(z==1) {
                              
-                             	EnBuf[1]= 0xfff;
-                             	PRINTF("Z==1 ZZZZZZZZZZZ \n\r");
-                              }
-							 else
+                                EnBuf[1]= 0xfff;
+								PRINTF("Z==1 ZZZZZZZZZZZ \n\r");
+                             }
+						   else
                               {
 	                            PRINTF("Z==2 ############# \n\r");
                                 PMW_AllClose_ABC_Channel();
