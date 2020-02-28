@@ -143,12 +143,12 @@ int main(void)
                              
 	                           z++;
 	                           if(z==1) {
-	                                DelayMs(100);
+	                                DelayMs(10);
 	                                EnBuf[1]= 0;
 									EnBuf[0]=0;
 									PRINTF("Z==1 ZZZZZZZZZZZ \n\r");
 	                             }
-							  else if(z >=2){
+							  else if(z ==2){
 										judge_n++; /*judge home and end position twice*/
 										PRINTF("Z==2 ############# \n\r");
 		                                PMW_AllClose_ABC_Channel();
@@ -237,7 +237,7 @@ int main(void)
     	if(Time_CNT % 100== 0){
 
 						mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
-						if(Dir == 0)//CCW
+						if(Dir == 0)//CCW HB0 = Horizion
 						{
 								if(en_t.eInit_n==0)iError = 0;
 								else
@@ -255,38 +255,45 @@ int main(void)
 								    H=abs(H);
 								    PRINTF("abs_H == %d \n\r",H);
                                    	if((H == 0)||(H< 5)){
-								   	
-										
+								   			m++;
+										    if(m==1)DelayMs(10);
+											else{
 											 PMW_AllClose_ABC_Channel();
 		                                     motor_ref.motor_run =0;
-											 PRINTF("z = %d \n\r",m);
+											 PRINTF("hor = %d \n\r",m);
 											 m=0;
+											}
 										
 									}
 								}
 						}
-						else{
+						else{  //Vertical HB1
 							  if(en_t.eInit_n==0)iError = 0;
                               else
                                 iError = 2000;
                               if(en_t.eInit_n ==1){
                                   
-                                  PRINTF("HB1= %d \n\r",en_t.Vertical_Position);
+                                  PRINTF("VER= %d \n\r",en_t.Vertical_Position);
 							      PRINTF("mCurPosValue= %d \n\r",mCurPosValue);
-							       V = (int32_t)( en_t.Vertical_Position- mCurPosValue);
+							       V = (int32_t)( en_t.Vertical_Position + mCurPosValue);
 								   if(V>=0)
 							      PRINTF("V == %d \n\r",V);
 								   else
 								   	 PRINTF("-V = - %d \n\r",V);
 								    V=abs(V);
 								    PRINTF("abs_V == %d \n\r",V);
-                                   if((V == 0)||(V<6)){
+                                   if((V == 0)||(V<5)){
 								   	
-										
+										w++;
+										if(w==1){
+											   DelayMs(10);
+											}
+										else{	
 										 PMW_AllClose_ABC_Channel();
 	                                     motor_ref.motor_run =0;
 										 PRINTF("W = %d \n\r",w);
 										 w=0;
+										}
 											
                                  }
                               }
@@ -301,26 +308,22 @@ int main(void)
 						if(dError_sum < -1000)dError_sum = -1000; 
 						PID_PWM_Duty = (int32_t)(iError *KP + dError_sum * KI + (iError - last_iError)*KD);//proportion + itegral + differential
 						PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
-						if(PID_PWM_Duty >=100)PID_PWM_Duty=98;
-                      
-						else{
-                               if(en_t.eInit_n==1){
-								   PRINTF("sECOND_H = %d \n\r",H);
-	                               	if((H == 0)||(H<14)){
-								   	
-										PMW_AllClose_ABC_Channel();
-	                                 	motor_ref.motor_run =0;
-									 	PRINTF("z = %d \n\r",m);
-												
-									}
-									if(PID_PWM_Duty<=10){
-										PMW_AllClose_ABC_Channel();
-	                                 	motor_ref.motor_run =0;
-									}
-									
-                              }
+						if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
+                        if(w==2){
+							 PMW_AllClose_ABC_Channel();
+                             motor_ref.motor_run =0;
+							 PRINTF("W = %d \n\r",w);
+							 w=0;
+						}
+						if(m==2){
+							 PMW_AllClose_ABC_Channel();
+                             motor_ref.motor_run =0;
+							 PRINTF("hor = %d \n\r",m);
+							 m=0;
+						}
+                     
 						  
-                        }
+                        
 						last_iError = iError;
 						PWM_Duty = PID_PWM_Duty;
 						
