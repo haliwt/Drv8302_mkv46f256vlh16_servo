@@ -72,7 +72,7 @@ int main(void)
      uint8_t ucKeyCode=0,kp,ki,kd,z=0,w=0,m=0;
      uint8_t RxBuffer[4],i,judge_n=0;
 	 float KP,KI,KD;
-     volatile uint16_t Time_CNT,EnBuf[2]={0,0xff};
+     volatile uint16_t Time_CNT,EnBuf[2]={0,0};
 	 volatile int32_t mCurPosValue,mHoldPos,eIn_n=0,H,V;
 	 int16_t j=0;
 
@@ -119,9 +119,10 @@ int main(void)
 		
 #if 1
 	 /***********Position :Home and End*****************/
-        if(en_t.eInit_n ==0){
-			
-            PWM_Duty =98;
+        if(en_t.eInit_n ==0)
+        {
+			PWM_Duty =50;
+            
             if(eIn_n > 300 ){
                    
 						   j++;
@@ -138,15 +139,16 @@ int main(void)
 						   if(j==10)j=0;
 
 							/*judge and setup this Home and End Position */
-					      if(EnBuf[0]==EnBuf[1]){
+					      if((EnBuf[0]==EnBuf[1])&&(EnBuf[0]>=1 || EnBuf[1]>=1)){
                              
 	                           z++;
 	                           if(z==1) {
-	                             
-	                                EnBuf[1]= 0xfff;
+	                                DelayMs(100);
+	                                EnBuf[1]= 0;
+									EnBuf[0]=0;
 									PRINTF("Z==1 ZZZZZZZZZZZ \n\r");
 	                             }
-							   else{
+							  else if(z >=2){
 										judge_n++; /*judge home and end position twice*/
 										PRINTF("Z==2 ############# \n\r");
 		                                PMW_AllClose_ABC_Channel();
@@ -208,8 +210,8 @@ int main(void)
      if(motor_ref.motor_run == 1)
       {
    		  if(en_t.eInit_n == 1)PWM_Duty = PID_PWM_Duty;
-						
-   		  
+				
+   		 
 		   #ifdef DRV8302 
             GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 		   #endif 
@@ -254,17 +256,12 @@ int main(void)
 								    PRINTF("abs_H == %d \n\r",H);
                                    	if((H == 0)||(H< 5)){
 								   	
-										m++;
-										if(m==1){
-											    mCurPosValue=0xfff;
-											 }
-										else if(m==5)
-											{
-												 PMW_AllClose_ABC_Channel();
-			                                     motor_ref.motor_run =0;
-												 PRINTF("z = %d \n\r",m);
-												 m=0;
-											}
+										
+											 PMW_AllClose_ABC_Channel();
+		                                     motor_ref.motor_run =0;
+											 PRINTF("z = %d \n\r",m);
+											 m=0;
+										
 									}
 								}
 						}
@@ -283,19 +280,14 @@ int main(void)
 								   	 PRINTF("-V = - %d \n\r",V);
 								    V=abs(V);
 								    PRINTF("abs_V == %d \n\r",V);
-                                   if((V == 0)||(V<2)){
+                                   if((V == 0)||(V<6)){
 								   	
-										w++;
-										if(w==1){
-											    mCurPosValue=0xfff;
-											 }
-										else if(w==6)
-											{
-												 PMW_AllClose_ABC_Channel();
-			                                     motor_ref.motor_run =0;
-												 PRINTF("W = %d \n\r",w);
-												 w=0;
-											}
+										
+										 PMW_AllClose_ABC_Channel();
+	                                     motor_ref.motor_run =0;
+										 PRINTF("W = %d \n\r",w);
+										 w=0;
+											
                                  }
                               }
 						}

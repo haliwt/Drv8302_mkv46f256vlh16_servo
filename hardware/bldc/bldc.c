@@ -126,7 +126,7 @@ void PWM_BLDC_Init(void)
    
 	pwmConfig.enableDebugMode = true;  //WT.EDIT 2019-07-13
     /* Use full cycle reload */
-    pwmConfig.reloadLogic =kPWM_ReloadPwmHalfCycle;//kPWM_ReloadPwmFullCycle;//kPWM_ReloadPwmHalfCycle; //WT.EDIT 2019-07-13 //kPWM_ReloadPwmFullCycle;
+    pwmConfig.reloadLogic =kPWM_ReloadPwmFullCycle;
     /* PWM A & PWM B form a complementary PWM pair */
     pwmConfig.pairOperation   = kPWM_Independent; //WT.EDIT kPWM_ComplementaryPwmA;
     pwmConfig.enableDebugMode = true;
@@ -141,8 +141,8 @@ void PWM_BLDC_Init(void)
     }
 
    /* Initialize submodule 1 */
-    //pwmConfig.clockSource           = kPWM_Submodule0Clock;
-    pwmConfig.clockSource           =  kPWM_BusClock; //WT.EDIT 2019-06-29
+   // pwmConfig.clockSource           = kPWM_Submodule0Clock;
+     pwmConfig.clockSource           =  kPWM_BusClock; //WT.EDIT 2019-06-29
     //pwmConfig.initializationControl = kPWM_Initialize_MasterSync;
     pwmConfig.initializationControl = kPWM_Initialize_LocalSync;//WT.EDIT 2019-06-29
     if (PWM_Init(BOARD_PWM_BASEADDR, kPWM_Module_1, &pwmConfig) == kStatus_Fail)
@@ -203,13 +203,14 @@ static void PWM_DRV_Init3PhPwm(void)
     uint16_t deadTimeVal;
     pwm_signal_param_t pwmSignal[2];
     uint32_t pwmSourceClockInHz;
-    uint32_t pwmFrequencyInHz = 10000;//edit 2020.02.25//20000; //1.3KHZ
+    uint32_t pwmFrequencyInHz = 600;//20000;//edit 2020.02.25//20000;//60000 //1.3KHZ
 
 
     pwmSourceClockInHz = PWM_SRC_CLK_FREQ;
 
     /* Set deadtime count, we set this to about 650ns */
-    deadTimeVal = 650;//((uint64_t)pwmSourceClockInHz * 650) / 1000000000;
+      deadTimeVal = ((uint64_t)pwmSourceClockInHz * 650) / 1000000000;
+	
 
     pwmSignal[0].pwmChannel       = kPWM_PwmA;
     pwmSignal[0].level            = kPWM_HighTrue;

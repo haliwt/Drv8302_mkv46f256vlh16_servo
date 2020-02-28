@@ -10,8 +10,7 @@
 
 
 
-#define PWM_SRC_CLK_FREQ 	CLOCK_GetFreq(kCLOCK_FastPeriphClk)//CLOCK_GetOsc0ErClkFreq() //CLOCK_GetFreq(kCLOCK_FastPeriphClk)// //WT.EDIT //84Mhz 
-                                                    ////CLOCK_GetFreq(kCLOCK_LpoClk)
+#define PWM_SRC_CLK_FREQ 	CLOCK_GetFreq(kCLOCK_FastPeriphClk)//84MHz
 /* The PWM base address */
 #define BOARD_PWM_BASEADDR PWMA
 
@@ -35,7 +34,7 @@
 
 //#define DEBUG_PRINT         1
 
-
+//#define DRV8302            1
 /* BLDC of struct */
 typedef struct _BLDC_Typedef_{
   __IO int32_t  uwStep ;  	  // 电机旋转状态
