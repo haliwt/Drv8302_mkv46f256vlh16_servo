@@ -256,14 +256,18 @@ int main(void)
 								   	 PRINTF("-V = - %d \n\r",V);
 								    V=abs(V);
 								    PRINTF("abs_V == %d \n\r",V);
-                                   if(V < 5){
+                                   if(V == 0){
 								   	
 										w++;
-										if(w==1)mCurPosValue=0xfff;
-										else
+										if(w==1){
+											    mCurPosValue=0xfff;
+											 }
+										else if(w==3)
 											{
 												 PMW_AllClose_ABC_Channel();
 			                                     motor_ref.motor_run =0;
+												 PRINTF("W = %d \n\r",w);
+												 w=0;
 											}
                                  }
                               }
