@@ -280,15 +280,17 @@ int main(void)
 								   	PRINTF("-H = - %d \n\r",H);
 								    H=abs(H);
 								    PRINTF("abs_H == %d \n\r",H);
-                                   	if((H == 0)||(H< 5)){
+                                   	if((H == 0)||(H==1)){
 								   			m++;
-										    if(m==1)DelayMs(10);
+										    if(m==1){
+												H=0xff;
+										    }
 											else{
 											 PMW_AllClose_ABC_Channel();
 		                                     motor_ref.motor_run =0;
-											 PRINTF("hor = %d \n\r",m);
 											 PRINTF("PIDHor_HALL = %d\r\n",en_t.Horizon_HALL_Pulse);
-											// m=0;
+											 m=0;
+											 PRINTF("HHHHHHHHHH\r\n");
 											}
 										
 									}
@@ -303,7 +305,9 @@ int main(void)
                                 PID_PWM_Duty = (int32_t)(iError *KP + dError_sum * KI + (iError - last_iError)*KD);//proportion + itegral + differential
 								iError= abs(iError);
 								PRINTF("iError = %d \r\n",iError);
-								PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
+								if(PID_PWM_Duty >=0)
+									PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
+								else PRINTF("-PID pwm= -%d\r \n",PID_PWM_Duty);
 								if(PID_PWM_Duty >=20)PID_PWM_Duty=50;
 		                     	last_iError = iError;
 								PWM_Duty = PID_PWM_Duty;
@@ -327,29 +331,28 @@ int main(void)
 								   	 PRINTF("-V = - %d \n\r",V);
 								    V=abs(V);
 								    PRINTF("abs_V == %d \n\r",V);
-                                   if((V == 0)||(V==1)){
+                                   if((V == 0)||(V==1)||(V==2)){
 								   	
+										 w++;
+										 if(w==1){
+										 	
+                                   	     }
+										 else{
 										
-										 PMW_AllClose_ABC_Channel();
-	                                     motor_ref.motor_run =0;
-										 PRINTF("Ver_HALL = %d\r\n",en_t.Vertical_HALL_Pulse);
-										 w=0;
-										}
-											
-                                 }
-                             
-							  
+										     PMW_AllClose_ABC_Channel();
+		                                     motor_ref.motor_run =0;
+											 PRINTF("Ver_HALL = %d\r\n",en_t.Vertical_HALL_Pulse);
+											 w=0;
+											 PRINTF("VVVVVVVVVV\n\r");
+										 }
+								   }
+                             }
 						}
 						
-						
-                        
-                         
-		}
+        }
 	   if(Time_CNT ==100)
 			Time_CNT = 0;
-
-              
-#endif 
+	   #endif 
 	} 
     else { 
             PMW_AllClose_ABC_Channel();
