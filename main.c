@@ -164,7 +164,7 @@ int main(void)
 														en_t.Horizon_HALL_Pulse =HALL_Pulse;
 												        en_t.Home_flag = 1;
 														en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-														
+														en_t.First_H_dec = 1;
 														PRINTF("HorizP_1 = %d\r\n",en_t.Horizon_Position);
 														PRINTF("Hor_HALL_1 = %d\r\n",en_t.Horizon_HALL_Pulse);
 										 		}
@@ -172,14 +172,26 @@ int main(void)
 
 														if((judge_n==2)&&(en_t.End_flag !=1)){
 
-														
-															    en_t.Horizon_HALL_Pulse =HALL_Pulse;
-														        en_t.End_flag = 1;
-																en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+														        /*第一检测到垂直位置，进行第二次检测*/
+															    
+																if(en_t.First_V_dec==1){
+																	en_t.Horizon_HALL_Pulse =HALL_Pulse;
+															        en_t.End_flag = 1;
+																	en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 																
-																PRINTF("Vertical_2 = %d\r\n",en_t.Vertical_Position);
-																PRINTF("Ver_HALL_2 = %d\r\n",en_t.Horizon_HALL_Pulse);
-														
+																	PRINTF("HorizP_2 = %d\r\n",en_t.Horizon_Position);
+																	PRINTF("Hor_HALL_2 = %d\r\n",en_t.Horizon_HALL_Pulse);
+																	
+																}
+																else{
+																	/**/
+																	en_t.Vertical_HALL_Pulse =HALL_Pulse;
+															        en_t.End_flag = 1;
+																	en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+																	
+																	PRINTF("Vertical_2 = %d\r\n",en_t.Vertical_Position);
+																	PRINTF("Ver_HALL_2 = %d\r\n",en_t.Vertical_HALL_Pulse);
+																}
 													 
 												        }
 												 
@@ -192,6 +204,7 @@ int main(void)
 													 PRINTF("-HallN 1=- %d\r\n", HALL_Pulse );
 													 en_t.Vertical_HALL_Pulse = HALL_Pulse;
 											         en_t.Home_flag = 1;
+													 en_t.First_V_dec =1;
 													 en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 													
 													 PRINTF("--Ver_1 = %d\r\n",en_t.Vertical_Position);
@@ -201,14 +214,32 @@ int main(void)
 												}
 												else if((judge_n== 2 )&& (en_t.End_flag !=1)){ 
 
-													/*水平位置-第二次*/
-													PRINTF("-HallN 2=- %d\r\n", HALL_Pulse );
-													en_t.Horizon_HALL_Pulse = HALL_Pulse;
-											        en_t.End_flag = 1;
-													en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 													
-													 PRINTF("--VorP_2= %d\r\n",en_t.Horizon_Position);
-													 PRINTF("--Vor_HALL_2 =- %d\r\n",en_t.Horizon_HALL_Pulse);
+													/*第一次检测到水平位置，第二检测*/
+													if(en_t.First_H_dec == 1){
+														
+ 															
+														PRINTF("-HallN 2=- %d\r\n", HALL_Pulse );
+														 en_t.Vertical_HALL_Pulse = HALL_Pulse;
+														 en_t.End_flag = 1;
+														 en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+														
+														 PRINTF("--Ver_2 = %d\r\n",en_t.Vertical_Position);
+														 PRINTF("--Ver_HALL_2 =- %d\r\n",en_t.Vertical_HALL_Pulse);
+													}
+													else{
+														
+														/*水平位置-第二次*/
+														PRINTF("-HallN 2=- %d\r\n", HALL_Pulse );
+														en_t.Horizon_HALL_Pulse = HALL_Pulse;
+												        en_t.End_flag = 1;
+														en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+														
+														 PRINTF("--VorP_2= %d\r\n",en_t.Horizon_Position);
+														 PRINTF("--Vor_HALL_2 =- %d\r\n",en_t.Horizon_HALL_Pulse);
+
+													}
+														
 												}
 										 }
 								 if(judge_n==2)en_t.eInit_n++;
@@ -280,7 +311,7 @@ int main(void)
 								   	PRINTF("-H = - %d \n\r",H);
 								    H=abs(H);
 								    PRINTF("abs_H == %d \n\r",H);
-                                   	if((H == 0)||(H==1)){
+                                   	if((H == 0)||(H==1)||(H==2)){
 								   			m++;
 										    if(m==1){
 												H=0xff;
@@ -305,7 +336,7 @@ int main(void)
                                 PID_PWM_Duty = (int32_t)(iError *KP + dError_sum * KI + (iError - last_iError)*KD);//proportion + itegral + differential
 								iError= abs(iError);
 								PRINTF("iError = %d \r\n",iError);
-								if(PID_PWM_Duty >=0)
+								if(PID_PWM_Duty >= 0)
 									PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
 								else PRINTF("-PID pwm= -%d\r \n",PID_PWM_Duty);
 								if(PID_PWM_Duty >=20)PID_PWM_Duty=50;
