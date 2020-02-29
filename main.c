@@ -165,24 +165,26 @@ int main(void)
 												        en_t.Home_flag = 1;
 														en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 														
-														PRINTF("HorizP = %d\r\n",en_t.Horizon_Position);
-														PRINTF("Hor_HALL = %d\r\n",en_t.Horizon_HALL_Pulse);
+														PRINTF("HorizP_1 = %d\r\n",en_t.Horizon_Position);
+														PRINTF("Hor_HALL_1 = %d\r\n",en_t.Horizon_HALL_Pulse);
 										 		}
 												else{
 
-												        if((judge_n==2)&&(en_t.End_flag !=1)){
-													
-							                          	 en_t.Vertical_HALL_Pulse = HALL_Pulse;	
-														 en_t.End_flag =1;
-														 en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+														if((judge_n==2)&&(en_t.End_flag !=1)){
+
 														
-														 PRINTF("VertialP = %d\r\n",en_t.Vertical_Position);
-														 PRINTF("Ver_HALL = %d\r\n",en_t.Vertical_HALL_Pulse);
-												
-													 	}
-												}
+															    en_t.Horizon_HALL_Pulse =HALL_Pulse;
+														        en_t.End_flag = 1;
+																en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+																
+																PRINTF("Vertical_2 = %d\r\n",en_t.Vertical_Position);
+																PRINTF("Ver_HALL_2 = %d\r\n",en_t.Horizon_HALL_Pulse);
+														
+													 
+												        }
 												 
-							             }
+							                     }
+										 }
 										else{
 
 												en_t.Vertical_J_n++;
@@ -205,9 +207,8 @@ int main(void)
 											        en_t.End_flag = 1;
 													en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 													
-													 PRINTF("--VertialP_2= %d\r\n",en_t.Horizon_Position);
-													 PRINTF("--Ver_HALL_2 =- %d\r\n",en_t.Horizon_HALL_Pulse);
-
+													 PRINTF("--VorP_2= %d\r\n",en_t.Horizon_Position);
+													 PRINTF("--Vor_HALL_2 =- %d\r\n",en_t.Horizon_HALL_Pulse);
 												}
 										 }
 								 if(judge_n==2)en_t.eInit_n++;
@@ -292,36 +293,30 @@ int main(void)
 										
 									}
 								}
+								
+								dError_sum += iError; /*误差累计和*/
+								
+								if(iError<2) //磁编码的误差 iError <36
+		    						iError = 0;
+							    if(dError_sum > 1000)dError_sum =1000; //积分限幅
+								if(dError_sum < -1000)dError_sum = -1000; 
+                                PID_PWM_Duty = (int32_t)(iError *KP + dError_sum * KI + (iError - last_iError)*KD);//proportion + itegral + differential
 								iError= abs(iError);
 								PRINTF("iError = %d \r\n",iError);
-								if(iError<37) //磁编码的误差 iError <36
-		    						iError = 0;
-							
-								dError_sum += iError; /*误差累计和*/
-								if(dError_sum > 1000)dError_sum =1000; //积分限幅
-								if(dError_sum < -1000)dError_sum = -1000; 
-								PID_PWM_Duty = (int32_t)(iError *KP + dError_sum * KI + (iError - last_iError)*KD);//proportion + itegral + differential
 								PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
 								if(PID_PWM_Duty >=20)PID_PWM_Duty=50;
-		                     
-								if(m >2){
-									 PMW_AllClose_ABC_Channel();
-		                             motor_ref.motor_run =0;
-									 PRINTF("second-hor = %d \n\r",m);
-									 PRINTF("sPIDHor_HALL = %d\r\n",en_t.Horizon_HALL_Pulse);
-									 m=0;
-								}
-		                     
-								  
-		                        
-								last_iError = iError;
+		                     	last_iError = iError;
 								PWM_Duty = PID_PWM_Duty;
 						}
+								
+								  
+		                        
+								
 						else{  //Vertical HB1
 						     
                               if(en_t.eInit_n ==1){
                                   
-                                  PRINTF("VEND= %d \n\r",en_t.Vertical_Position);
+                                  PRINTF("VENDPOS= %d \n\r",en_t.Vertical_Position);
 							      PRINTF("mCurPosValue= %d \n\r",mCurPosValue);
 							      en_t.Vertical_Position = abs(en_t.Vertical_Position);
 							      mCurPosValue = abs(mCurPosValue);
@@ -337,8 +332,7 @@ int main(void)
 										
 										 PMW_AllClose_ABC_Channel();
 	                                     motor_ref.motor_run =0;
-										 PRINTF("W = %d \n\r",w);
-										  PRINTF("PID_Ver_HALL = %d\r\n",en_t.Vertical_HALL_Pulse);
+										 PRINTF("Ver_HALL = %d\r\n",en_t.Vertical_HALL_Pulse);
 										 w=0;
 										}
 											
