@@ -20,7 +20,7 @@ typedef struct _encoder_t_
   int16_t Horizon_HALL_Pulse;  //水平位置hall 方向判断
   int16_t Vertical_HALL_Pulse; //垂直位置hall 方向判断
   uint8_t Horizon_J_n;  //水平判断hall ，方向次数
-
+  uint8_t Vertical_J_n; 
  }encoder_t;
 
 #define abs(x)    ((x)>0?(x):-(x))
