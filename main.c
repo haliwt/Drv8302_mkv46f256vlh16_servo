@@ -53,6 +53,8 @@ encoder_t en_t;
 int32_t PID_Result;
 PID_TypeDef  sPID;
 __IO int32_t  PID_PWM_Duty;
+BLDC_Typedef BLDCMotor;
+
 
 /*******************************************************************************
  *
@@ -308,18 +310,18 @@ int main(void)
 								else
                                 {
 							 		iError = mCurPosValue - en_t.Horizon_Position ; //
-								//	#ifdef DEBUG_PRINT
+									#ifdef DEBUG_PRINT
                                		PRINTF("HB0= %d \n\r",en_t.Horizon_Position);
 							      	PRINTF("mCurPosValue= %d \n\r",mCurPosValue);
 								    PRINTF("currHALL= %d \n\r",HALL_Pulse);
-								//	#endif
+									#endif
 								    mCurPosValue = abs(mCurPosValue);
 							       	H = iError;
 								   	if(H>=0)
 							      	PRINTF("H = %d \n\r",H);
 								   	else
 								   	PRINTF("-H = - %d \n\r",H);
-                                   	if(((H == 0)||(H == -1||H ==1)||(H==2||H==-2))&&(HALL_Pulse>10)){
+                                   	if(((H == 0)||(H == -1||H ==1)||(H==2||H==-2)||(H==3||H==-3)||(H==4||H==-4)||(H==5||H==-5))&&(HALL_Pulse>10)){
 										
 
 									        m++;
@@ -334,10 +336,12 @@ int main(void)
 												 
 												 PMW_AllClose_ABC_Channel();
 			                                     motor_ref.motor_run =0;
-												 PRINTF("PIDHor_HALL = %d\r\n",en_t.Horizon_HALL_Pulse);
-												 m=0;
-												 PRINTF("HHHHHHHHHH\r\n");
+												 PRINTF("H= %d\r\n",H);
+												 PRINTF("PID_PWM_Duty = %d\r\n",PID_PWM_Duty);
 												 HALL_Pulse =0;
+												  m=0;
+												 PRINTF("HHHHHHHHHH\r\n");
+												  BLDCMotor.Lock_Time=0;
 										    }
 											
 									}
@@ -348,59 +352,73 @@ int main(void)
 							    if(dError_sum > 1000)dError_sum =1000; //�����޷�
 								if(dError_sum < -1000)dError_sum = -1000; 
                                 PID_PWM_Duty = (int32_t)(iError *KP + dError_sum * KI + (iError - last_iError)*KD);//proportion + itegral + differential
-						
+						        #ifdef DEBUG_PRINT
 								if(PID_PWM_Duty > 0)
 									PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
 								else if(PID_PWM_Duty == 0)PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
 								else PRINTF("-PID pwm= -%d\r \n",PID_PWM_Duty);
-
+								#endif
 								PID_PWM_Duty = abs(PID_PWM_Duty);
-								if(PID_PWM_Duty >=20)PID_PWM_Duty=50;
+								if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
 			
 		                     	last_iError = iError;
 								PWM_Duty = PID_PWM_Duty;
+								HALL_Pulse =0;
 								
 						}
 						else{  //Vertical Position judge is boundary
 						     
-                              if(en_t.eInit_n ==1){
+                               if(en_t.eInit_n ==1){
+							  
                                 #ifdef DEBUG_PRINT 
                                   PRINTF("VENDPOS= %d \n\r",en_t.Vertical_Position);
 								  PRINTF("VcurrHALL= %d \n\r",HALL_Pulse);
 							      PRINTF("mCurPosValue= %d \n\r",mCurPosValue);
 							    #endif 
-							      en_t.Vertical_Position = abs(en_t.Vertical_Position);
-							      mCurPosValue = abs(mCurPosValue);
+							       en_t.Vertical_Position = abs(en_t.Vertical_Position);
+							       mCurPosValue = abs(mCurPosValue);
 							       V = (int32_t)( en_t.Vertical_Position  - mCurPosValue);
-								 #ifdef DEBUG_PRINT
-								   if(V>=0)
+								// #ifdef DEBUG_PRINT
+								 if(V>=0)
 							      PRINTF("V == %d \n\r",V);
 								   else
 								   	PRINTF("-V = - %d \n\r",V);
-								#endif
-								 //  PRINTF("VcurrHALL= %d \n\r",HALL_Pulse);
-								 //  PRINTF("VeCurPos= %d \n\r",mCurPosValue);
-								   HALL_Pulse= abs(HALL_Pulse);
-                                   if(((V == 0)||(V==1 || V==-1)||(V==2 ||V == -2))&&(HALL_Pulse>10)){
+								// #endif
+								   V = abs(V);
+								   PRINTF("firstlocktime = %d\r\n",BLDCMotor.Lock_Time);
+                                   if((V<=5)&&(HALL_Pulse>10)){
 								   
-								   	       w++;
-										   if(w==1){
-										   
-										   	  //uwStep = HallSensor_GetPinState();
-                                             // HALLSensor_Detected_BLDC(PWM_Duty);
-										   	}
-										   else if(w==4){
-										   	
-											     PMW_AllClose_ABC_Channel();
+								   	             PMW_AllClose_ABC_Channel();
 			                                     motor_ref.motor_run =0;
-												 PRINTF("Ver_HALL = %d\r\n",en_t.Vertical_HALL_Pulse);
+												 PRINTF("V = %d\r\n",V);
 												 w=0;
 												 PRINTF("VVVVVVVVVV\n\r");
 												 HALL_Pulse =0;
-										   	}
+												 BLDCMotor.Lock_Time=0;
+										   	
 										 
 								   }
+								   else{
+										
+											
+										  if( V<=5 ){
+										  	      BLDCMotor.Lock_Time ++;
+												  BLDCMotor.Position = V;
+										          
+												 if(BLDCMotor.Lock_Time >=3){
+												 	if(BLDCMotor.Position <=5){
+														
+		                                                 PMW_AllClose_ABC_Channel();
+					                                     motor_ref.motor_run =0;
+														 PRINTF("locktime = %d\r\n",BLDCMotor.Lock_Time);
+														 BLDCMotor.Lock_Time=0;
+												 	}
+									   	     
+								   	   	         }
+                                         }
+								   }
                              }
+							 HALL_Pulse =0;
 						}
 						
         }
@@ -451,7 +469,7 @@ int main(void)
                  
                   case DIR_CW_PRES ://Dir =1 ,PTE29-CW,KEY1
 				  	// Dir = 1;
-			
+			          BLDCMotor.Lock_Time=0;
                     if(Dir == 0) //
 	   			    {
 
@@ -495,7 +513,7 @@ int main(void)
                    
 				   motor_ref.motor_run =1;
 				   HALL_Pulse =0;
-                
+                   BLDCMotor.Lock_Time=0;
                    PRINTF("START_KEY @@@@@@@@@@@@@@@@@@@@@@@@@\n\r");
 #if 0
                  if(motor_ref.motor_run == 1)
@@ -518,7 +536,7 @@ int main(void)
 				   // Dir = 0 ; //
 				   
 				   PRINTF("DIR =0\r\n");
-	  			
+	  			   
 			     if(Dir==1) // Dir = 0; //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª
 				   {
 	               
@@ -554,6 +572,7 @@ int main(void)
 	                  
 	                  }
 				   HALL_Pulse =0;
+				   BLDCMotor.Lock_Time=0;
                  UART_WriteBlocking(DEMO_UART, printx2, sizeof(printx2) - 1);
 			   
 			
@@ -562,6 +581,7 @@ int main(void)
                    
 					 motor_ref.motor_run = 3;
 					 HALL_Pulse =0;
+				     BLDCMotor.Lock_Time=0;
                      PRINTF("motor stop = %d \n\r",motor_ref.motor_run);
                  break;
 				case USART_RT_PRES:
@@ -594,7 +614,7 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
     GPIO_PortClearInterruptFlags(BRAKE_KEY_GPIO, 1U << BRAKE_KEY_GPIO_PIN );
     /* Change state of button. */
    
-	
+	 BLDCMotor.Lock_Time=0;
     motor_ref.motor_run = 0;
 	PMW_AllClose_ABC_Channel();
 	HALL_Pulse =0;
