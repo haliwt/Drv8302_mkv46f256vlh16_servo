@@ -16,7 +16,7 @@ typedef struct
   __IO long     SumError;                                 //����ۼ�?
   __IO float    Proportion;                               //�������� Proportional Const
   __IO float    Integral;                                 //���ֳ��� Integral Const
-  __IO float    Derivative;                               //΢�ֳ��� Derivative Const
+  __IO float    Derivative;                               //΢�� Derivative Const
   __IO int      LastError;                                //Error[-1]
   __IO int      PrevError;                                //Error[-2]
 }PID_TypeDef;
@@ -34,22 +34,17 @@ typedef struct
 #define D_ANGLE_DATA		0.35f
 
 #define abs(x)    ((x)>0?(x):-(x))
-#define  TARGET_PULSE  1000
 
-extern int32_t array_data[4];
+
+
 
 /* ��չ���� ------------------------------------------------------------------*/
-
-
-extern uint8_t  arithmetic_flag ;
-
 
 extern int32_t PID_Result ;
 
 extern uint32_t Time_CNT ;
-extern uint32_t ABZ_CNT;
 
-extern int32_t PID_Result ;
+
 
 
 

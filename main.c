@@ -71,7 +71,7 @@ int main(void)
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
  
-     uint8_t ucKeyCode=0,z=0,w=0,m=0;
+     uint8_t ucKeyCode=0,z=0,m=0;
      uint8_t RxBuffer[4],i,ki,kp,kd,judge_n=0;
 	 float KP,KI,KD;
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
@@ -127,139 +127,139 @@ int main(void)
             
             if(eIn_n > 300 ){
                    
-						   j++;
+				   j++;
 
-                           abs(HALL_Pulse);
-	                       if(j==1){
-	                                EnBuf[0]=mHoldPos;
-	                                
- 								   }
-						   else if(j==7){
-						   			EnBuf[1]= mCurPosValue;
-	                               }
+                   abs(HALL_Pulse);
+                   if(j==1){
+                            EnBuf[0]=mHoldPos;
+                            
+							   }
+				   else if(j==7){
+				   			EnBuf[1]= mCurPosValue;
+                           }
 
-						   if(j==10)j=0;
+				   if(j==10)j=0;
 
-							/*judge and setup this Home and End Position */
-					      if((EnBuf[0]==EnBuf[1])&&(EnBuf[0]>=1 || EnBuf[1]>=1)){
-                             
-	                           z++;
-	                           if(z==1) {
-	                               // DelayMs(10);
-	                                EnBuf[1]= 0;
-									EnBuf[0]=0;
-									PRINTF("Z==1 ZZZZZZZZZZZ \n\r");
-	                             }
-							  else if(z ==2){
-										judge_n++; /*judge home and end position twice*/
-										PRINTF("Z==2 ############# \n\r");
-		                                PMW_AllClose_ABC_Channel();
-		                                motor_ref.motor_run = 0;
-		                                eIn_n=0;
-		                                z=0;
-										
-										/*set Home position and End position*/
-										 if(HALL_Pulse >0){
-									    		
-												en_t.Horizon_J_n++;
-										 		if((en_t.Horizon_J_n==1)&&(en_t.Home_flag !=1)){
-														en_t.Horizon_HALL_Pulse =HALL_Pulse;
-												        en_t.Home_flag = 1;
-														en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-														en_t.First_H_dec = 1;
-														PRINTF("HorizP_1 = %d\r\n",en_t.Horizon_Position);
-														PRINTF("Hor_HALL_1 = %d\r\n",en_t.Horizon_HALL_Pulse);
-														HALL_Pulse =0;
-										 		}
-												else{
-
-														if((judge_n==2)&&(en_t.End_flag !=1)){
-
-														        /*第一检测到垂直位置，进行第二次检测*/
-															    
-																if(en_t.First_V_dec==1){
-																	en_t.Horizon_HALL_Pulse =HALL_Pulse;
-															        en_t.End_flag = 1;
-																	en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-																
-																	PRINTF("HorizP_2 = %d\r\n",en_t.Horizon_Position);
-																	PRINTF("Hor_HALL_2 = %d\r\n",en_t.Horizon_HALL_Pulse);
-																	HALL_Pulse =0;
-																	
-																}
-																else{
-																	/**/
-																	en_t.Vertical_HALL_Pulse =HALL_Pulse;
-															        en_t.End_flag = 1;
-																	en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-																	
-																	PRINTF("Vertical_2 = %d\r\n",en_t.Vertical_Position);
-																	PRINTF("Ver_HALL_2 = %d\r\n",en_t.Vertical_HALL_Pulse);
-																	HALL_Pulse =0;
-																}
-													 
-												        }
-												 
-							                     }
-										 }
+					/*judge and setup this Home and End Position */
+			      if((EnBuf[0]==EnBuf[1])&&(EnBuf[0]>=1 || EnBuf[1]>=1)){
+                     
+                       z++;
+                       if(z==1) {
+                           // DelayMs(10);
+                            EnBuf[1]= 0;
+							EnBuf[0]=0;
+							PRINTF("Z==1 ZZZZZZZZZZZ \n\r");
+                         }
+					  else if(z ==2){
+								judge_n++; /*judge home and end position twice*/
+								PRINTF("Z==2 ############# \n\r");
+                                PMW_AllClose_ABC_Channel();
+                                motor_ref.motor_run = 0;
+                                eIn_n=0;
+                                z=0;
+								
+								/*set Home position and End position*/
+								 if(HALL_Pulse >0){
+							    		
+										en_t.Horizon_J_n++;
+								 		if((en_t.Horizon_J_n==1)&&(en_t.Home_flag !=1)){
+												en_t.Horizon_HALL_Pulse =HALL_Pulse;
+										        en_t.Home_flag = 1;
+												en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+												en_t.First_H_dec = 1;
+												PRINTF("HorizP_1 = %d\r\n",en_t.Horizon_Position);
+												PRINTF("Hor_HALL_1 = %d\r\n",en_t.Horizon_HALL_Pulse);
+												HALL_Pulse =0;
+								 		}
 										else{
 
-												en_t.Vertical_J_n++;
-												if((en_t.Vertical_J_n == 1)&&( en_t.Home_flag !=1)){
-													 PRINTF("-HallN 1=- %d\r\n", HALL_Pulse );
-													 en_t.Vertical_HALL_Pulse = HALL_Pulse;
-											         en_t.Home_flag = 1;
-													 en_t.First_V_dec =1;
-													 en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-													
-													 PRINTF("--Ver_1 = %d\r\n",en_t.Vertical_Position);
-													 PRINTF("--Ver_HALL_1 =- %d\r\n",en_t.Vertical_HALL_Pulse);
+												if((judge_n==2)&&(en_t.End_flag !=1)){
 
-												
-												}
-												else if((judge_n== 2 )&& (en_t.End_flag !=1)){ 
+												        /*第一检测到垂直位置，进行第二次检测*/
+													    
+														if(en_t.First_V_dec==1){
+															en_t.Horizon_HALL_Pulse =HALL_Pulse;
+													        en_t.End_flag = 1;
+															en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+														
+															PRINTF("HorizP_2 = %d\r\n",en_t.Horizon_Position);
+															PRINTF("Hor_HALL_2 = %d\r\n",en_t.Horizon_HALL_Pulse);
+															HALL_Pulse =0;
+															
+														}
+														else{
+															/**/
+															en_t.Vertical_HALL_Pulse =HALL_Pulse;
+													        en_t.End_flag = 1;
+															en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+															
+															PRINTF("Vertical_2 = %d\r\n",en_t.Vertical_Position);
+															PRINTF("Ver_HALL_2 = %d\r\n",en_t.Vertical_HALL_Pulse);
+															HALL_Pulse =0;
+														}
+											 
+										        }
+										 
+					                     }
+								 }
+								else{
 
-													
-													/*第一次检测到水平位置，第二检测*/
-													if(en_t.First_H_dec == 1){
-														
- 															
-														PRINTF("-HallN 2=- %d\r\n", HALL_Pulse );
-														 en_t.Vertical_HALL_Pulse = HALL_Pulse;
-														 en_t.End_flag = 1;
-														 en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-														
-														 PRINTF("--Ver_2 = %d\r\n",en_t.Vertical_Position);
-														 PRINTF("--Ver_HALL_2 =- %d\r\n",en_t.Vertical_HALL_Pulse);
-														 HALL_Pulse =0;
-													}
-													else{
-														
-														/*水平位置-第二次*/
-														PRINTF("-HallN 2=- %d\r\n", HALL_Pulse );
-														en_t.Horizon_HALL_Pulse = HALL_Pulse;
-												        en_t.End_flag = 1;
-														en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-														
-														 PRINTF("--HorP_2= %d\r\n",en_t.Horizon_Position);
-														 PRINTF("--Hor_HALL_2 =- %d\r\n",en_t.Horizon_HALL_Pulse);
-														 HALL_Pulse =0;
+										en_t.Vertical_J_n++;
+										if((en_t.Vertical_J_n == 1)&&( en_t.Home_flag !=1)){
+											 PRINTF("-HallN 1=- %d\r\n", HALL_Pulse );
+											 en_t.Vertical_HALL_Pulse = HALL_Pulse;
+									         en_t.Home_flag = 1;
+											 en_t.First_V_dec =1;
+											 en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+											
+											 PRINTF("--Ver_1 = %d\r\n",en_t.Vertical_Position);
+											 PRINTF("--Ver_HALL_1 =- %d\r\n",en_t.Vertical_HALL_Pulse);
 
-													}
-														
-												}
-										 }
-								 if(judge_n==2){
-								 	      en_t.eInit_n++;
-										  HALL_Pulse =0;
-								 	}
 										
-	                          }
-                          }
-                        
-                }
-                if(eIn_n > 300)eIn_n =0;
+										}
+										else if((judge_n== 2 )&& (en_t.End_flag !=1)){ 
+
+											
+											/*第一次检测到水平位置，第二检测*/
+											if(en_t.First_H_dec == 1){
+												
+														
+												PRINTF("-HallN 2=- %d\r\n", HALL_Pulse );
+												 en_t.Vertical_HALL_Pulse = HALL_Pulse;
+												 en_t.End_flag = 1;
+												 en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+												
+												 PRINTF("--Ver_2 = %d\r\n",en_t.Vertical_Position);
+												 PRINTF("--Ver_HALL_2 =- %d\r\n",en_t.Vertical_HALL_Pulse);
+												 HALL_Pulse =0;
+											}
+											else{
+												
+												/*水平位置-第二次*/
+												PRINTF("-HallN 2=- %d\r\n", HALL_Pulse );
+												en_t.Horizon_HALL_Pulse = HALL_Pulse;
+										        en_t.End_flag = 1;
+												en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+												
+												 PRINTF("--HorP_2= %d\r\n",en_t.Horizon_Position);
+												 PRINTF("--Hor_HALL_2 =- %d\r\n",en_t.Horizon_HALL_Pulse);
+												 HALL_Pulse =0;
+
+											}
+												
+										}
+								 }
+						 if(judge_n==2){
+						 	      en_t.eInit_n++;
+								  HALL_Pulse =0;
+						 	}
+								
+                      }
+                  }
                 
+        }
+        if(eIn_n > 300)eIn_n =0;
+        
 				
 				
         }
@@ -288,138 +288,133 @@ int main(void)
 	      uwStep = HallSensor_GetPinState();
           HALLSensor_Detected_BLDC(PWM_Duty);
           
-                    mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
-                    #ifdef DEBUG_PRINT 
-                     PRINTF("CurrPos : %d\r\n", mCurPosValue);
-                    #endif
+	        mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
+	        #ifdef DEBUG_PRINT 
+	         PRINTF("CurrPos : %d\r\n", mCurPosValue);
+	        #endif
                
-					
-           
-           eIn_n ++;    
-        
-			
-          Time_CNT++;
+		   eIn_n ++; 
+		 	if(eIn_n == 0xffff)eIn_n =1;
+           Time_CNT++;
 #if 1    
         /* 100ms arithmetic PID */
     	if(Time_CNT % 100== 0){
 
-					//	mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
-						if(Dir == 0)//CCW HB0 = Horizion
-						{
-								if(en_t.eInit_n==0)iError = 1;
-								else
-                                {
-							 		iError = mCurPosValue - en_t.Horizon_Position ; //
-									#ifdef DEBUG_PRINT
-                               		PRINTF("HB0= %d \n\r",en_t.Horizon_Position);
-							      	PRINTF("mCurPosValue= %d \n\r",mCurPosValue);
-								    PRINTF("currHALL= %d \n\r",HALL_Pulse);
-									#endif
-								    mCurPosValue = abs(mCurPosValue);
-							       	H = iError;
-								   	if(H>=0)
-							      	PRINTF("H = %d \n\r",H);
-								   	else
-								   	PRINTF("-H = - %d \n\r",H);
-                                   	if(((H == 0)||(H == -1||H ==1)||(H==2||H==-2)||(H==3||H==-3)||(H==4||H==-4)||(H==5||H==-5))&&(HALL_Pulse>10)){
-										
+			//	mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
+			if(Dir == 0)//CCW HB0 = Horizion
+			{
+					if(en_t.eInit_n==0)iError = 1;
+					else
+                    {
+				 		iError = mCurPosValue - en_t.Horizon_Position ; //
+						#ifdef DEBUG_PRINT
+                       		PRINTF("HB0= %d \n\r",en_t.Horizon_Position);
+					      	PRINTF("mCurPosValue= %d \n\r",mCurPosValue);
+						    PRINTF("currHALL= %d \n\r",HALL_Pulse);
+						#endif
+				       	H = iError;
+					   	if(H>=0)
+				      	PRINTF("H = %d \n\r",H);
+					   	else
+					   	PRINTF("-H = - %d \n\r",H);
+                       	if(((H == 0)||(H == -1||H ==1)||(H==2||H==-2)||(H==3||H==-3)||(H==4||H==-4)||(H==5||H==-5))&&(HALL_Pulse>10)){
+							
 
-									        m++;
-											if(m==1)
-											{
-												
-												// uwStep = HallSensor_GetPinState();
-                                                // HALLSensor_Detected_BLDC(PWM_Duty);
-          
-											}
-										    else if(m==4){
-												 
-												 PMW_AllClose_ABC_Channel();
-			                                     motor_ref.motor_run =0;
-												 PRINTF("H= %d\r\n",H);
-												 PRINTF("PID_PWM_Duty = %d\r\n",PID_PWM_Duty);
-												 HALL_Pulse =0;
-												  m=0;
-												 PRINTF("HHHHHHHHHH\r\n");
-												  BLDCMotor.Lock_Time=0;
-										    }
-											
-									}
-								}
+					        m++;
+							if(m==1)
+							{
 								
-								dError_sum += iError; /*误差累计和*/
-								
-							    if(dError_sum > 1000)dError_sum =1000; //积分限幅
-								if(dError_sum < -1000)dError_sum = -1000; 
-                                PID_PWM_Duty = (int32_t)(iError *KP + dError_sum * KI + (iError - last_iError)*KD);//proportion + itegral + differential
-						        #ifdef DEBUG_PRINT
-								if(PID_PWM_Duty > 0)
-									PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
-								else if(PID_PWM_Duty == 0)PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
-								else PRINTF("-PID pwm= -%d\r \n",PID_PWM_Duty);
-								#endif
-								PID_PWM_Duty = abs(PID_PWM_Duty);
-								if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
-			
-		                     	last_iError = iError;
-								PWM_Duty = PID_PWM_Duty;
-								HALL_Pulse =0;
+								// uwStep = HallSensor_GetPinState();
+                                // HALLSensor_Detected_BLDC(PWM_Duty);
+
+							}
+						    else if(m==4){
+								 
+								 PMW_AllClose_ABC_Channel();
+                                 motor_ref.motor_run =0;
+								 PRINTF("H= %d\r\n",H);
+								 PRINTF("PID_PWM_Duty = %d\r\n",PID_PWM_Duty);
+								 HALL_Pulse =0;
+								  m=0;
+								 PRINTF("HHHHHHHHHH\r\n");
+								  BLDCMotor.Lock_Time=0;
+								  iError =0;
+						    }
 								
 						}
-						else{  //Vertical Position judge is boundary
-						     
-                               if(en_t.eInit_n ==1){
-							  
-                                #ifdef DEBUG_PRINT 
-                                  PRINTF("VENDPOS= %d \n\r",en_t.Vertical_Position);
-								  PRINTF("VcurrHALL= %d \n\r",HALL_Pulse);
-							      PRINTF("mCurPosValue= %d \n\r",mCurPosValue);
-							    #endif 
-							       en_t.Vertical_Position = abs(en_t.Vertical_Position);
-							       mCurPosValue = abs(mCurPosValue);
-							       V = (int32_t)( en_t.Vertical_Position  - mCurPosValue);
-								// #ifdef DEBUG_PRINT
-								 if(V>=0)
-							      PRINTF("V == %d \n\r",V);
-								   else
-								   	PRINTF("-V = - %d \n\r",V);
-								// #endif
-								   V = abs(V);
-								   PRINTF("firstlocktime = %d\r\n",BLDCMotor.Lock_Time);
-                                   if((V<=5)&&(HALL_Pulse>10)){
-								   
-								   	             PMW_AllClose_ABC_Channel();
-			                                     motor_ref.motor_run =0;
-												 PRINTF("V = %d\r\n",V);
-												 w=0;
-												 PRINTF("VVVVVVVVVV\n\r");
-												 HALL_Pulse =0;
-												 BLDCMotor.Lock_Time=0;
-										   	
-										 
-								   }
-								   else{
-										
+					}
+					
+					dError_sum += iError; /*误差累计和*/
+					
+				    if(dError_sum > 1000)dError_sum =1000; //积分限幅
+					if(dError_sum < -1000)dError_sum = -1000; 
+                    PID_PWM_Duty = (int32_t)(iError *KP + dError_sum * KI + (iError - last_iError)*KD);//proportion + itegral + differential
+			       // #ifdef DEBUG_PRINT
+						if(PID_PWM_Duty > 0)
+							PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
+						else if(PID_PWM_Duty == 0)PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
+						else PRINTF("-PID pwm= -%d\r \n",PID_PWM_Duty);
+					//#endif
+					PID_PWM_Duty = abs(PID_PWM_Duty);
+					if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
+
+                 	last_iError = iError;
+					PWM_Duty = PID_PWM_Duty;
+					HALL_Pulse =0;
+					
+			}
+			else{  //Vertical Position judge is boundary
+			     
+                   if(en_t.eInit_n ==1){
+				  
+                    #ifdef DEBUG_PRINT 
+                      PRINTF("VENDPOS= %d \n\r",en_t.Vertical_Position);
+					  PRINTF("VcurrHALL= %d \n\r",HALL_Pulse);
+				      PRINTF("mCurPosValue= %d \n\r",mCurPosValue);
+				    #endif 
+				       en_t.Vertical_Position = abs(en_t.Vertical_Position);
+				       mCurPosValue = abs(mCurPosValue);
+				       V = (int32_t)( en_t.Vertical_Position  - mCurPosValue);
+					 #ifdef DEBUG_PRINT
+						 if(V>=0)
+					      	PRINTF("V == %d \n\r",V);
+						 else
+						   	PRINTF("-V = - %d \n\r",V);
+						    PRINTF("firstlocktime = %d\r\n",BLDCMotor.Lock_Time);
+					 #endif
+					   V = abs(V);
+					  
+                       if((V<=5)&&(HALL_Pulse>10)){
+					   
+					   	             PMW_AllClose_ABC_Channel();
+                                     motor_ref.motor_run =0;
+									 PRINTF("V = %d\r\n",V);
+									 PRINTF("VVVVVVVVVV\n\r");
+									 HALL_Pulse =0;
+									 BLDCMotor.Lock_Time=0;
+					   }
+					   else{
+							
+							if( V<=5 ){
+							  	      BLDCMotor.Lock_Time ++;
+									  BLDCMotor.Position = V;
+							          
+									 if(BLDCMotor.Lock_Time >=3){
+									 	if(BLDCMotor.Position <=5){
 											
-										  if( V<=5 ){
-										  	      BLDCMotor.Lock_Time ++;
-												  BLDCMotor.Position = V;
-										          
-												 if(BLDCMotor.Lock_Time >=3){
-												 	if(BLDCMotor.Position <=5){
-														
-		                                                 PMW_AllClose_ABC_Channel();
-					                                     motor_ref.motor_run =0;
-														 PRINTF("locktime = %d\r\n",BLDCMotor.Lock_Time);
-														 BLDCMotor.Lock_Time=0;
-												 	}
-									   	     
-								   	   	         }
-                                         }
-								   }
-                             }
-							 HALL_Pulse =0;
-						}
+                                             PMW_AllClose_ABC_Channel();
+		                                     motor_ref.motor_run =0;
+											 PRINTF("locktime = %d\r\n",BLDCMotor.Lock_Time);
+											 BLDCMotor.Lock_Time=0;
+											 PRINTF("VVVVVVVV\r\n");
+									 	}
+						   	     
+					   	   	         }
+                            }
+					   }
+                 }
+				 HALL_Pulse =0;
+			}
 						
         }
 	   if(Time_CNT ==100){
