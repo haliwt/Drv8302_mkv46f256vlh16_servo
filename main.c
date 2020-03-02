@@ -264,23 +264,14 @@ int main(void)
         }
         if(eIn_n > 200)eIn_n =0;
         
-				
-				
-        }
-
-	  
-	   
+	   }
 #endif 
          
     /***********motor run main*********************/
      if(motor_ref.motor_run == 1)
       {
    		  if(en_t.eInit_n == 1){
-			   if(Dir == 1){
-			   	   PWM_Duty =50;
-			   	}
-			   else
-			     PWM_Duty = PID_PWM_Duty;
+			   PWM_Duty = PID_PWM_Duty;
    		  	}	
    		 
 		   #ifdef DRV8302 
@@ -325,11 +316,8 @@ int main(void)
 							
 
 					        m++;
-							if(m==1)
-							{
-								
-								// uwStep = HallSensor_GetPinState();
-                                // HALLSensor_Detected_BLDC(PWM_Duty);
+							if(m==1){
+							
 
 							}
 						    else if(m==4){
@@ -388,8 +376,8 @@ int main(void)
 						
              			VDff = abs(VDff);
 					   HALL_Pulse = abs(HALL_Pulse);
-					   PRINTF("VDff= %d  \r\n",VDff);
-					   PRINTF("VcurrHALL= %d \n\r",HALL_Pulse);
+					//   PRINTF("VDff= %d  \r\n",VDff);
+					//   PRINTF("VcurrHALL= %d \n\r",HALL_Pulse);
                       if(( VDff<=5 )&&(HALL_Pulse>10)){
 					  	      BLDCMotor.Lock_Time ++;
 							  BLDCMotor.Position = VDff;
@@ -404,6 +392,7 @@ int main(void)
 			                         BLDCMotor.Lock_Time=0;
 			                         PRINTF("VVVVVVVV\r\n");
 									 HALL_Pulse =0;
+									 iError =0;
 	                            }
 				   	     
 			   	   	         }
@@ -441,6 +430,7 @@ int main(void)
     else { 
             PMW_AllClose_ABC_Channel();
 			HALL_Pulse =0;
+	        iError =0;
 			#ifdef DRV8302
 		 	GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
 		    #endif 
