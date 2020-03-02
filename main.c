@@ -75,7 +75,7 @@ int main(void)
      uint8_t RxBuffer[5],i,ki,kp,kd,k0,judge_n;
 	 float KP,KI,KD;
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
-	 volatile int32_t mCurPosValue,mHoldPos,eIn_n=0,H,V,Dff;
+	 volatile int32_t mCurPosValue,mHoldPos,eIn_n=0,H,VDff,Dff;
 	 int16_t j=0;
 
 	 
@@ -172,7 +172,7 @@ int main(void)
 								 		}
 										else{
 
-												if((judge_n==2)&&(en_t.End_V_flag !=1)){
+												if((judge_n==2||judge_n==5)&&(en_t.End_V_flag !=1)){
 
 												        /*第一检测到水平位置，进行第二次到垂直位置*/
 													    
@@ -205,6 +205,9 @@ int main(void)
 								 }
 								else{
 										PRINTF("HALL < 0 \r\n");
+										PRINTF("judge_n = %d\n\r",judge_n);
+										PRINTF("End_H_flag = %d \r\n",en_t.End_H_flag);
+										PRINTF("First_H_dec = %d \r\n",en_t.First_H_dec);
 										en_t.Vertical_J_n++;
 										if((en_t.Vertical_J_n == 1)&&( en_t.First_H_dec!=1)){
 											 PRINTF("-HallN 1=- %d\r\n", HALL_Pulse );
@@ -219,7 +222,7 @@ int main(void)
 
 										
 										}
-										else if((judge_n==2)&& (en_t.End_H_flag !=1)){ 
+										else if((judge_n==2||judge_n==5)&& (en_t.End_H_flag !=1)){ 
 
 											
 											/*第一次检测到垂直位置，第二还是检测到水平位置,hall <0*/
@@ -249,7 +252,7 @@ int main(void)
 												
 										}
 								 }
-						 if(judge_n==2){
+						 if(judge_n==2||judge_n==5){
 						 	      en_t.eInit_n++;
 								  HALL_Pulse =0;
 						         
@@ -365,51 +368,70 @@ int main(void)
 					
 			}
 			else{  //Vertical Position judge is boundary
-			     
-                   if(en_t.eInit_n ==1){
-				  
-                    #ifdef DEBUG_PRINT 
-                      PRINTF("VENDPOS= %d \n\r",en_t.Vertical_Position);
-					  PRINTF("VcurrHALL= %d \n\r",HALL_Pulse);
-				      PRINTF("mCurPosValue= %d \n\r",mCurPosValue);
-				    #endif 
-				       en_t.Vertical_Position = abs(en_t.Vertical_Position);
-				       mCurPosValue = abs(mCurPosValue);
-				       V = (int32_t)( en_t.Vertical_Position  - mCurPosValue);
-					 #ifdef DEBUG_PRINT
-						 if(V>=0)
-					      	PRINTF("V == %d \n\r",V);
-						 else
-						   	PRINTF("-V = - %d \n\r",V);
-						    PRINTF("firstlocktime = %d\r\n",BLDCMotor.Lock_Time);
-					 #endif
-					   V = abs(V);
+
+				if(en_t.eInit_n==0)iError = 0;
+				else
+                    {
+				 		iError = mCurPosValue - en_t.Vertical_Position ; //
+						#ifdef DEBUG_PRINT
+                			PRINTF("HB0= %d \n\r",en_t.Vertical_Position);
+					      	PRINTF("mCurPosValue= %d \n\r",mCurPosValue);
+						    PRINTF("currHALL= %d \n\r",HALL_Pulse);
+						#endif
+				       	VDff = iError;
+						#ifdef DEBUG_PRINT
+						   	if(VDff>=0)
+						      	PRINTF("VDff = %d \n\r",VDff);
+							 else
+							   	PRINTF("-VDff = - %d \n\r",VDff);
+                        #endif 
+						
+             			VDff = abs(VDff);
 					   HALL_Pulse = abs(HALL_Pulse);
-					   PRINTF("V= %d  \r\n",V);
+					   PRINTF("VDff= %d  \r\n",VDff);
 					   PRINTF("VcurrHALL= %d \n\r",HALL_Pulse);
-                      if(( V<=5 )&&(HALL_Pulse>10)){
+                      if(( VDff<=5 )&&(HALL_Pulse>10)){
 					  	      BLDCMotor.Lock_Time ++;
-							  BLDCMotor.Position = V;
+							  BLDCMotor.Position = VDff;
 					          
 							 if(BLDCMotor.Lock_Time >=3){
-							 	if(BLDCMotor.Position <=5){
-									
-									 PRINTF("V= %d \r\n",V);
-									 PMW_AllClose_ABC_Channel();
-                                     motor_ref.motor_run =0;
-									 PRINTF("locktime = %d\r\n",BLDCMotor.Lock_Time);
-									 BLDCMotor.Lock_Time=0;
-									 PRINTF("VVVVVVVV\r\n");
-							 	}
+                    			if(BLDCMotor.Position <=5){
+                        
+			                         PRINTF("VDff= %d \r\n",VDff);
+			                         PMW_AllClose_ABC_Channel();
+			                                           motor_ref.motor_run =0;
+			                         PRINTF("locktime = %d\r\n",BLDCMotor.Lock_Time);
+			                         BLDCMotor.Lock_Time=0;
+			                         PRINTF("VVVVVVVV\r\n");
+									 HALL_Pulse =0;
+	                            }
 				   	     
 			   	   	         }
                       }
-					   
-                 }
-				 HALL_Pulse =0;
+								
+				}
+			
+					
+					dError_sum += iError; /*误差累计和*/
+					
+				    if(dError_sum > 1000)dError_sum =1000; //积分限幅
+					if(dError_sum < -1000)dError_sum = -1000; 
+                    PID_PWM_Duty = (int32_t)(iError *KP + dError_sum * KI + (iError - last_iError)*KD);//proportion + itegral + differential
+			        #ifdef DEBUG_PRINT
+						if(PID_PWM_Duty > 0)
+							PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
+						else if(PID_PWM_Duty == 0)PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
+						else PRINTF("-PID pwm= -%d\r \n",PID_PWM_Duty);
+					#endif
+					PID_PWM_Duty = abs(PID_PWM_Duty);
+					if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
+
+                 	last_iError = iError;
+					PWM_Duty = PID_PWM_Duty;
+					HALL_Pulse =0;
 			}
-						
-        }
+				 HALL_Pulse =0;
+		}
 	   if(Time_CNT ==100){
 			Time_CNT = 0;
 			HALL_Pulse =0;
