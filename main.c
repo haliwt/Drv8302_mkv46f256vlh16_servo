@@ -67,7 +67,7 @@ int main(void)
 {
     
      enc_config_t mEncConfigStruct;
-	 int32_t iError,dError_sum,last_iError;
+	 volatile int32_t iError,dError_sum,last_iError;
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
  
@@ -75,7 +75,7 @@ int main(void)
      uint8_t RxBuffer[5],i,ki,kp,kd,k0,judge_n;
 	 float KP,KI,KD;
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
-	 volatile int32_t mCurPosValue,mHoldPos,eIn_n=0,H,VDff,Dff;
+	 volatile int32_t mCurPosValue,mHoldPos,eIn_n=0,HDff,VDff,Dff;
 	 int16_t j=0;
 
 	 
@@ -302,38 +302,37 @@ int main(void)
 					else
                     {
 				 		iError = mCurPosValue - en_t.Horizon_Position ; //
+				 		if(iError <= 5 && iError >= -5)iError =0;
 						#ifdef DEBUG_PRINT
                        		PRINTF("HB0= %d \n\r",en_t.Horizon_Position);
 					      	PRINTF("mCurPosValue= %d \n\r",mCurPosValue);
 						    PRINTF("currHALL= %d \n\r",HALL_Pulse);
 						#endif
-				       	H = iError;
-					   	if(H>=0)
-				      	PRINTF("H = %d \n\r",H);
+				       	HDff = iError;
+					   	if(HDff>=0)
+				      	PRINTF("HDff = %d \n\r",HDff);
 					   	else
-					   	PRINTF("-H = - %d \n\r",H);
-                       	if(((H == 0)||(H == -1||H ==1)||(H==2||H==-2)||(H==3||H==-3)||(H==4||H==-4)||(H==5||H==-5))&&(HALL_Pulse>1)){
-							
-
-					        m++;
-							if(m==1){
-							
-
-							}
-						    else if(m==4){
-								 
-								 PMW_AllClose_ABC_Channel();
-                                 motor_ref.motor_run =0;
-								 PRINTF("H= %d\r\n",H);
-								 PRINTF("PID_PWM_Duty = %d\r\n",PID_PWM_Duty);
-								 HALL_Pulse =0;
-								  m=0;
-								 PRINTF("HHHHHHHHHH\r\n");
-								  BLDCMotor.Lock_Time=0;
-								  iError =0;
+					   	PRINTF("-HDff = - %d \n\r",HDff);
+						#if 1
+                       	if((HDff <= 5 && HDff >= -5)&&(HALL_Pulse>10)){
+						    m++;
+						    if(m>=3){
+								  if(HDff <= 5 && HDff >= -5){
+							         PMW_AllClose_ABC_Channel();
+	                                 motor_ref.motor_run =0;
+									 PRINTF("HDff= %d\r\n",HDff);
+									 PRINTF("PID_PWM_Duty = %d\r\n",PID_PWM_Duty);
+									 HALL_Pulse =0;
+									  m=0;
+									 PRINTF("HHHHHHHHHH\r\n");
+									  BLDCMotor.Lock_Time=0;
+									  iError =0;
+									  m=0;
+								  	}
 						    }
 								
 						}
+						#endif 
 					}
 					
 					dError_sum += iError; /*ŒÛ≤Ó¿€º∆∫Õ*/
@@ -361,6 +360,7 @@ int main(void)
 				else
                     {
 				 		iError = mCurPosValue - en_t.Vertical_Position ; //
+				 		if(iError <= 5 && iError >= -5)iError =0;
 						#ifdef DEBUG_PRINT
                 			PRINTF("HB0= %d \n\r",en_t.Vertical_Position);
 					      	PRINTF("mCurPosValue= %d \n\r",mCurPosValue);
@@ -393,6 +393,7 @@ int main(void)
 			                         PRINTF("VVVVVVVV\r\n");
 									 HALL_Pulse =0;
 									 iError =0;
+									 PRINTF("PID_PWM= %d \r\n",PID_PWM_Duty);
 	                            }
 				   	     
 			   	   	         }
@@ -442,7 +443,7 @@ int main(void)
 		  	
 				  UART_ReadBlocking(DEMO_UART, RxBuffer, 5);
                   for(i=0;i<5;i++){
-				  	     
+				  	    
 						  if(RxBuffer[0]==0xff){
 							  kp=RxBuffer[1];
 		                      ki=RxBuffer[2];
@@ -454,10 +455,11 @@ int main(void)
 		                      KD = (float)kd/10;
 					  	  }
 						  else{
-								k0=RxBuffer[0];
+								 k0=RxBuffer[0];
 								 PRINTF("USART Error !!!!!!!!\n\r");
 								 PRINTF("k0 = %d \n\r",k0);
-								 
+								 PRINTF("KP KI KD = %d %d %d \n\r",kp,ki,kd);
+								 motor_ref.motor_run =0;
 						  }
                      
                   }
