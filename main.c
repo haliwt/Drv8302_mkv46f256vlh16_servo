@@ -72,7 +72,7 @@ int main(void)
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
  
      uint8_t ucKeyCode=0,z=0,m=0;
-     uint8_t RxBuffer[4],i,ki,kp,kd,judge_n=0;
+     uint8_t RxBuffer[5],i,ki,kp,kd,k0,judge_n,w=0;
 	 float KP,KI,KD;
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
 	 volatile int32_t mCurPosValue,mHoldPos,eIn_n=0,H,V,Dff;
@@ -349,12 +349,12 @@ int main(void)
 				    if(dError_sum > 1000)dError_sum =1000; //»ý·ÖÏÞ·ù
 					if(dError_sum < -1000)dError_sum = -1000; 
                     PID_PWM_Duty = (int32_t)(iError *KP + dError_sum * KI + (iError - last_iError)*KD);//proportion + itegral + differential
-			       // #ifdef DEBUG_PRINT
+			        #ifdef DEBUG_PRINT
 						if(PID_PWM_Duty > 0)
 							PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
 						else if(PID_PWM_Duty == 0)PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
 						else PRINTF("-PID pwm= -%d\r \n",PID_PWM_Duty);
-					//#endif
+					#endif
 					PID_PWM_Duty = abs(PID_PWM_Duty);
 					if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
 
@@ -435,21 +435,28 @@ int main(void)
 	     
           if( motor_ref.motor_run == 3){
 		  	
-                  UART_ReadBlocking(DEMO_UART, RxBuffer, 4);
-                  for(i=0;i<5;i++)
-                  {
-                      kp=RxBuffer[0];
-                      ki=RxBuffer[1];
-					  kd=RxBuffer[2];
-                      motor_ref.motor_run =RxBuffer[3];
-                      PRINTF("KP KI KD = %d %d %d \n\r",kp,ki,kd);
-                      KP = (float)kp/10;
-                      KI = (float)ki/100;
-                      KD = (float)kd/10;
+				  UART_ReadBlocking(DEMO_UART, RxBuffer, 4);
+                  for(i=0;i<5;i++){
+				  	     
+						  if(RxBuffer[0]==0xff){
+							  kp=RxBuffer[1];
+		                      ki=RxBuffer[2];
+							  kd=RxBuffer[3];
+		                      motor_ref.motor_run =RxBuffer[4];
+		                      PRINTF("KP KI KD = %d %d %d \n\r",kp,ki,kd);
+		                      KP = (float)kp/10;
+		                      KI = (float)ki/100;
+		                      KD = (float)kd/10;
+					  	  }
+						  else{
+								k0=RxBuffer[0];
+								 PRINTF("USART Error !!!!!!!!\n\r");
+								 PRINTF("k0 = %d \n\r",k0);
+								 
+						  }
                      
                   }
-
-         }
+		  }
          PRINTF("Motor Stop !!!!!!!!!!! \r\n");
          PRINTF("motor_run = %d \r\n",motor_ref.motor_run );
                 
