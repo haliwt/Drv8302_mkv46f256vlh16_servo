@@ -15,7 +15,8 @@ typedef struct _encoder_t_
   int32_t Horizon_Position;
   int32_t Vertical_Position;
   int8_t  Home_flag;
-  int8_t  End_flag;
+  int8_t  End_H_flag;
+  int8_t  End_V_flag;
   uint16_t eInit_n;   //初始化起始位置和终点位置的次数
   int16_t Horizon_HALL_Pulse;  //水平位置hall 方向判断
   int16_t Vertical_HALL_Pulse; //垂直位置hall 方向判断
