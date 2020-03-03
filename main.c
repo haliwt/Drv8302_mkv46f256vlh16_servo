@@ -157,7 +157,7 @@ int main(void)
                                 eIn_n=0;
                                 z=0;
 								
-								/*set Home position and End position*/
+								/*To judge  Home position and End position*/
 								 if(HALL_Pulse >=0){
 							    		PRINTF("HALL > 0\n\r");
 										en_t.Horizon_J_n++;
@@ -255,8 +255,10 @@ int main(void)
 						 if(judge_n==2||judge_n==5){
 						 	      en_t.eInit_n++;
 								  HALL_Pulse =0;
-						         
-						 	}
+						          KP = 0.1f;  /*初始化PID 常数参数*/
+								  KI= 0.02f;
+								  KD = 1.0f;
+						 }
 								
                       }
                   }
@@ -301,7 +303,7 @@ int main(void)
 					if(en_t.eInit_n==0)iError = 1;
 					else
                     {
-				 		iError = mCurPosValue - en_t.Horizon_Position ; //
+				 		iError = mCurPosValue - en_t.Horizon_Position ; //误差值
 				 		if(iError <= 5 && iError >= -5)iError =0;
 						#ifdef DEBUG_PRINT
                        		PRINTF("HB0= %d \n\r",en_t.Horizon_Position);
@@ -316,8 +318,8 @@ int main(void)
 						#if 1
                        	if((HDff <= 5 && HDff >= -5)&&(HALL_Pulse>10)){
 						    m++;
-						    if(m>=3){
-								  if(HDff <= 5 && HDff >= -5){
+						    if(m>=2){
+								  if(HDff <= 7 && HDff >= -7){
 							         PMW_AllClose_ABC_Channel();
 	                                 motor_ref.motor_run =0;
 									 PRINTF("HDff= %d\r\n",HDff);
@@ -382,7 +384,7 @@ int main(void)
 					  	      BLDCMotor.Lock_Time ++;
 							  BLDCMotor.Position = VDff;
 					          
-							 if(BLDCMotor.Lock_Time >=3){
+							 if(BLDCMotor.Lock_Time >=2){
                     			if(BLDCMotor.Position <=5){
                         
 			                         PRINTF("VDff= %d \r\n",VDff);

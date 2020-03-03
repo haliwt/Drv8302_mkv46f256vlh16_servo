@@ -44,6 +44,7 @@ extern int32_t PID_Result ;
 
 extern uint32_t Time_CNT ;
 
+void IncPIDInit(void);
 
 
 

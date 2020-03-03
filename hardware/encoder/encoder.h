@@ -26,7 +26,7 @@ typedef struct _encoder_t_
   uint8_t First_V_dec;
  }encoder_t;
 
-#define abs(x)    ((x)>0?(x):-(x))
+
 
 /*******************************************************************************
  * Definitions
