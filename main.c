@@ -336,14 +336,17 @@ int main(void)
 												m=0;
 												s=0;
 											   }
-											    else if((n==2)&&(HDff <= 150)){
+											    else if((n==2)&&(HDff <= 250)){
 												 en_t.HorizonStop_flag =2;
 												 Dir =1;
-												PWM_Duty=30;
-													uwStep = HallSensor_GetPinState();
-													HALLSensor_Detected_BLDC(PWM_Duty);
-													
-												Dir =0;
+														    for(n_pulse =0;n_pulse<250;n_pulse++){//300 times motor run to Vertical is error
+                                                            Dir =1;
+														    PWM_Duty=50;
+															uwStep = HallSensor_GetPinState();
+															HALLSensor_Detected_BLDC(PWM_Duty);
+															
+														    Dir =0;
+												    	}
 												 n=0;
 												 m=0;
 												 s=0;
@@ -377,7 +380,7 @@ int main(void)
 							else PRINTF("-PID pwm= -%d\r \n",PID_PWM_Duty);
 						#endif
 						PID_PWM_Duty = abs(PID_PWM_Duty);
-						if(PID_PWM_Duty >=20)PID_PWM_Duty=20;
+						if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
                       
 	                 	last_iError = iError;
 						PWM_Duty = PID_PWM_Duty;
@@ -472,7 +475,7 @@ int main(void)
           HALLSensor_Detected_BLDC(PWM_Duty);
           //  DelayMs(100);
           Dir =0;
-          n= 10;
+          if(n_pulse== 0xff) n_pulse =20;
 		  PRINTF("STOP HOR ^^^^^^^^^^\r\n");
      
      }
