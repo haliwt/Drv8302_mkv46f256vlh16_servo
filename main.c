@@ -60,7 +60,7 @@ int main(void)
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
  
-     uint8_t ucKeyCode=0,z=0,m=0,s=0,n=0,p=0;
+     uint8_t ucKeyCode=0,z=0,m=0,s=0,n=0,p=0,n_pulse;
      uint8_t RxBuffer[5],i,ki,kp,kd,k0,judge_n;
 	 int8_t HORBuff[2];
 	 float KP,KI,KD;
@@ -336,7 +336,7 @@ int main(void)
 												m=0;
 												s=0;
 											   }
-											    else if((n==2)&&(HDff <= 200)){
+											    else if((n==2)&&(HDff <= 150)){
 												 en_t.HorizonStop_flag =2;
 												 Dir =1;
 												PWM_Duty=30;
@@ -377,8 +377,8 @@ int main(void)
 							else PRINTF("-PID pwm= -%d\r \n",PID_PWM_Duty);
 						#endif
 						PID_PWM_Duty = abs(PID_PWM_Duty);
-						if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
-
+						if(PID_PWM_Duty >=20)PID_PWM_Duty=20;
+                      
 	                 	last_iError = iError;
 						PWM_Duty = PID_PWM_Duty;
 						HALL_Pulse =0;
@@ -479,6 +479,7 @@ int main(void)
     else { 
             
 			   en_t.HorizonStop_flag=0;
+                 n_pulse =0;
 				PMW_AllClose_ABC_Channel();
 				HALL_Pulse =0;
 				iError =0;
@@ -531,6 +532,7 @@ int main(void)
 				  	// Dir = 1;
                     en_t.HorizonStop_flag=0;
 			          BLDCMotor.Lock_Time=0;
+                      n_pulse =0;
                     if(Dir == 0) //
 	   			    {
 
@@ -571,6 +573,7 @@ int main(void)
 				  	break;
         		
                  case START_PRES:
+                     n_pulse =0;
                    en_t.HorizonStop_flag=0;
 				   motor_ref.motor_run =1;
 				   HALL_Pulse =0;
@@ -582,6 +585,7 @@ int main(void)
 				 case DIR_CCW_PRES: //Dir = 0;PTE24 = CCW,KEY3
 				   // Dir = 0 ; //
 				   en_t.HorizonStop_flag=0;
+                     n_pulse =0;
 				   PRINTF("DIR =0\r\n");
 	  			   
 			     if(Dir==1) // Dir = 0; //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª
