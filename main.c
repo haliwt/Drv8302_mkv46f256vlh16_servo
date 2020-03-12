@@ -342,12 +342,13 @@ int main(void)
 												PWM_Duty=30;
 													uwStep = HallSensor_GetPinState();
 													HALLSensor_Detected_BLDC(PWM_Duty);
-													PRINTF("speed -------------- \r\n");
-													DelayMs(100);
+													
 												Dir =0;
 												 n=0;
 												 m=0;
 												 s=0;
+												 PRINTF("speed -------------- \r\n");
+													
 											
 												}
 												if(n>=2)n=0;
