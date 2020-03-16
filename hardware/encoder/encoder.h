@@ -20,11 +20,12 @@ typedef struct _encoder_t_
   uint16_t eInit_n;   //初始化起始位置和终点位置的次数
   int16_t Horizon_HALL_Pulse;  //水平位置hall 方向判断
   int16_t Vertical_HALL_Pulse; //垂直位置hall 方向判断
-  uint8_t Horizon_J_n;  //水平判断hall ，方向次数
-  uint8_t Vertical_J_n;  
+  uint8_t HorVer_R_times;  //水平判断hall ，方向次数
+  
   uint8_t First_H_dec;    //第一次水平检测的标志位。
   uint8_t First_V_dec;
   uint8_t HorizonStop_flag; /* 水平停止标志位 */
+  uint8_t Stop_flag; 
  }encoder_t;
 
 
