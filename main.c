@@ -56,39 +56,33 @@ int main(void)
 {
     
      enc_config_t mEncConfigStruct;
-	 volatile int32_t iError,dError_sum,last_iError;
+	 volatile int32_t iError,dError_sum,last_iError,temp;
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
  
-     uint8_t ucKeyCode=0,z=0,m=0,s=0,n=0,n_pulse;
-     uint8_t RxBuffer[5],i,ki,kp,kd,k0,judge_n;
+     uint8_t ucKeyCode=0,z=0,m=0,n_pulse,s=0;
+     uint8_t RxBuffer[5],i,ki,kp,kd,k0,HALL_temp;
 
 	 float KP,KI,KD;
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
 	 volatile int32_t mCurPosValue,mHoldPos,HDff,VDff,Dff;
 	 uint32_t eIn_n= 0;
 	 int16_t j=0;
-
-	 
-    
+     
     XBARA_Init(XBARA);
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
- 
     
      LED_Init();
      KEY_Init();
      DelayInit();
      HALL_Init();
      Capture_Input_Init();
-
-   
+     
     OUTPUT_Fucntion_Init();
     ADC_CADC_Init();
-   
-	
-    /* Set the PWM Fault inputs to a low value */
+   /* Set the PWM Fault inputs to a low value */
     PWM_BLDC_Init();
    // USART_POLLING_Init();
      #if 1  //no interrupt
@@ -114,8 +108,8 @@ int main(void)
 	 /***********Position :Home and End*****************/
         if(en_t.eInit_n ==0)
         {
-			if(Dir ==0)PWM_Duty =30;
-           else PWM_Duty =50;
+			
+			PWM_Duty =50;
             
             if(eIn_n > 300 ){
                    
@@ -142,18 +136,19 @@ int main(void)
 							 HALL_Pulse =0;
                          }
 					  else if(z ==2){
-								judge_n++; /*judge home and end position twice*/
+							  /*judge home and end position twice*/
+                                en_t.HorVer_R_times++;
 								PRINTF("Z==2 ############# \n\r");
                                 PMW_AllClose_ABC_Channel();
                                 motor_ref.motor_run = 0;
                                 eIn_n=0;
                                 z=0;
-								PRINTF("judge_n =%d \n\r",judge_n);
+								PRINTF("en_t.HorVer_R_times = %d\n\r",en_t.HorVer_R_times);
 								/*To judge  Home position and End position*/
-								 if(HALL_Pulse >=0){  /* TO horizion Position CCW */
+								 if(HALL_Pulse >=0){
 							    		PRINTF("HALL > 0\n\r");
-										en_t.Horizon_J_n++;
-								 		if((en_t.Horizon_J_n==1)&&(en_t.First_V_dec !=1)){
+									
+								 		if((en_t.HorVer_R_times==1)&&(en_t.First_V_dec !=1)){
 												en_t.Horizon_HALL_Pulse =HALL_Pulse;
 										        en_t.Home_flag = 1;
 												en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
@@ -164,7 +159,7 @@ int main(void)
 								 		}
 										else{
 
-												if((judge_n==2||judge_n==5)&&(en_t.End_V_flag !=1)){
+												if((en_t.HorVer_R_times==2)&&(en_t.End_V_flag !=1)){
 
 												        /* */
 													    
@@ -195,13 +190,13 @@ int main(void)
 										 
 					                     }
 								 }
-								else{ /*HALL_Pulse < 0 to run CW vertical Position */
+								else{
 										PRINTF("HALL < 0 \r\n");
-										PRINTF("judge_n = %d\n\r",judge_n);
+										
 										PRINTF("End_H_flag = %d \r\n",en_t.End_H_flag);
 										PRINTF("First_H_dec = %d \r\n",en_t.First_H_dec);
-										en_t.Vertical_J_n++;
-										if((en_t.Vertical_J_n == 1)&&( en_t.First_H_dec!=1)){
+									
+										if((en_t.HorVer_R_times == 1)&&( en_t.First_H_dec!=1)){
 											 PRINTF("-HallN 1=- %d\r\n", HALL_Pulse );
 											 en_t.Vertical_HALL_Pulse = HALL_Pulse;
 									         en_t.Home_flag = 1;
@@ -214,10 +209,10 @@ int main(void)
 
 										
 										}
-										else if((judge_n==2||judge_n==5)&& (en_t.End_H_flag !=1)){ 
+										else if((en_t.HorVer_R_times==5)&& (en_t.End_H_flag !=1)){ 
 
 											
-											/* look for vertical bounded end or start Position*/
+											/*????��?????��??????????????��??,hall <0*/
 											if(en_t.First_V_dec == 1){
 												
 												 en_t.Horizon_HALL_Pulse = HALL_Pulse;
@@ -230,7 +225,7 @@ int main(void)
 											}
 											else{
 												
-												/* vertical Position the second*/
+												/*????��??��??*/
 												en_t.Vertical_HALL_Pulse = HALL_Pulse;
 										        en_t.End_V_flag = 1;
 												en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
@@ -244,10 +239,10 @@ int main(void)
 												
 										}
 								 }
-						 if(judge_n==2||judge_n==5){
+						 if(en_t.HorVer_R_times==2){
 						 	      en_t.eInit_n++;
 								  HALL_Pulse =0;
-						          KP = 0.1f;  /*��ʼ��PID ��������*/
+						          KP = 0.1f;  /*?????PID ????????*/
 								  KI= 0.02f;
 								  KD = 1.0f;
 						 }
@@ -257,8 +252,8 @@ int main(void)
                 
         }
         if(eIn_n > 300)eIn_n =0;
-        
-	   }
+       }
+	
 #endif 
          
     /***********motor run main*********************/
@@ -280,9 +275,9 @@ int main(void)
 	         	PRINTF("CurrPos : %d\r\n", mCurPosValue);
 	        #endif
                
-		   eIn_n ++; 
-		 	if((eIn_n > 0xfffffffe)&&(judge_n ==2 || judge_n ==5))eIn_n =1;
-			else if(eIn_n > 0xfffffffe)eIn_n = 0;
+		    eIn_n ++; 
+		 	if((eIn_n >= 0xfffffffe)&&(en_t.HorVer_R_times==2))eIn_n =1;
+			else if(eIn_n >= 0xfffffffe)eIn_n = 0;
            Time_CNT++;
 #if 1    
         /* 100ms arithmetic PID */
@@ -295,98 +290,74 @@ int main(void)
 					else
                     {
 				 		iError = mCurPosValue - en_t.Horizon_Position ; //error
-				 		if(iError <= 5 && iError >= -5)iError =0;
+				 		if(iError <= 10 && iError >= -10)iError =0; //error range 
 						#ifdef DEBUG_PRINT
                        		PRINTF("HB0= %d \n\r",en_t.Horizon_Position);
 					      	PRINTF("mCurPosValue= %d \n\r",mCurPosValue);
 						    PRINTF("currHALL= %d \n\r",HALL_Pulse);
 						#endif
-				       	HDff = iError;
+				       	HDff = iError; 
 					   	if(HDff>=0)
-				      	PRINTF("HDff = %d \n\r",HDff);
+				      		PRINTF("HDff = %d \n\r",HDff);
 					   	else
-					   	PRINTF("-HDff = - %d \n\r",HDff);
+					   		PRINTF("-HDff = - %d \n\r",HDff);
 				
-                       	if((HDff <= 300 && HDff >= -300)&&(HALL_Pulse>10)){
-						    m++;
-							s++;
-						    if(m>=2){
-#if 0
-									 if((s==2)&&(en_t.HorizonStop_flag !=2)){
-												Dir =1;
-												PWM_Duty =50; //WT.EDIT 2020-03-13
-												uwStep = HallSensor_GetPinState();
-												HALLSensor_Detected_BLDC(PWM_Duty);
-												PRINTF("speed -------------- \r\n");
-												//DelayMs(100);
-												Dir =0;
-									  }
-#endif 
-									//  else{
-                                        {
-                                        
-										       n++;
-											   HDff = abs(HDff);
-											   if(n==1){
+                       	if((HDff <= 500 && HDff >= -500)&&(HALL_Pulse>10)){
 
-											   en_t.HorizonStop_flag =2;
-											   
-												//en_t.HorizonStop_flag =1;
-												PID_PWM_Duty=0; //WT.EDIT 2020-03-12
-												PRINTF("HDff= %d\r\n",HDff);
-												PRINTF("PID_PWM_Duty = %d\r\n",PID_PWM_Duty);
-												HALL_Pulse =0;
-												PRINTF("HHHHHHHHHH\r\n");
-												BLDCMotor.Lock_Time=0;
-												iError =0;
-											   }
-											  // else if((n==2)&&(HDff <= 120)){
-														 	//	en_t.HorizonStop_flag =2;
-														    	for(n_pulse =0;n_pulse<250;n_pulse++)//300 times motor run to Vertical is error
-																{
-				                                                    Dir =1;
-																    PWM_Duty=50;
-																	uwStep = HallSensor_GetPinState();
-																	HALLSensor_Detected_BLDC(PWM_Duty);
-																
-															    	Dir =0;
-													        	}
-												  
-												      
-												        PRINTF("nnnnnnnn---- \r\n");
-												
-											  // }
-												if(n>=2)n=0;//WT.EDIT 2020-03-13
-												if(s>=2)s=0;
-												if(m>=2)m=0;
+							m++;
+						
+						    if(m>=2){
+					              HDff = abs(HDff);
+								  en_t.HorizonStop_flag =2;
+								   
+									//en_t.HorizonStop_flag =1;
+									PID_PWM_Duty=0; //WT.EDIT 2020-03-12
+									PRINTF("HDff= %d\r\n",HDff);
+									PRINTF("PID_PWM_Duty = %d\r\n",PID_PWM_Duty);
+									HALL_Pulse =0;
+									PRINTF("HHHHHHHHHH\r\n");
+									BLDCMotor.Lock_Time=0;
+									iError =0;
+								
+									for(n_pulse =0;n_pulse<250;n_pulse++)//300 times motor run to Vertical is error
+									{
+                                        Dir =1;
+									    PWM_Duty=50;
+										uwStep = HallSensor_GetPinState();
+										HALLSensor_Detected_BLDC(PWM_Duty);
+									
+								    	Dir =0;
+						        	}
+									  
+									      
+								     PRINTF("nnnnnnnn---- \r\n");
+								    if(m>=2)m=0;
 												   
-									  }
-									 
-						    }
+							}
 								
 						}
 					
-					if(en_t.HorizonStop_flag ==1){
+					if(en_t.HorizonStop_flag ==2){
 						
-						     PWM_Duty = PID_PWM_Duty;
+						    PWM_Duty = PID_PWM_Duty;
 					}
-					else{
-						dError_sum += iError; 
-						
-					    if(dError_sum > 1000)dError_sum =1000; /*error accumulate */
-						if(dError_sum < -1000)dError_sum = -1000; 
-	                    PID_PWM_Duty = (int32_t)(iError *KP + dError_sum * KI + (iError - last_iError)*KD);//proportion + itegral + differential
-				        #ifdef DEBUG_PRINT
-							if(PID_PWM_Duty > 0)
-								PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
-							else if(PID_PWM_Duty == 0)PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
-							else PRINTF("-PID pwm= -%d\r \n",PID_PWM_Duty);
-						#endif
-						PID_PWM_Duty = abs(PID_PWM_Duty);
-						if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
-                      
-	                 	last_iError = iError;
-						PWM_Duty = PID_PWM_Duty;
+					else {
+							dError_sum += iError; 
+							
+						    if(dError_sum > 1000)dError_sum =1000; /*error accumulate */
+							if(dError_sum < -1000)dError_sum = -1000; 
+		                    PID_PWM_Duty = (int32_t)(iError *KP + dError_sum * KI + (iError - last_iError)*KD);//proportion + itegral + differential
+					        #ifdef DEBUG_PRINT
+								if(PID_PWM_Duty > 0)
+									PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
+								else if(PID_PWM_Duty == 0)PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
+								else PRINTF("-PID pwm= -%d\r \n",PID_PWM_Duty);
+							#endif
+							PID_PWM_Duty = abs(PID_PWM_Duty);
+							if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
+	                      
+		                 	last_iError = iError;
+							PWM_Duty = PID_PWM_Duty;
 						
 				    }
 					
@@ -445,9 +416,6 @@ int main(void)
 			   	   	        
                       }
 								
-			//	}
-			
-					
 					dError_sum += iError; 
 					
 				    if(dError_sum > 1000)dError_sum =1000; 
@@ -477,18 +445,35 @@ int main(void)
 	   #endif 
 	} 
     else if(en_t.HorizonStop_flag==2){
-       
+          /*keep balance guide rode*/
+	     
           Dir =1;
           PWM_Duty =30;
           uwStep = HallSensor_GetPinState();
           HALLSensor_Detected_BLDC(PWM_Duty);
-          //  DelayMs(100);
-          Dir =0;
-		  n_pulse=0;
 		  PRINTF("STOP HOR ^^^^^^^^^^\r\n");
+ 
+          Dir =0;
+		
+		  
+	          
+		  if(s==0){
+			  
+			  /*run to down slowly CCW direction Horzion Dir =0*/
+			  PWM_Duty =20;
+	          uwStep = HallSensor_GetPinState();
+	          HALLSensor_Detected_BLDC(PWM_Duty);
+			  HALL_Pulse = abs(HALL_Pulse);
+			  temp = en_t.Horizon_Position - HALL_Pulse  ; //error
+			  temp =abs(temp);
+			  PRINTF("STOP iError@@ =%d\r\n",temp);
+			  if(temp <=50)s++;
+			  PRINTF("STOP UP*******\r\n");
+		  }
+		  
      
      }
-    else { 
+    else{ 
             
 	    en_t.HorizonStop_flag=0;
         n_pulse =0;
@@ -600,7 +585,7 @@ int main(void)
                      n_pulse =0;
 				   PRINTF("DIR =0\r\n");
 	  			   
-			     if(Dir==1) // Dir = 0; //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª
+			     if(Dir==1) /* Dir = 0; Run to CCW direction */
 				   {
 	               
 	                 if((motor_ref.motor_run == 1) &&(motor_ref.Dir_flag ==1))//motor is runing
@@ -683,7 +668,7 @@ void BARKE_KEY_IRQ_HANDLER(void )//void BOARD_BRAKE_IRQ_HANDLER(void)
 	PMW_AllClose_ABC_Channel();
 	HALL_Pulse =0;
 	#ifdef DRV8302
-    GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
+    	GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
     #endif 
 	PRINTF("interrupte has happed  \r\n");
 	                  
