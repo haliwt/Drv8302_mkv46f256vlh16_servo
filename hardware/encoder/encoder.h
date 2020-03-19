@@ -14,7 +14,6 @@ typedef struct _encoder_t_
 {
   int32_t Horizon_Position;
   int32_t Vertical_Position;
-  int8_t  Home_flag;
   int8_t  End_H_flag;
   int8_t  End_V_flag;
   uint16_t eInit_n;   //初始化起始位置和终点位置的次数
@@ -25,7 +24,9 @@ typedef struct _encoder_t_
   uint8_t First_H_dec;    //第一次水平检测的标志位。
   uint8_t First_V_dec;
   uint8_t HorizonStop_flag; /* 水平停止标志位 */
-  uint8_t Stop_flag; 
+  uint8_t Stop_flag;
+  uint8_t Idrun_times;
+
  }encoder_t;
 
 
