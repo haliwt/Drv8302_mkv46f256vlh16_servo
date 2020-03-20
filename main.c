@@ -98,6 +98,8 @@ int main(void)
    {
        ucKeyCode = KEY_Scan(0);
     mHoldPos = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+	//PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
+   // PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
        
 	#ifdef DEBUG_PRINT 
 		   PRINTF("CPHod: %d\r\n", mHoldPos);
@@ -147,7 +149,8 @@ int main(void)
 								/*To judge  Home position and End position*/
 								 if(HALL_Pulse >=0){
 							    		PRINTF("HALL > 0\n\r");
-									
+									    PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
+    									PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
 								 		if((en_t.HorVer_R_times==1)&&(en_t.First_V_dec !=1)){
 												en_t.Horizon_HALL_Pulse =HALL_Pulse;
 										      
@@ -195,6 +198,8 @@ int main(void)
 										
 										PRINTF("End_H_flag = %d \r\n",en_t.End_H_flag);
 										PRINTF("First_H_dec = %d \r\n",en_t.First_H_dec);
+										PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
+    									PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
 									
 										if((en_t.HorVer_R_times == 1)&&( en_t.First_H_dec!=1)){
 											 PRINTF("-HallN 1=- %d\r\n", HALL_Pulse );
@@ -212,7 +217,7 @@ int main(void)
 										else if((en_t.HorVer_R_times==2)&& (en_t.End_H_flag !=1)){ 
 
 											
-											/*????¦Ì?????¦Ë??????????????¦Ë??,hall <0*/
+											/*????ï¿½ï¿½?????ï¿½ï¿½??????????????ï¿½ï¿½??,hall <0*/
 											if(en_t.First_V_dec == 1){
 												
 												 en_t.Horizon_HALL_Pulse = HALL_Pulse;
@@ -225,7 +230,7 @@ int main(void)
 											}
 											else{
 												
-												/*????¦Ä??¦Ë??*/
+												/*????ï¿½ï¿½??ï¿½ï¿½??*/
 												en_t.Vertical_HALL_Pulse = HALL_Pulse;
 										        en_t.End_V_flag = 1;
 												en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
