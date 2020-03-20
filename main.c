@@ -306,7 +306,7 @@ int main(void)
 					   	else
 					   		PRINTF("-HDff = - %d \n\r",HDff);
 				
-                       	if((HDff <= 500 && HDff >= -500)&&(HALL_Pulse>10)){
+                       	if((HDff <= 400 && HDff >= -400)&&(HALL_Pulse>10)){
 
 							m++;
 						
@@ -445,17 +445,19 @@ int main(void)
     else if(en_t.HorizonStop_flag==2){
 		
            	mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
+			//PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
+    		//PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
 			if(en_t.Idrun_times ==0){
 			  Dir =0;
 			  /*run to down slowly CCW direction Horzion Dir =0*/
-			  PWM_Duty =20;
+			  PWM_Duty =0;//20;//20
 	          uwStep = HallSensor_GetPinState();
 	          HALLSensor_Detected_BLDC(PWM_Duty);
 			  HALL_Pulse = abs(HALL_Pulse);
 			  temp =  mCurPosValue - en_t.Horizon_Position ; //error
 			  temp =abs(temp);
 			  PRINTF("STOP iError@@ =%d\r\n",temp);
-			  if(temp <=50)en_t.Idrun_times++;
+			  if(temp <=80)en_t.Idrun_times++;
 			  PRINTF("STOP UP UP UP\r\n");
 		  }
 
