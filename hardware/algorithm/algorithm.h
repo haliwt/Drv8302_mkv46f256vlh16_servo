@@ -19,13 +19,13 @@ typedef struct _pid_t_
 	
 }pid_t;
 
-#define  P_DATA      0.85f                                // P²ÎÊý
-#define  I_DATA      0.055f                                // I²ÎÊý
-#define  D_DATA      0.558f                                 // D²ÎÊý
+extern float  P_DATA  ;//=    0.85f ;                               // P²ÎÊý
+extern float  I_DATA  ;// =   0.055f  ;                              // I²ÎÊý
+extern float  D_DATA  ;// =   0.558f  ;                               // D²ÎÊý
 
-#define  VP_DATA      0.85f                                // P²ÎÊý
-#define  VI_DATA      0.055f                                // I²ÎÊý
-#define  VD_DATA      0.558f                                 // D²ÎÊý
+extern float  VP_DATA ;//=     0.85f  ;                              // P²ÎÊý
+extern float  VI_DATA ;//=     0.055f ;                               // I²ÎÊý
+extern float VD_DATA  ; //=   0.558f  ;                               // D²ÎÊý
 
 
 void Horizontal_Decelerate_Function(void);

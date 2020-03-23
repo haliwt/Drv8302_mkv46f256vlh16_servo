@@ -149,14 +149,14 @@ void Detect_HorVer_Position(void)
 /*************************************************
 	*
 	*函数名：
-	*函数功能：电机水平运动减速算法函�?
+	*函数功能：电机水平运动减速算法函?
 	*
 	*
 **************************************************/
 void Horizontal_Decelerate_Function(void)
 {
 		int32_t HDff;
-		int8_t n;
+		uint8_t n;
 		algpid_t.iError =abs( (algpid_t.mCurPosValue - en_t.Horizon_Position)/en_t.VH_Total_Dis);//iError =[0 1]
 		if(algpid_t.iError <= 20 && algpid_t.iError >= -20)algpid_t.iError =0; //error range 
 		#ifdef DEBUG_PRINT
@@ -233,7 +233,7 @@ void Horizontal_Decelerate_Function(void)
 /*************************************************
 	*
 	*函数名：
-	*函数功能：电机垂直运动减速算法函�?
+	*函数功能：电机垂直运动减速算法函?
 	*
 	*
 **************************************************/
@@ -263,7 +263,7 @@ void Vertical_Decelerate_Function(void)
 	  	      BLDCMotor.Lock_Time ++;
 			  BLDCMotor.Position = VDff;
 	          HALL_Pulse = 0;
-			 if(BLDCMotor.Lock_Time >=2){//Â¼Ã†Ã‹Ã£ÂµÂ¼Â¸Ã‹ÂµÂ½Â´Â¹Ã–Â±ÃŽÂ»Ã–ÃƒÂµÃ„Â¼ÃµÃ‹Ã™Ã‡Ã�?
+			 if(BLDCMotor.Lock_Time >=2){//Â¼Ã†Ã‹Ã£ÂµÂ¼Â¸Ã‹ÂµÂ½Â´Â¹Ã–Â±ÃŽÂ»Ã–ÃƒÂµÃ„Â¼ÃµÃ‹Ã™Ã‡Ã?
 		
 					    Dir =0;
 				    PWM_Duty=30;
@@ -307,7 +307,7 @@ void Vertical_Decelerate_Function(void)
 /*************************************************
 	*
 	*Function Name:
-	*Function:decelerate speed rgion 
+	*Function:horizon decelerate speed rgion 
 	*
 	*
 **************************************************/

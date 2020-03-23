@@ -40,10 +40,17 @@ __IO int32_t HALL_Pulse;
 
 output_t  motor_ref;
 encoder_t en_t;
-int32_t PID_Result;
-PID_TypeDef  sPID;
+
 __IO int32_t  PID_PWM_Duty;
 BLDC_Typedef BLDCMotor;
+float  P_DATA  =   0.85f ;                               // P2?那y
+float  I_DATA   =  0.055f  ;                              // I2?那y
+float  D_DATA   =  0.558f  ;                               // D2?那y
+
+float  VP_DATA   =   0.85f  ;                              // P2?那y
+float  VI_DATA   =   0.055f ;                               // I2?那y
+float VD_DATA   = 0.558f  ;  
+
 
 
 /*******************************************************************************
@@ -63,7 +70,6 @@ int main(void)
      uint8_t ucKeyCode=0;
      uint8_t RxBuffer[8],i,ki,kp,kd,k0;
 	 
-     int32_t temp;
 	 float KP,KI,KD,KPV,KIV,KDV;
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
 	
@@ -218,6 +224,12 @@ int main(void)
 							  KPV = (float)RxBuffer[4]/10;
 		                      KIV = (float)RxBuffer[5]/10;
 		                      KDV = (float)RxBuffer[6]/10;
+		                      P_DATA = kp;
+		                      I_DATA = ki;
+		                      D_DATA = kd;
+		                      VP_DATA = KPV;
+		                      VI_DATA = KIV;
+		                      VD_DATA = KDV;
 							  motor_ref.motor_run =RxBuffer[7];
 					  	  }
 						  else{
