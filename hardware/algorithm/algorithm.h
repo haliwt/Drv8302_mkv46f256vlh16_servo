@@ -10,6 +10,12 @@ typedef struct _pid_t_
 	 volatile int32_t last_iError;
 	 volatile int32_t iVError;
 	 volatile int32_t mCurPosValue;
+	 volatile int32_t mHoldPos;
+	 uint8_t Buff[2];
+	 uint8_t  hv_n;
+	 uint8_t hv_g_n;
+	 uint8_t total_n;
+	 uint8_t hor_n;
 	
 }pid_t;
 
@@ -24,6 +30,7 @@ typedef struct _pid_t_
 
 void Horizontal_Decelerate_Function(void);
 void Vertical_Decelerate_Function(void);
+void Detect_HorVer_Position(void);
 
 
 extern pid_t algpid_t ;

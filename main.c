@@ -60,15 +60,15 @@ int main(void)
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
  
-     uint8_t ucKeyCode=0,z=0;
-     uint8_t RxBuffer[8],i,ki,kp,kd,k0,HALL_temp;
+     uint8_t ucKeyCode=0;
+     uint8_t RxBuffer[8],i,ki,kp,kd,k0;
 	 
      int32_t temp;
 	 float KP,KI,KD,KPV,KIV,KDV;
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
-	 volatile int32_t mCurPosValue,mHoldPos;
+	
 	 uint32_t eIn_n= 0;
-	 int16_t j=0;
+	
      
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -98,7 +98,7 @@ int main(void)
    while(1)
    {
     ucKeyCode = KEY_Scan(0);
-    mHoldPos = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+    algpid_t.mHoldPos = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 	//PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
    // PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
        
@@ -109,158 +109,20 @@ int main(void)
 		
 #if 1
 	 /***********Position :Home and End*****************/
-        if(en_t.eInit_n ==0)//ÅÐ¶ÏË®Æ½ºÍÖÕÖ¹Î»ÖÃ£¬ÕÒ³öË®Æ½ºÍ´¹Ö±Î»ÖÃÖµ
+        if(algpid_t.total_n ==0)//ÅÐ¶ÏË®Æ½ºÍÖÕÖ¹Î»ÖÃ£¬ÕÒ³öË®Æ½ºÍ´¹Ö±Î»ÖÃÖµ
         {
 			
 			PWM_Duty =50;
             
             if(eIn_n > 300 ){
                    
-				   j++;
-                   if(j==1){
-                            EnBuf[0]=mHoldPos;
-                            
-							   }
-				   else if(j==8){
-				   			EnBuf[1]= mCurPosValue;
-                           }
-
-				   if(j==12)j=0;
-
-					/*judge and setup this Home and End Position */
-			      if((EnBuf[0]==EnBuf[1])&&(EnBuf[0]>=1 || EnBuf[1]>=1)){
-                     
-                       z++;
-                       if(z==1) {
-                           // DelayMs(10);
-                            EnBuf[1]= 0;
-							EnBuf[0]=0;
-							PRINTF("Z==1 ZZZZZZZZZZZ \n\r");
-							 HALL_Pulse =0;
-                         }
-					  else if(z ==2){
-							  /*judge home and end position twice*/
-                                en_t.HorVer_R_times++;
-								PRINTF("Z==2 ############# \n\r");
-                                PMW_AllClose_ABC_Channel();
-                                motor_ref.motor_run = 0;
-                                eIn_n=0;
-                                z=0;
-								PRINTF("en_t.HorVer_R_times = %d\n\r",en_t.HorVer_R_times);
-								/*To judge  Home position and End position*/
-								 if(HALL_Pulse >=0){
-							    		PRINTF("HALL > 0\n\r");
-									    PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
-    									PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
-								 		if((en_t.HorVer_R_times==1)&&(en_t.First_V_dec !=1)){
-												en_t.Horizon_HALL_Pulse =HALL_Pulse;
-										      
-												en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-												en_t.First_H_dec = 1;
-												PRINTF("HorizP_1 = %d\r\n",en_t.Horizon_Position);
-												PRINTF("Hor_HALL_1 = %d\r\n",en_t.Horizon_HALL_Pulse);
-												HALL_Pulse =0;
-								 		}
-										else{
-
-												if((en_t.HorVer_R_times==2)&&(en_t.End_V_flag !=1)){
-
-												        /* */
-													    
-														if(en_t.First_H_dec==1){
-
-														    en_t.Vertical_HALL_Pulse =HALL_Pulse;
-													        en_t.End_H_flag = 1;
-															en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-														
-															PRINTF("VerPos_2 = %d\r\n",en_t.Vertical_Position);
-															PRINTF("VerHal_2 = %d\r\n",en_t.Vertical_HALL_Pulse);
-															HALL_Pulse =0;
-															
-															
-														}
-														else{
-															/**/
-															en_t.Horizon_HALL_Pulse =HALL_Pulse;
-													        en_t.End_H_flag = 1;
-															en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-														
-															PRINTF("HoPos_2 = %d\r\n",en_t.Horizon_Position);
-															PRINTF("HoHal_2 = %d\r\n",en_t.Horizon_HALL_Pulse);
-															HALL_Pulse =0;
-														}
-											 
-										        }
-										 
-					                     }
-								 }
-								else{
-										PRINTF("HALL < 0 \r\n");
-										
-										PRINTF("End_H_flag = %d \r\n",en_t.End_H_flag);
-										PRINTF("First_H_dec = %d \r\n",en_t.First_H_dec);
-										PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
-    									PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
-									
-										if((en_t.HorVer_R_times == 1)&&( en_t.First_H_dec!=1)){
-											 PRINTF("-HallN 1=- %d\r\n", HALL_Pulse );
-											 en_t.Vertical_HALL_Pulse = HALL_Pulse;
-									    
-											 en_t.First_V_dec =1;
-											 en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-											
-											 PRINTF("--Ver_1 = %d\r\n",en_t.Vertical_Position);
-											 PRINTF("--Ver_HALL_1 =- %d\r\n",en_t.Vertical_HALL_Pulse);
-											 HALL_Pulse =0;
-
-										
-										}
-										else if((en_t.HorVer_R_times==2)&& (en_t.End_H_flag !=1)){ 
-
-											
-											/*the second detector horizon Position*/
-											if(en_t.First_V_dec == 1){
-												
-												 en_t.Horizon_HALL_Pulse = HALL_Pulse;
-												 en_t.End_V_flag = 1;
-												 en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-												 
-												 PRINTF("--Hor_2 = %d\r\n",en_t.Horizon_Position);
-												 PRINTF("--Hor_HALL_2 =- %d\r\n",en_t.Horizon_HALL_Pulse);
-												 HALL_Pulse =0;
-											}
-											else{
-												
-												/*the second detector Horizon Position*/
-												en_t.Vertical_HALL_Pulse = HALL_Pulse;
-										        en_t.End_V_flag = 1;
-											   // en_t.VerToHor_Position=1;
-												en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-												
-												 PRINTF("--VerPos_2= %d\r\n",en_t.Vertical_Position);
-												 PRINTF("--Ver_HALL_2 =- %d\r\n",en_t.Vertical_HALL_Pulse);
-												 HALL_Pulse =0;
-												
-
-											}
-												
-										}
-								 }
-						 if(en_t.HorVer_R_times==2){
-						 	      en_t.eInit_n++;
-								  HALL_Pulse =0;
-						          en_t.VH_Total_Dis = abs(abs(en_t.Horizon_Position) -abs(en_t.Vertical_Position));//¼ÆËãÕû¸öÐÐ³ÌµÄ¾ø¶ÔÖµ
-						          
-						          KP = 0.1f;  /*?????PID ????????*/
-								  KI= 0.02f;
-								  KD = 1.0f;
-								  KPV = 0.1f;
-								  KIV = 0.2f;
-								  KDV = 0.1f;
-						 }
-								
-                      }
+				   Detect_HorVer_Position();
                   }
+			 if(en_t.HorVer_R_times==2){
+		 	      algpid_t.total_n++;
+				  HALL_Pulse =0;
+		          en_t.VH_Total_Dis = abs(abs(en_t.Horizon_Position) -abs(en_t.Vertical_Position));//¼ÆËãÕû¸öÐÐ³ÌµÄ¾ø¶ÔÖµ
+			 }
                 
         }
         if(eIn_n > 300)eIn_n =0;
@@ -284,7 +146,7 @@ int main(void)
 	     if(en_t.eInit_n !=1)
 	     algpid_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 	        #ifdef DEBUG_PRINT 
-	         	PRINTF("CurrPos : %d\r\n", mCurPosValue);
+	         	PRINTF("CurrPos : %d\r\n", algpid_t.mCurPosValue);
 	        #endif
                
 		    eIn_n ++; 
@@ -316,7 +178,7 @@ int main(void)
 	} 
     else if(en_t.HorizonStop_flag==2){
 		
-           	mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
+           	algpid_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 			//PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
     		//PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
 			if(en_t.Idrun_times ==0){
@@ -326,7 +188,7 @@ int main(void)
 	          uwStep = HallSensor_GetPinState();
 	          HALLSensor_Detected_BLDC(PWM_Duty);
 			  HALL_Pulse = abs(HALL_Pulse);
-			  temp =  mCurPosValue - en_t.Horizon_Position ; //error
+			  temp =  algpid_t.mCurPosValue - en_t.Horizon_Position ; //error
 			  temp =abs(temp);
 			  PRINTF("STOP iError@@ =%d\r\n",temp);
 			  if(temp <=80)en_t.Idrun_times++;
@@ -522,7 +384,7 @@ int main(void)
 	}
 
   }//end while(1)
-}
+
 /******************************************************************************
  *
  * Function Name:BARKE_KEY_IRQ_HANDLER(void)

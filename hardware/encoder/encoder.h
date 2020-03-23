@@ -60,7 +60,7 @@ extern encoder_t en_t;
 #define FTM_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_FastPeriphClk)
 
 
-extern uint32_t mCurPosValue;
+
 void Capture_Input_Init(void);
 uint16_t Capture_ReadPulse_Value(void);
 void ENC_SetPositionZero(ENC_Type *base, uint32_t value);
