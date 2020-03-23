@@ -126,7 +126,7 @@ int main(void)
                 
         }
         if(eIn_n > 300)eIn_n =0;
-       }
+     
 	
 #endif 
          
@@ -178,31 +178,9 @@ int main(void)
 	} 
     else if(en_t.HorizonStop_flag==2){
 		
-           	algpid_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
-			//PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
-    		//PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
-			if(en_t.Idrun_times ==0){
-			  Dir =0;
-			  /*run to down slowly CCW direction Horzion Dir =0*/
-			  PWM_Duty =0;//20;//20
-	          uwStep = HallSensor_GetPinState();
-	          HALLSensor_Detected_BLDC(PWM_Duty);
-			  HALL_Pulse = abs(HALL_Pulse);
-			  temp =  algpid_t.mCurPosValue - en_t.Horizon_Position ; //error
-			  temp =abs(temp);
-			  PRINTF("STOP iError@@ =%d\r\n",temp);
-			  if(temp <=80)en_t.Idrun_times++;
-			  PRINTF("STOP UP UP UP\r\n");
-		  }
+           Decelerate_Speed_Region();
+		  
 
-		  /*keep balance guide rode*/
-	      Dir =1;
-          PWM_Duty =30;
-          uwStep = HallSensor_GetPinState();
-          HALLSensor_Detected_BLDC(PWM_Duty);
-		  PRINTF("STOP HOR ^^^^^^^^^^\r\n");
- 
-          Dir =0;
      
      }
     else{ //µç»úÍ£Ö¹ÔËÐÐ³ÌÐò
@@ -384,7 +362,7 @@ int main(void)
 	}
 
   }//end while(1)
-
+}
 /******************************************************************************
  *
  * Function Name:BARKE_KEY_IRQ_HANDLER(void)

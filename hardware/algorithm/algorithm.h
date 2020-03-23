@@ -31,6 +31,7 @@ typedef struct _pid_t_
 void Horizontal_Decelerate_Function(void);
 void Vertical_Decelerate_Function(void);
 void Detect_HorVer_Position(void);
+void Decelerate_Speed_Region(void);
 
 
 extern pid_t algpid_t ;

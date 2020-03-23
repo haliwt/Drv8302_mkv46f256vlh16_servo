@@ -186,7 +186,6 @@ void Horizontal_Decelerate_Function(void)
 					PRINTF("HHHHHHHHHH\r\n");
 					BLDCMotor.Lock_Time=0;
 					algpid_t.iError =0;
-				  // algpid_t.hor_n=0;
 					for(n =0;n<250;n++)//300 times motor run to Vertical is error
 					{
 	                    Dir =1;
@@ -305,3 +304,42 @@ void Vertical_Decelerate_Function(void)
 	PWM_Duty = PID_PWM_Duty;
 	HALL_Pulse =0;
 }
+/*************************************************
+	*
+	*Function Name:
+	*Function:decelerate speed rgion 
+	*
+	*
+**************************************************/
+
+void Decelerate_Speed_Region(void)
+{
+		   int32_t temp;
+			algpid_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
+			//PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
+    		//PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
+			if(en_t.Idrun_times ==0){
+			  Dir =0;
+			  /*run to down slowly CCW direction Horzion Dir =0*/
+			  PWM_Duty =0;//20;//20
+	          uwStep = HallSensor_GetPinState();
+	          HALLSensor_Detected_BLDC(PWM_Duty);
+			  HALL_Pulse = abs(HALL_Pulse);
+			  temp =  algpid_t.mCurPosValue - en_t.Horizon_Position ; //error
+			  temp =abs(temp);
+			  PRINTF("STOP iError@@ =%d\r\n",temp);
+			  if(temp <=80)en_t.Idrun_times++;
+			  PRINTF("STOP UP UP UP\r\n");
+			}
+			  
+		  /*keep balance guide rode*/
+	      Dir =1;
+          PWM_Duty =30;
+          uwStep = HallSensor_GetPinState();
+          HALLSensor_Detected_BLDC(PWM_Duty);
+		  PRINTF("STOP HOR ^^^^^^^^^^\r\n");
+ 
+          Dir =0;
+
+}
+
