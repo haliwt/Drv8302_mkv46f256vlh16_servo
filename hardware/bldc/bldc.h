@@ -47,6 +47,7 @@ typedef struct _BLDC_Typedef_{
   __IO int32_t  Lock_Time;    // 电机堵转时间
 }BLDC_Typedef;
 
+extern BLDC_Typedef BLDCMotor;
 
 typedef enum
 {

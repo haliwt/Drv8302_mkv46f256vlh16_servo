@@ -26,10 +26,13 @@ typedef struct _encoder_t_
   uint8_t HorizonStop_flag; /* 水平停止标志位 */
   uint8_t Stop_flag;
   uint8_t Idrun_times;
+  uint32_t VH_Total_Dis;      /*绝对误差值*/
+  uint8_t VerToHor_Position ; /*垂直位置的水平位置第二次判断*/
+  uint8_t HorToVer_Position;  /*水平位置的垂直位置第二判断*/
 
  }encoder_t;
 
-
+extern encoder_t en_t;
 
 /*******************************************************************************
  * Definitions

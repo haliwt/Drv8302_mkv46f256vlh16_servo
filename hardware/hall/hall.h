@@ -25,13 +25,8 @@ typedef struct
    
 
 
-#define  P_DATA      0.1f//0.85f                                // P����
-#define  I_DATA      0.01//0.055f                                // I����
-#define  D_DATA      0.2//0.558f                                 // D����
 
-#define P_ANGLE_DATA        0.35f   		//��������
-#define I_ANGLE_DATA		0.002f
-#define D_ANGLE_DATA		0.35f
+      
 
 #define abs(x)    ((x)>0?(x):-(x))
 
