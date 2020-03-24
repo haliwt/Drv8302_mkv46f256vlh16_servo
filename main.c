@@ -115,8 +115,8 @@ int main(void)
 		
 #if 1
 	 /***********Position :Home and End*****************/
-        if(algpid_t.total_n ==0)//ÅÐ¶ÏË®Æ½ºÍÖÕÖ¹Î»ÖÃ£¬ÕÒ³öË®Æ½ºÍ´¹Ö±Î»ÖÃÖµ
-        {
+        if(algpid_t.total_n ==0){
+        
 			
 			PWM_Duty =50;
             
@@ -130,8 +130,8 @@ int main(void)
 		          en_t.VH_Total_Dis = abs(abs(en_t.Horizon_Position) -abs(en_t.Vertical_Position));//¼ÆËãÕû¸öÐÐ³ÌµÄ¾ø¶ÔÖµ
 			 }
                 
-        }
-        if(eIn_n > 300)eIn_n =0;
+       }
+       if(eIn_n > 300)eIn_n =0;
      
 	
 #endif 
@@ -143,9 +143,9 @@ int main(void)
 			   PWM_Duty = PID_PWM_Duty;
    		  	}	
    		 
-		   #ifdef DRV8302 
-            GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
-		   #endif 
+		  #ifdef DRV8302 
+            	GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
+		  #endif 
 		  uwStep = HallSensor_GetPinState();
           HALLSensor_Detected_BLDC(PWM_Duty);
           
@@ -157,9 +157,9 @@ int main(void)
                
 		    eIn_n ++; 
 		 	if((eIn_n >= 0xfffffffe)&&(en_t.HorVer_R_times==2))eIn_n =1;
-			else if(eIn_n >= 0xfffffffe)eIn_n = 0;
+		   else if(eIn_n >= 0xfffffffe)eIn_n = 0;
            Time_CNT++;
-#if 1    
+	  
         /* 100ms arithmetic PID */
     	if(Time_CNT % 100== 0){
 
@@ -175,24 +175,25 @@ int main(void)
 
 				Vertical_Decelerate_Function();	
 				
-		}
-	   if(Time_CNT ==100){
-			Time_CNT = 0;
-			HALL_Pulse =0;
-	   	}
-	   #endif 
+		   }
+		   if(Time_CNT ==100){
+				Time_CNT = 0;
+				HALL_Pulse =0;
+		 }
+	
 	} 
     else if(en_t.HorizonStop_flag==2){
 		
-           Decelerate_Speed_Region();
+           Stop_Region();
 		  
-
-     
-     }
-    else{ //µç»úÍ£Ö¹ÔËÐÐ³ÌÐò
+		}
+    else{ //stop 
         en_t.Idrun_times =0;  
 	    en_t.HorizonStop_flag=0;
-    
+        algpid_t.iVError=0;
+		algpid_t.iError=0;
+		algpid_t.dError_sum=0;
+		algpid_t.last_iError=0;
 		
 		PMW_AllClose_ABC_Channel();
 		HALL_Pulse =0;

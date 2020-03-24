@@ -31,7 +31,7 @@ extern float VD_DATA  ; //=   0.558f  ;                               // D²ÎÊ
 void Horizontal_Decelerate_Function(void);
 void Vertical_Decelerate_Function(void);
 void Detect_HorVer_Position(void);
-void Decelerate_Speed_Region(void);
+void Stop_Region(void);
 
 
 extern pid_t algpid_t ;
