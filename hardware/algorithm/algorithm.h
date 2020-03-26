@@ -11,6 +11,7 @@ typedef struct _pid_t_
 	 volatile int32_t iVError;
 	 volatile int32_t mCurPosValue;
 	 volatile int32_t mHoldPos;
+	 volatile int32_t mStopHoldPos; /*indication stop Position value*/
 	 uint8_t Buff[2];
 	 uint8_t  hv_n;
 	 uint8_t hv_g_n;

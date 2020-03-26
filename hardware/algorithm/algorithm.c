@@ -303,38 +303,42 @@ void Vertical_Decelerate_Function(void)
 /*************************************************
 	*
 	*Function Name:
-	*Function:horizon stop region 
+	*Function:horizon stop region when the motor run limit to stop
 	*
 	*
 **************************************************/
 void Stop_Region(void)
 {
-		   int32_t temp;
-			algpid_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
-			//PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
-    		//PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
-			if(en_t.Idrun_times ==0){
-			  Dir =0;
-			  /*run to down slowly CCW direction Horzion Dir =0*/
-			  PWM_Duty =0;//20;//20
-	          uwStep = HallSensor_GetPinState();
-	          HALLSensor_Detected_BLDC(PWM_Duty);
-			  HALL_Pulse = abs(HALL_Pulse);
-			  temp =  algpid_t.mCurPosValue - en_t.Horizon_Position ; //error
-			  temp =abs(temp);
-			  PRINTF("STOP iError@@ =%d\r\n",temp);
-			  if(temp <=80)en_t.Idrun_times++;
-			  PRINTF("STOP UP UP UP\r\n");
-			}
-			  
-		  /*keep balance guide rode*/
-	      Dir =1;
-          PWM_Duty =30;
-          uwStep = HallSensor_GetPinState();
-          HALLSensor_Detected_BLDC(PWM_Duty);
-		  PRINTF("STOP HOR ^^^^^^^^^^\r\n");
- 
-          Dir =0;
+	int32_t temp;
+	algpid_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
+	//PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
+	//PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
+	if(en_t.Idrun_times ==0){
+	  Dir =0;
+	  /*run to down slowly CCW direction Horzion Dir =0*/
+	  PWM_Duty =0;//20;//20
+	  uwStep = HallSensor_GetPinState();
+	  HALLSensor_Detected_BLDC(PWM_Duty);
+	  HALL_Pulse = abs(HALL_Pulse);
+	  temp =  algpid_t.mCurPosValue - en_t.Horizon_Position ; //error
+	  temp =abs(temp);
+	  PRINTF("STOP iError@@ =%d\r\n",temp);
+	  if(temp <=80){
+	  		en_t.Idrun_times++;
+			algpid_t.mStopHoldPos = algpid_t.mCurPosValue - en_t.Horizon_Position ;
+	  		
+	  }
+	  PRINTF("STOP UP UP UP\r\n");
+	}
+	  
+	/*keep balance pole position*/
+	Dir =1;
+	PWM_Duty =30;
+	uwStep = HallSensor_GetPinState();
+	HALLSensor_Detected_BLDC(PWM_Duty);
+	PRINTF("STOP HOR ^^^^^^^^^^\r\n");
+	HALL_Pulse =0;
+	Dir =0;
 
 }
 

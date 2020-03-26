@@ -159,11 +159,11 @@ static inline void GPIO_PinWrite(GPIO_Type *base, uint32_t pin, uint8_t output)
 
     if (output == 0U)
     {
-        base->PCOR = u32flag << pin;
+        base->PCOR = u32flag << pin; //设置输出 0
     }
     else
     {
-        base->PSOR = u32flag << pin;
+        base->PSOR = u32flag << pin; //设置输出 1
     }
 }
 

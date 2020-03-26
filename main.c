@@ -74,6 +74,7 @@ int main(void)
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
 	
 	 uint32_t eIn_n= 0;
+	 Dir=3;
 	
      
     XBARA_Init(XBARA);
@@ -85,8 +86,8 @@ int main(void)
      KEY_Init();
      DelayInit();
      HALL_Init();
-     Capture_Input_Init();
-     
+
+    FTM_Quadrature_Init(); 
     OUTPUT_Fucntion_Init();
     ADC_CADC_Init();
    /* Set the PWM Fault inputs to a low value */
@@ -98,7 +99,7 @@ int main(void)
     ENC_Init(DEMO_ENC_BASEADDR, &mEncConfigStruct);
     ENC_DoSoftwareLoadInitialPositionValue(DEMO_ENC_BASEADDR); /* Update the position counter with initial value. */
     #endif
-	Dir=3;
+	
    
 	
    while(1)
@@ -114,7 +115,7 @@ int main(void)
 			
 		
 #if 1
-	 /***********Position :Home and End*****************/
+	 /***********look for Position :Home and End*****************/
         if(algpid_t.total_n ==0){
         
 			
@@ -127,8 +128,7 @@ int main(void)
 			 if(en_t.HorVer_R_times==2){
 		 	      algpid_t.total_n++;
 				  HALL_Pulse =0;
-		          en_t.VH_Total_Dis = abs(abs(en_t.Horizon_Position) -abs(en_t.Vertical_Position));//¼ÆËãÕû¸öÐÐ³ÌµÄ¾ø¶ÔÖµ
-			 }
+		          en_t.VH_Total_Dis = abs(abs(en_t.Horizon_Position) -abs(en_t.Vertical_Position));//Toatal= horizonPos-verticalPos
                 
        }
        if(eIn_n > 300)eIn_n =0;
@@ -137,7 +137,7 @@ int main(void)
 #endif 
          
     /***********motor run main*********************/
-     if((motor_ref.motor_run == 1)&&(en_t.HorizonStop_flag !=2))//µç»úÔËÐÐ³ÌÐò
+     if((motor_ref.motor_run == 1)&&(en_t.HorizonStop_flag !=2))//judge motor run is condition
       {
    		  if(en_t.eInit_n == 1){
 			   PWM_Duty = PID_PWM_Duty;
@@ -164,7 +164,7 @@ int main(void)
     	if(Time_CNT % 100== 0){
 
 			algpid_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);  /*read current position of value*/
-			if(Dir == 0)//CCW HB0 = Horizion
+			if(Dir == 0)//CCW motor to run Horizion position
 			{
 					
                Horizontal_Decelerate_Function();    
@@ -182,12 +182,12 @@ int main(void)
 		 }
 	
 	} 
-    else if(en_t.HorizonStop_flag==2){
+    else if(en_t.HorizonStop_flag==2){ //motor run to stop
 		
            Stop_Region();
 		  
 		}
-    else{ //stop 
+    else{ //Don't motor run to stop 
         en_t.Idrun_times =0;  
 	    en_t.HorizonStop_flag=0;
         algpid_t.iVError=0;
@@ -374,6 +374,7 @@ int main(void)
         
 	}
 
+    }
   }//end while(1)
 }
 /******************************************************************************

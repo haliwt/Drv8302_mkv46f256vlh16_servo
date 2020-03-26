@@ -34,36 +34,33 @@ typedef struct _encoder_t_
 
 extern encoder_t en_t;
 
-/*******************************************************************************
- * Definitions
- ******************************************************************************/
+
 #define DEMO_ENC_BASEADDR ENC
 
 
+/* Get source clock for PIT driver */
+#define PIT_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_BusClk)
+
 /* The Flextimer instance/channel used for board */
-#define DEMO_FTM_BASEADDR FTM3
-
-/* FTM channel pair used for the dual-edge capture, channel pair 2 uses channels 4 and 5 */
-#define BOARD_FTM_INPUT_CAPTURE_CHANNEL_PAIR kFTM_Chnl_3    //kFTM_Chnl_2
-
-/* Interrupt number and interrupt handler for the FTM instance used */
-#define FTM_INTERRUPT_NUMBER FTM3_IRQn
-#define FTM_INPUT_CAPTURE_HANDLER FTM3_IRQHandler
-
-/* Interrupt to enable and flag to read; depends on the FTM channel used for dual-edge capture */
-#define FTM_FIRST_CHANNEL_INTERRUPT_ENABLE      kFTM_Chnl6InterruptEnable       //kFTM_Chnl4InterruptEnable
-#define FTM_FIRST_CHANNEL_FLAG              kFTM_Chnl6Flag   //kFTM_Chnl4Flag
-#define FTM_SECOND_CHANNEL_INTERRUPT_ENABLE      kFTM_Chnl7InterruptEnable                 //kFTM_Chnl5InterruptEnable
-#define FTM_SECOND_CHANNEL_FLAG      kFTM_Chnl7Flag           //kFTM_Chnl5Flag
+#define DEMO_FTM_BASEADDR FTM1
 
 /* Get source clock for FTM driver */
-#define FTM_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_FastPeriphClk)
+#define FTM_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_BusClk)
+
+#define DEMO_QUAD_DECODER_MODULO 2000U
+
+/*******************************************************************************
+ * Prototypes
+ ******************************************************************************/
+
+/*******************************************************************************
+ * Variables
+ ******************************************************************************/
 
 
 
-void Capture_Input_Init(void);
-uint16_t Capture_ReadPulse_Value(void);
-void ENC_SetPositionZero(ENC_Type *base, uint32_t value);
+void FTM_Quadrature_Init(void);
+
 
 
 
