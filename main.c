@@ -67,7 +67,7 @@ int main(void)
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
  
-     uint8_t ucKeyCode=0;
+     uint8_t ucKeyCode=0,endir=3;
      uint8_t RxBuffer[8],i,ki,kp,kd,k0;
 	 
 	 float KP,KI,KD,KPV,KIV,KDV;
@@ -122,7 +122,10 @@ int main(void)
 			PWM_Duty =50;
             
             if(eIn_n > 300 ){
-                   
+
+			       endir = FTM_Detect_Direction();
+				   if(endir == 1)PRINTF("111111111111\n");
+				   else PRINTF("0000000000\n");
 				   Detect_HorVer_Position();
                   }
 			 if(en_t.HorVer_R_times==2){

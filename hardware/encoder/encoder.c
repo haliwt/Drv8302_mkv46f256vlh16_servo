@@ -1,6 +1,6 @@
 #include "encoder.h"
 
-volatile uint32_t encoder_count         = 0U;
+
 volatile uint8_t dir_when_overflow      = 0U;
 volatile uint8_t counter_overflow_flag  = 0U;
 volatile uint8_t counter_overflow_count = 0U;
@@ -8,6 +8,15 @@ volatile uint32_t loop_counter          = 0U;
 volatile bool encoder_direction         = false;
 volatile bool gQdFreshReady             = false;
 
+
+/*********************************************************
+	*
+	*Function Name:void FTM_Qudrature_Init()
+	*Function :initinal FTM GPIO qudrature
+	*
+	*
+	*
+**********************************************************/
 void FTM_Quadrature_Init(void)
 {
 
@@ -43,10 +52,37 @@ void FTM_Quadrature_Init(void)
 
 }
 
+/*********************************************************
+	*
+	*Function Name:FTM _Detect_Direction(void)
+	*Function :
+	*
+	*
+	*
+**********************************************************/
+uint8_t FTM_Detect_Direction(void)
+{
+      /* Read counter value */
+	   en_t.encoder_count = FTM_GetQuadDecoderCounterValue(DEMO_FTM_BASEADDR);
+	   /* Clear counter */
+	   FTM_ClearQuadDecoderCounterValue(DEMO_FTM_BASEADDR);
+       PRINTF("Get current counter: %d\r\n", en_t.encoder_count);
+	   /* Read direction */
+	   if (FTM_GetQuadDecoderFlags(DEMO_FTM_BASEADDR) & kFTM_QuadDecoderCountingIncreaseFlag) //
+	   {
+		   encoder_direction = true;
+		   return 1;
+	   }
+	   else
+	   {
+		   encoder_direction = false;
+		   return 0;
+	   }
+	   
+	   
 
 
-
-
+}
 
 
 

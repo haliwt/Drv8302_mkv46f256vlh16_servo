@@ -29,6 +29,7 @@ typedef struct _encoder_t_
   uint32_t VH_Total_Dis;      /*绝对误差值*/
   uint8_t VerToHor_Position ; /*垂直位置的水平位置第二次判断*/
   uint8_t HorToVer_Position;  /*水平位置的垂直位置第二判断*/
+  volatile int32_t encoder_count ;
 
  }encoder_t;
 
@@ -60,6 +61,7 @@ extern encoder_t en_t;
 
 
 void FTM_Quadrature_Init(void);
+uint8_t FTM_Detect_Direction(void);
 
 
 
