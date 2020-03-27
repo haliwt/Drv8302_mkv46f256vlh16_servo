@@ -48,7 +48,7 @@ extern encoder_t en_t;
 /* Get source clock for FTM driver */
 #define FTM_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_BusClk)
 
-#define DEMO_QUAD_DECODER_MODULO 2000U
+#define DEMO_QUAD_DECODER_MODULO 65535U//2000U
 
 /*******************************************************************************
  * Prototypes

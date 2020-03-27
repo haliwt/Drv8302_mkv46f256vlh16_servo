@@ -26,13 +26,14 @@ extern float  D_DATA  ;// =   0.558f  ;                               // D²ÎÊ
 
 extern float  VP_DATA ;//=     0.85f  ;                              // P²ÎÊý
 extern float  VI_DATA ;//=     0.055f ;                               // I²ÎÊý
-extern float VD_DATA  ; //=   0.558f  ;                               // D²ÎÊý
+extern float  VD_DATA  ; //=   0.558f  ;                               // D²ÎÊý
 
 
 void Horizontal_Decelerate_Function(void);
 void Vertical_Decelerate_Function(void);
 void Detect_HorVer_Position(void);
 void Stop_Region(void);
+void Balance_Stop_Function(void);
 
 
 extern pid_t algpid_t ;

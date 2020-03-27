@@ -1,12 +1,9 @@
 #include "encoder.h"
 
 
-volatile uint8_t dir_when_overflow      = 0U;
-volatile uint8_t counter_overflow_flag  = 0U;
-volatile uint8_t counter_overflow_count = 0U;
-volatile uint32_t loop_counter          = 0U;
+
 volatile bool encoder_direction         = false;
-volatile bool gQdFreshReady             = false;
+
 
 
 /*********************************************************
@@ -78,10 +75,6 @@ uint8_t FTM_Detect_Direction(void)
 		   encoder_direction = false;
 		   return 0;
 	   }
-	   
-	   
-
-
 }
 
 

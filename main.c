@@ -117,9 +117,7 @@ int main(void)
 #if 1
 	 /***********look for Position :Home and End*****************/
         if(algpid_t.total_n ==0){
-        
-			
-			PWM_Duty =50;
+      
             
             if(eIn_n > 300 ){
 
@@ -191,19 +189,12 @@ int main(void)
 		  
 		}
     else{ //Don't motor run to stop 
-        en_t.Idrun_times =0;  
-	    en_t.HorizonStop_flag=0;
-        algpid_t.iVError=0;
-		algpid_t.iError=0;
-		algpid_t.dError_sum=0;
-		algpid_t.last_iError=0;
-		
-		PMW_AllClose_ABC_Channel();
-		HALL_Pulse =0;
-	
+      
+	    Balance_Stop_Function();
 		#ifdef DRV8302
 			GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,0);
 		#endif 
+		
 		
 	      DelayMs(50);
 	      GPIO_PortToggle(GPIOD,1<<BOARD_LED1_GPIO_PIN);
@@ -256,7 +247,7 @@ int main(void)
 	  switch(ucKeyCode){ 
                  
                   case DIR_CW_PRES ://Dir =1 ,PTE29-CW,KEY1
-				  	// Dir = 1;
+				  	/* Dir = 1; Run to CW direction to verticonal position*/
                       en_t.HorizonStop_flag=0;
 			    
 				     en_t.Idrun_times =0; 
@@ -277,9 +268,7 @@ int main(void)
                          
                               motor_ref.Dir_flag =1;
                               Dir =1;
-                            
-                          
-                        }
+                       	}
 						else 
 						{
 							Dir=1;
@@ -312,12 +301,12 @@ int main(void)
 				  break;
 		
 				 case DIR_CCW_PRES: //Dir = 0;PTE24 = CCW,KEY3
-				   // Dir = 0 ; //
+				   /* Dir = 0 ; Run to CCW direction to Horizon position*/
 				   en_t.HorizonStop_flag=0;
 				   en_t.Idrun_times =0; 
 				   PRINTF("DIR =0\r\n");
 	  			   
-			     if(Dir==1) /* Dir = 0; Run to CCW direction */
+			     if(Dir==1) /* Dir = 0; Run to CCW direction to Horizon position*/
 				   {
 	               
 	                 if((motor_ref.motor_run == 1) &&(motor_ref.Dir_flag ==1))//motor is runing
