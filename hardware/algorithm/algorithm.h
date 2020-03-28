@@ -1,7 +1,7 @@
 #ifndef __ALGORITHM_H__
 #define __ALGORITHM_H__
 #include "encoder.h"
-#include "bldc.h"
+#include "bsp_bldc.h"
 
 typedef struct _pid_t_
 {

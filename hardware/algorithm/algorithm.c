@@ -89,7 +89,7 @@ void Detect_HorVer_Position(void)
 			 
 	         }
 	 }
-	else{
+	else if(HALL_Pulse <=0){  /* HALL_Pulse == 0 motor stop    */
 			PRINTF("HALL < 0 \r\n");
 			
 			PRINTF("End_H_flag = %d \r\n",en_t.End_H_flag);
@@ -372,7 +372,7 @@ void Balance_Stop_Function(void)
 	*
 	*Function Name:static void PID_STOP_Region()
 	*Function:Balance stop function.
-	*Input Regerence:pid standard value ,curent position v
+	*Input Regerence:pid standard value ,current read position cvalue
 	*
 	*
 **************************************************/
@@ -389,7 +389,7 @@ static void PID_STOP_Region(int32_t istvalue,int32_t cvalue)
 			ilast_error = ierror_sum;
 			if((HALL_Pulse >=0)&&( istvalue <= 20 &&  istvalue >= -20 )){  
 				/*motor run to horizon position Dir =0 */
-				Dir = 1; /* negative direction run*/
+				Dir = 1; /* negative direction run to vertical*/
 				iresult =abs(iresult);
 				PWM_Duty =(uint32_t) iresult ;
 				uwStep = HallSensor_GetPinState();
@@ -398,7 +398,7 @@ static void PID_STOP_Region(int32_t istvalue,int32_t cvalue)
 			}
 			else if((HALL_Pulse < 0)&&( istvalue <= 20 &&  istvalue >= -20 )){/* Dir = 1; Run to CW direction to verticonal position*/
 
-				Dir = 0; /* positive direction run*/
+				Dir = 0; /* positive direction run to horizon */
 				iresult =abs(iresult);
 				PWM_Duty = (uint32_t)iresult ;
 				uwStep = HallSensor_GetPinState();
