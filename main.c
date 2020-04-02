@@ -43,13 +43,13 @@ encoder_t en_t;
 
 __IO int32_t  PID_PWM_Duty;
 BLDC_Typedef BLDCMotor;
-float  P_DATA  =   0.85f ;                               // P2?那y
-float  I_DATA   =  0.055f  ;                              // I2?那y
-float  D_DATA   =  0.558f  ;                               // D2?那y
+float  P_DATA   =   10.0f ;                               // P2?那y
+float  I_DATA   =   0.1f  ;                              // I2?那y
+float  D_DATA   =   1.0f  ;                               // D2?那y
 
-float  VP_DATA   =   0.85f  ;                              // P2?那y
-float  VI_DATA   =   0.055f ;                               // I2?那y
-float VD_DATA   = 0.558f  ;  
+float  VP_DATA   =   10.0f  ;                              // P2?那y
+float  VI_DATA   =   0.1f ;                               // I2?那y
+float  VD_DATA   =    1.0f  ;  
 
 
 
@@ -67,7 +67,7 @@ int main(void)
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
  
-     uint8_t ucKeyCode=0,endir=3;
+     uint8_t ucKeyCode=0;
      uint8_t RxBuffer[8],i,ki,kp,kd,k0;
 	 
 	 float KP,KI,KD,KPV,KIV,KDV;
@@ -118,11 +118,9 @@ int main(void)
 	 /***********look for Position :Home and End*****************/
         if(algpid_t.total_n ==0){
       
-            
             if(eIn_n > 300 ){
 				
-				   if(endir == 1)PRINTF("111111111111\n");
-				   else PRINTF("0000000000\n");
+				   PRINTF("0000000000\n");
 				   Detect_HorVer_Position();
             }
 			if(en_t.HorVer_R_times==2){
@@ -217,13 +215,13 @@ int main(void)
 		                     
 		                      PRINTF("KP KI KD = %d %d %d \n\r",kp,ki,kd);
 							  PRINTF("KPv KIv KDv = %d %d %d \n\r",RxBuffer[4],RxBuffer[5],RxBuffer[6]);
-		                      KP = (float)kp/10;
+		                      KP = (float)kp;
 		                      KI = (float)ki/10;
-		                      KD = (float)kd/10;
+		                      KD = (float)kd;
 							  
-							  KPV = (float)RxBuffer[4]/10;
+							  KPV = (float)RxBuffer[4];
 		                      KIV = (float)RxBuffer[5]/10;
-		                      KDV = (float)RxBuffer[6]/10;
+		                      KDV = (float)RxBuffer[6];
 		                      P_DATA = kp;
 		                      I_DATA = ki;
 		                      D_DATA = kd;

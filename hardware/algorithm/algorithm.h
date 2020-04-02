@@ -18,15 +18,16 @@ typedef struct _pid_t_
 	 volatile int32_t mHoldPos;
 	 volatile int32_t mStopHoldPos; /*indication stop Position value*/
 	 volatile int32_t mStopVerPos;
-	 uint8_t Buff[2];
+	 uint8_t  Buff[2];
 	 uint8_t  hv_n;
-	 uint8_t total_n;
-	 uint8_t hor_n;
+	 uint8_t  total_n;
+	 uint8_t  hor_n;
+	 uint8_t  oneKeyDetector_flag;  /*one key detector flag*/
 	
 }pid_t;
 
-extern float  P_DATA  ;//=    0.85f ;                               // P²ÎÊý
-extern float  I_DATA  ;// =   0.055f  ;                              // I²ÎÊý
+extern float  P_DATA ;//=    0.85f ;                               // P²ÎÊý
+extern float  I_DATA ;// =   0.055f  ;                              // I²ÎÊý
 extern float  D_DATA  ;// =   0.558f  ;                               // D²ÎÊý
 
 extern float  VP_DATA ;//=     0.85f  ;                              // P²ÎÊý

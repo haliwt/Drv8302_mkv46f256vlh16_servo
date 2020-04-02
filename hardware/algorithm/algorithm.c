@@ -28,14 +28,18 @@ void Detect_HorVer_Position(void)
 		if(algpid_t.Buff[0]==algpid_t.Buff[1]){
 
 			/*judge home and end position twice*/
+		   
 			en_t.HorVer_R_times++;
 			PRINTF("HorVer_times=%d \n\r",en_t.HorVer_R_times);
 			PMW_AllClose_ABC_Channel();
 			motor_ref.motor_run = 0;
+			algpid_t.oneKeyDetector_flag ++;
+			if(algpid_t.oneKeyDetector_flag ==2)
+				en_t.HorVer_R_times=1;
 			
 			PRINTF("en_t.HorVer_R_times = %d\n\r",en_t.HorVer_R_times);
 			/*To judge  Home position and End position*/
-			 if(HALL_Pulse >=0){
+			 if(HALL_Pulse >=0){ /*Dir = 0*/
 			 	    /*Direction to motor run  horizon position (home)*/
 					PRINTF("HALL > 0\n\r");
 				    PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
@@ -48,6 +52,11 @@ void Detect_HorVer_Position(void)
 							PRINTF("HorizP_1 = %d\r\n",en_t.Horizon_Position);
 							PRINTF("Hor_HALL_1 = %d\r\n",en_t.Horizon_HALL_Pulse);
 							HALL_Pulse =0;
+							if(algpid_t.oneKeyDetector_flag==1){
+								
+								Dir =1; //motor run to Vertical direction
+								motor_ref.motor_run = 1;
+							}
 			 		}
 					else{
 
@@ -83,7 +92,7 @@ void Detect_HorVer_Position(void)
 					 
 			        }
 		 }
-		else {  /* HALL_Pulse == 0 motor stop  HALL < 0  */
+		else {  /* Dir = 1;HALL_Pulse == 0 motor stop  HALL < 0  */
 				/*Direction vertical motor run to Position */
 				PRINTF("HALL < 0 \r\n");
 				
@@ -102,6 +111,11 @@ void Detect_HorVer_Position(void)
 					 PRINTF("--Ver_1 = %d\r\n",en_t.Vertical_Position);
 					 PRINTF("--Ver_HALL_1 =- %d\r\n",en_t.Vertical_HALL_Pulse);
 					 HALL_Pulse =0;
+					 if(algpid_t.oneKeyDetector_flag==1){
+								
+								Dir =0; //motor run to Horizon direction
+								motor_ref.motor_run = 1;
+					 }
 
 				
 				}
