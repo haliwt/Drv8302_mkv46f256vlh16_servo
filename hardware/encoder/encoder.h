@@ -24,6 +24,7 @@ typedef struct _encoder_t_
   uint8_t First_H_dec;    //第一次水平检测的标志位。
   uint8_t First_V_dec;
   uint8_t HorizonStop_flag; /* 水平停止标志位 */
+  uint8_t VerticalStop_flag; 
   uint8_t Stop_flag;
   uint8_t Idrun_times;
   uint32_t VH_Total_Dis;      /*起始位置 - 终点位置 = 距离*/

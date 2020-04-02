@@ -17,6 +17,7 @@ typedef struct _pid_t_
 	 volatile int32_t mCurPosValue;
 	 volatile int32_t mHoldPos;
 	 volatile int32_t mStopHoldPos; /*indication stop Position value*/
+	 volatile int32_t mStopVerPos;
 	 uint8_t Buff[2];
 	 uint8_t  hv_n;
 	 uint8_t total_n;
@@ -36,7 +37,10 @@ extern float  VD_DATA  ; //=   0.558f  ;                               // D²Î�
 void Horizontal_Decelerate_Function(void);
 void Vertical_Decelerate_Function(void);
 void Detect_HorVer_Position(void);
-void Stop_Region(void);
+
+void HorizonStop_Region(void);
+void VerticalStop_Regin(void);
+
 void Balance_Stop_Function(void);
 
 

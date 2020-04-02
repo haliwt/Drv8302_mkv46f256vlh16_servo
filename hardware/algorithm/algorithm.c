@@ -1,7 +1,9 @@
 #include "algorithm.h"
 
 pid_t algpid_t ;
-static void PID_STOP_Region(int32_t mStopHoldP,int32_t mCurPos);
+static void PID_HorizonSTOP_Region(int32_t mStopHoldP,int32_t mCurPos);
+static void PID_VerticalStop_Region(int32_t mStopHoldP,int32_t mCurPos);
+
 /*************************************************
 	*
 	*funtion Name:void Detect_HorVer_Positon(void)
@@ -167,14 +169,15 @@ void Horizontal_Decelerate_Function(void)
 			algpid_t.hor_n++;
 		    BLDCMotor.Lock_Time++; /*Motor block up times,has error judgement */
 		    if(algpid_t.hor_n>=2){
-	                HDff = abs(HDff);
+	               
 				    en_t.HorizonStop_flag =2;
-		
+					HDff = abs(HDff);
 					PRINTF("HDff= %d\r\n",HDff);
 					PRINTF("PID_PWM_Duty = %d\r\n",PID_PWM_Duty);
 
 					PWM_Duty=0;
 					PID_PWM_Duty=0;
+					/*transient stop hover */
 					for(n =0;n<250;n++)//300 times motor run to Vertical is error
 					{
 	                    Dir =1; /*motor run to vertical reverser direction*/
@@ -200,7 +203,7 @@ void Horizontal_Decelerate_Function(void)
 			
 		    if(algpid_t.dError_sum > 50)algpid_t.dError_sum =50; /*error accumulate */
 			if(algpid_t.dError_sum < -50)algpid_t.dError_sum = -50; 
-	         tempv= (algpid_t.iError *P_DATA + algpid_t.dError_sum * I_DATA + (algpid_t.iError - algpid_t.last_iError)*D_DATA);//proportion + itegral + differential
+	        tempv= (algpid_t.iError *P_DATA + algpid_t.dError_sum * I_DATA + (algpid_t.iError - algpid_t.last_iError)*D_DATA);//proportion + itegral + differential
 			PID_PWM_Duty = (int32_t)tempv;
 			#ifdef DEBUG_PRINT
 				if(tempv> 0)
@@ -251,12 +254,14 @@ void Vertical_Decelerate_Function(void)
 	  	      BLDCMotor.Lock_Time ++;
 	          HALL_Pulse = 0;
 			 if(BLDCMotor.Lock_Time >=2){//judge the pole if arrived the vertical position
+
+					en_t.VerticalStop_flag =1 ;
 					Dir =0;
 				    PWM_Duty=30;
 					uwStep = HallSensor_GetPinState();
 					HALLSensor_Detected_BLDC(PWM_Duty);
-				
-			    	Dir =1;                       
+					Dir =1; 
+					algpid_t.mStopVerPos = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 
 					 PRINTF("VDff= %d \r\n", algpid_t.iVError);
 	                 PMW_AllClose_ABC_Channel();
@@ -298,22 +303,25 @@ void Vertical_Decelerate_Function(void)
 	*
 	*
 **************************************************/
-void Stop_Region(void)
+void HorizonStop_Region(void)
 {
 	int32_t temp;
 	 algpid_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 	//PRINTF("Position differential value: %d\r\n", (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR));
 	//PRINTF("Position revolution value: %d\r\n", ENC_GetHoldRevolutionValue(DEMO_ENC_BASEADDR));
 	if(en_t.Idrun_times ==0){
-	  Dir =0;
+		/*slow slow tend to stop*/
+	   Dir =1;
 	  /*run to down slowly CCW direction Horzion Dir =0*/
-	  PWM_Duty =0;//20;//20
+	  PWM_Duty =20;//20;//20
 	  uwStep = HallSensor_GetPinState();
 	  HALLSensor_Detected_BLDC(PWM_Duty);
+	  DelayMs(10);
+	  Dir =0 ;
 	  HALL_Pulse = abs(HALL_Pulse);
 	  temp =  en_t.Horizon_Position - algpid_t.mCurPosValue ; //error
 	  if(temp >=0)
-	  PRINTF("STOP region =%d\r\n",temp);
+	  	PRINTF("STOP region =%d\r\n",temp);
 	  else
 	  	PRINTF("--STOP region = - %d\r\n",temp);
 	  if(temp <=80 && temp >= -80){
@@ -323,7 +331,7 @@ void Stop_Region(void)
 	  }
 	  PRINTF("STOP Region \r\n");
 	}
-    PID_STOP_Region(algpid_t.mStopHoldPos,algpid_t.mCurPosValue);  
+    PID_HorizonSTOP_Region(algpid_t.mStopHoldPos,algpid_t.mCurPosValue);  
 	/*keep balance pole position*/
 	Dir =1; //Vertical direction
 	PWM_Duty =30;
@@ -335,6 +343,9 @@ void Stop_Region(void)
 	algpid_t.iError=0;  /*pid error reference clear to zero*/
 	algpid_t.dError_sum=0;
 	algpid_t.last_iError=0;
+	algpid_t.iVError =0;
+	algpid_t.last_ivError =0;
+	algpid_t.dvError_sum =0;
 
 }
 /*************************************************
@@ -353,6 +364,9 @@ void Balance_Stop_Function(void)
 	algpid_t.iError=0;
 	algpid_t.dError_sum=0;
 	algpid_t.last_iError=0;
+	algpid_t.iVError =0;
+	algpid_t.last_ivError =0;
+	algpid_t.dvError_sum =0;
 	Dir =1;
 	PWM_Duty =30;
 	uwStep = HallSensor_GetPinState();
@@ -369,7 +383,7 @@ void Balance_Stop_Function(void)
 	*
 	*
 **************************************************/
-static void PID_STOP_Region(int32_t mStopHoldP,int32_t mCurPos)
+static void PID_HorizonSTOP_Region(int32_t mStopHoldP,int32_t mCurPos)
 {
 	volatile int32_t tempvalue,tempierror,ierror_sum,ilast_error;
 	float pDATA = 1.0f,iDATA = 0.1f,dDATA =0.1f,iresult;
@@ -377,6 +391,8 @@ static void PID_STOP_Region(int32_t mStopHoldP,int32_t mCurPos)
 	tempierror = mStopHoldP - tempvalue; //error of value 
 
 	ierror_sum += tempierror; //accumulate error of value
+	if(ierror_sum  > 100)ierror_sum  =50; 
+	if(ierror_sum  < -100)ierror_sum  = -50; 
 
 	iresult = (float)(tempierror *pDATA + ierror_sum * iDATA + ( tempierror- ilast_error)*dDATA);//proportion + itegral + differential   
 	ilast_error = ierror_sum;
@@ -390,7 +406,7 @@ static void PID_STOP_Region(int32_t mStopHoldP,int32_t mCurPos)
 		HALLSensor_Detected_BLDC(PWM_Duty);
 	    
 	}
-	else if((HALL_Pulse < 0)&&( mStopHoldP <= 20 &&  mStopHoldP >= -20 )){/* Dir = 1; Run to CW direction to verticonal position*/
+   if((HALL_Pulse < 0)&&( mStopHoldP <= 20 &&  mStopHoldP >= -20 )){/* Dir = 1; Run to CW direction to verticonal position*/
 
 		Dir = 0; /* positive direction run to horizon reverser */
 		iresult =abs(iresult);
@@ -399,6 +415,77 @@ static void PID_STOP_Region(int32_t mStopHoldP,int32_t mCurPos)
 		HALLSensor_Detected_BLDC(PWM_Duty);
 		
 	}
+}
+/**********************************************************************
+	*
+	*Function :VerticalStop_Regin(void)
+	*
+	*
+	*
+**********************************************************************/
+void VerticalStop_Regin(void)
+{
+    /*keep balance pole position*/
+	en_t.Idrun_times =0;  
+    en_t.HorizonStop_flag=0;
+    algpid_t.iVError=0;
+	algpid_t.iError=0;
+	algpid_t.dError_sum=0;
+	algpid_t.last_iError=0;
+	algpid_t.iVError =0;
+	algpid_t.last_ivError =0;
+	algpid_t.dvError_sum =0;
+	algpid_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
+	HALL_Pulse =0;
+	
+	PID_VerticalStop_Region(algpid_t.mStopVerPos,algpid_t.mCurPosValue);
+
+	
+
+
+}
+
+/**********************************************************************
+	*
+	*Function :PID_VerticalStop
+	*
+	*
+	*
+**********************************************************************/
+static void PID_VerticalStop_Region(int32_t mStopHoldP,int32_t mCurPos)
+{
+	volatile int32_t tempvalue,tempierror,ierror_sum,ilast_error;
+	float pDATA = 1.0f,iDATA = 0.1f,dDATA =0.1f,iresult;
+	tempvalue = mCurPos - en_t.Horizon_Position ;
+	tempierror = mStopHoldP - tempvalue; //error of value 
+
+	ierror_sum += tempierror; //accumulate error of value
+	if(ierror_sum  > 100)ierror_sum  =50; 
+	if(ierror_sum  < -100)ierror_sum  = -50; 
+
+	iresult = (float)(tempierror *pDATA + ierror_sum * iDATA + ( tempierror- ilast_error)*dDATA);//proportion + itegral + differential   
+	ilast_error = ierror_sum;
+	/*balance position wave value pid algorithem*/
+	if((HALL_Pulse >=0)&&( mStopHoldP <= 20 &&  mStopHoldP >= -20 )){  
+		/*motor run to horizon position Dir =0 */
+		Dir = 1; /* negative direction run to vertical reverser*/
+		iresult =abs(iresult);
+		PWM_Duty =(uint32_t) iresult ;
+		uwStep = HallSensor_GetPinState();
+		HALLSensor_Detected_BLDC(PWM_Duty);
+	    
+	}
+   if((HALL_Pulse < 0)&&( mStopHoldP <= 20 &&  mStopHoldP >= -20 )){/* Dir = 1; Run to CW direction to verticonal position*/
+
+		Dir = 0; /* positive direction run to horizon reverser */
+		iresult =abs(iresult);
+		PWM_Duty = (uint32_t)iresult ;
+		uwStep = HallSensor_GetPinState();
+		HALLSensor_Detected_BLDC(PWM_Duty);
+
+
+  }
+
 }
 
 

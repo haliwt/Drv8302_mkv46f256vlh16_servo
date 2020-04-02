@@ -186,9 +186,13 @@ int main(void)
 	} 
     else if(en_t.HorizonStop_flag==2){ //motor run to stop
 		
-           Stop_Region();
+           HorizonStop_Region();
 		  
 		}
+	else if(en_t.VerticalStop_flag == 1){
+		
+		   VerticalStop_Regin();
+	}
     else{ //Don't motor run to stop 
       
 	    Balance_Stop_Function();
