@@ -52,7 +52,7 @@ void Detect_HorVer_Position(void)
 							PRINTF("HorizP_1 = %d\r\n",en_t.Horizon_Position);
 							PRINTF("Hor_HALL_1 = %d\r\n",en_t.Horizon_HALL_Pulse);
 							HALL_Pulse =0;
-							if(algpid_t.oneKeyDetector_flag==1){
+							if(algpid_t.oneKeyDetector_flag==1 ||algpid_t.oneKeyDetector_flag==2){
 								
 								Dir =1; //motor run to Vertical direction
 								motor_ref.motor_run = 1;
@@ -111,7 +111,7 @@ void Detect_HorVer_Position(void)
 					 PRINTF("--Ver_1 = %d\r\n",en_t.Vertical_Position);
 					 PRINTF("--Ver_HALL_1 =- %d\r\n",en_t.Vertical_HALL_Pulse);
 					 HALL_Pulse =0;
-					 if(algpid_t.oneKeyDetector_flag==1){
+					 if(algpid_t.oneKeyDetector_flag==1||algpid_t.oneKeyDetector_flag==2){
 								
 								Dir =0; //motor run to Horizon direction
 								motor_ref.motor_run = 1;
