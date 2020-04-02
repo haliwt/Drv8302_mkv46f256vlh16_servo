@@ -21,7 +21,7 @@
 #include "fsl_xbara.h"
 #include "led.h"
 #include "key.h"
-#include "bldc.h"
+#include "bsp_bldc.h"
 #include "adc.h"
 #include "pollingusart.h"
 #include "output.h"
@@ -120,29 +120,28 @@ int main(void)
       
             
             if(eIn_n > 300 ){
-
-			       endir = FTM_Detect_Direction();
+				
 				   if(endir == 1)PRINTF("111111111111\n");
 				   else PRINTF("0000000000\n");
 				   Detect_HorVer_Position();
-                  }
-			 if(en_t.HorVer_R_times==2){
+            }
+			if(en_t.HorVer_R_times==2){
 		 	      algpid_t.total_n++;
-				  HALL_Pulse =0;
-		          en_t.VH_Total_Dis = abs(abs(en_t.Horizon_Position) -abs(en_t.Vertical_Position));//Toatal= horizonPos-verticalPos
+				  en_t.eInit_n=1;
+		          en_t.VH_Total_Dis = abs(en_t.Horizon_Position -en_t.Vertical_Position);//Toatal= horizonPos-verticalPos
                 
-       }
-       if(eIn_n > 300)eIn_n =0;
+       		}
+         if(eIn_n > 300)eIn_n =0;
      
-	
+        }
 #endif 
          
     /***********motor run main*********************/
      if((motor_ref.motor_run == 1)&&(en_t.HorizonStop_flag !=2))//judge motor run is condition
       {
-   		  if(en_t.eInit_n == 1){
-			   PWM_Duty = PID_PWM_Duty;
-   		  	}	
+   		  
+		  PWM_Duty = PID_PWM_Duty;
+   		  		
    		 
 		  #ifdef DRV8302 
             	GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
@@ -150,15 +149,17 @@ int main(void)
 		  uwStep = HallSensor_GetPinState();
           HALLSensor_Detected_BLDC(PWM_Duty);
           
-	     if(en_t.eInit_n !=1)
-	     algpid_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
+	      if( algpid_t.total_n !=1)
+	       algpid_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 	        #ifdef DEBUG_PRINT 
 	         	PRINTF("CurrPos : %d\r\n", algpid_t.mCurPosValue);
 	        #endif
                
-		    eIn_n ++; 
-		 	if((eIn_n >= 0xfffffffe)&&(en_t.HorVer_R_times==2))eIn_n =1;
-		   else if(eIn_n >= 0xfffffffe)eIn_n = 0;
+			if(algpid_t.total_n == 1)eIn_n =0;
+			else{	
+				eIn_n ++; 
+			 	if(eIn_n >= 0xfffffffe)eIn_n = 0;
+			}
            Time_CNT++;
 	  
         /* 100ms arithmetic PID */
@@ -367,8 +368,8 @@ int main(void)
 	}
 
     }
-  }//end while(1)
 }
+
 /******************************************************************************
  *
  * Function Name:BARKE_KEY_IRQ_HANDLER(void)

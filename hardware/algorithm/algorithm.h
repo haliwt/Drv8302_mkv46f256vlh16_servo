@@ -3,18 +3,22 @@
 #include "encoder.h"
 #include "bsp_bldc.h"
 
+#define  float_t     float;    
+
+
 typedef struct _pid_t_
 {
-	 volatile int32_t iError;
-	 volatile int32_t dError_sum;
-	 volatile int32_t last_iError;
-	 volatile int32_t iVError;
+	 volatile float   iError;
+	 volatile float   dError_sum;
+	 volatile float   last_iError;
+	 volatile float   iVError;
+	 volatile float   last_ivError;
+	 volatile float   dvError_sum;
 	 volatile int32_t mCurPosValue;
 	 volatile int32_t mHoldPos;
 	 volatile int32_t mStopHoldPos; /*indication stop Position value*/
 	 uint8_t Buff[2];
 	 uint8_t  hv_n;
-	 uint8_t hv_g_n;
 	 uint8_t total_n;
 	 uint8_t hor_n;
 	
