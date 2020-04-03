@@ -362,16 +362,17 @@ void HorizonStop_Region(void)
 	algpid_t.dvError_sum =0;
 
 }
-/*************************************************
+/************************************************************
 	*
 	*Function Name:Balance_Stop_Function()
-	*Function:Balance stop function.
+	*Function:Balance stop function.machine learning
 	*
 	*
-**************************************************/
+************************************************************/
 void Balance_Stop_Function(void)
 {
 	/*keep balance pole position*/
+	int32_t lvalue;   //l -local 
 	en_t.Idrun_times =0;  
     en_t.HorizonStop_flag=0;
     algpid_t.iVError=0;
@@ -381,8 +382,47 @@ void Balance_Stop_Function(void)
 	algpid_t.iVError =0;
 	algpid_t.last_ivError =0;
 	algpid_t.dvError_sum =0;
+	HALL_Pulse =0;
+	algpid_t.mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+	lvalue = algpid_t.mCurPosValue;
+	if( lvalue >= algpid_t.mCurPosValue + 20 && lvalue <= algpid_t.mCurPosValue -20 ){
+		if(HALL_Pulse >0 ){
+			/*Dir =0 run to horizon position*/
+		   Dir =1; //reverser to direction vertical 
+		   algpid_t.times_vertical_stop ++;
+		   PWM_Duty =30 + algpid_t.times_vertical_stop;
+		    uwStep = HallSensor_GetPinState();
+	        HALLSensor_Detected_BLDC(PWM_Duty);
+		   }
+		
+		if(HALL_Pulse < 0){
+
+		    /*Dir =1 run to Vertical position*/
+		   Dir =0; //reverser to direction horizon
+		   algpid_t.times_horizon_stop ++;
+		   PWM_Duty =30 - algpid_t.times_horizon_stop;
+		   uwStep = HallSensor_GetPinState();
+	       HALLSensor_Detected_BLDC(PWM_Duty);
+			
+		}
+		if(HALL_Pulse == 0 || lvalue == algpid_t.mCurPosValue){
+
+		     algpid_t.pwm_api = PWM_Duty;
+			 DelayMs(1000);
+		    if(algpid_t.pwm_api = PWM_Duty){
+				algpid_t.balance_stop_flag = 1;
+		    }
+		} 
+			 
+		
+		
+	}
+	
 	Dir =1;
-	PWM_Duty =30;
+	if(algpid_t.balance_stop_flag ==1)
+		PWM_Duty =algpid_t.pwm_api;
+	else 
+		PWM_Duty = 30;
 	uwStep = HallSensor_GetPinState();
 	HALLSensor_Detected_BLDC(PWM_Duty);
 	PRINTF("STOP HOR ^^^^^^^^^^\r\n");

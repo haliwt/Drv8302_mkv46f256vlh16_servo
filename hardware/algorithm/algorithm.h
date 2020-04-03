@@ -23,7 +23,10 @@ typedef struct _pid_t_
 	 uint8_t  total_n;
 	 uint8_t  hor_n;
 	 uint8_t  oneKeyDetector_flag;  /*one key detector flag*/
-	
+	 uint8_t  times_vertical_stop;   /*recoder stop times*/
+	 uint8_t  times_horizon_stop; 
+	 uint8_t  pwm_api; 
+	 uint8_t  balance_stop_flag;   
 }pid_t;
 
 extern float  P_DATA ;//=    0.85f ;                               // P²ÎÊý
