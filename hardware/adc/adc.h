@@ -8,7 +8,7 @@
 
 #include "pin_mux.h"
 #include "clock_config.h"
-#include "bldc.h"
+#include "bsp_bldc.h"
 
 
 #include "fsl_dmamux.h"

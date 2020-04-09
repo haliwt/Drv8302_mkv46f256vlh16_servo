@@ -1,4 +1,4 @@
-#include "encoder.h"
+#include "bsp_encoder.h"
 
 
 encoder_t encap_t;

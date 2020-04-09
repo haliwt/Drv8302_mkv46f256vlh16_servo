@@ -1,5 +1,5 @@
-#ifndef __ENCODER_H__
-#define __ENCODER_H__
+#ifndef __BSP_ENCODER_H__
+#define __BSP_ENCODER_H__
 
 #include "fsl_gpio.h"
 #include "fsl_port.h"
@@ -25,6 +25,8 @@ typedef struct _encoder_t_
   uint8_t First_H_dec;    //第一次水平检测的标志位。
   uint8_t First_V_dec;
   uint8_t HorizonStop_flag; /* 水平停止标志位 */
+  int32_t VH_Total_Dis;
+  int32_t mini_value;
  }encoder_t;
 
 

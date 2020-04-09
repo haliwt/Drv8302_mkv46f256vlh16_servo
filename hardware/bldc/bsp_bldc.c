@@ -1,4 +1,4 @@
-#include "bldc.h"
+#include "bsp_bldc.h"
 
 pwm_config_t pwmConfig;
 

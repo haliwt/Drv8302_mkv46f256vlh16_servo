@@ -3,8 +3,8 @@
 
 #include "fsl_gpio.h"
 #include "fsl_port.h"
-#include "bldc.h"
-#include "encoder.h"
+#include "bsp_bldc.h"
+#include "bsp_encoder.h"
 #include "output.h"
 
 

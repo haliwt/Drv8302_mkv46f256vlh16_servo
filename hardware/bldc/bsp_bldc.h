@@ -1,5 +1,5 @@
-#ifndef __BLDC_H__
-#define __BLDC_H__
+#ifndef __BSP_BLDC_H__
+#define __BSP_BLDC_H__
 
 #include "fsl_pwm.h"
 #include "fsl_xbara.h"
