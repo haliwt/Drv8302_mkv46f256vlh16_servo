@@ -44,7 +44,7 @@ PID_TypeDef  sPID;
 __IO int32_t  PID_PWM_Duty;
 BLDC_Typedef BLDCMotor;
 
-struct _pid_reference pid_r={0.1f,0.01f,0.1f,0.5f,0.01f,0.5f};
+struct _pid_reference pid_r={0.1f,0.01f,0.6f,0.5f,0.01f,0.5f};
 /*******************************************************************************
  *
  * Code
@@ -297,16 +297,18 @@ int main(void)
 						//#endif
 				       	HDff = iError;
 					   	HDff = abs(iError);
-				        if(HDff <= 200 ){
+				        if(HDff <= 300 ){
 						  
-						    en_t.HorizonStop_flag =2;
-                            for(z=0;z<500;z++){
+						   // mn ++ ;
+							//if(mn % 2 ==0)
+							en_t.HorizonStop_flag =2;
+                            for(z=0;z<300;z++){
                             Dir =1;
                             PWM_Duty =50;
                             uwStep = HallSensor_GetPinState();
                             HALLSensor_Detected_BLDC(PWM_Duty);
-							PRINTF("Stop200 CurrPos : %d\r\n", mCurPosValue);
                             Dir =0;
+							PRINTF("Stop200 CurrPos : %d\r\n", mCurPosValue);
                            }
 												
 						}
@@ -474,43 +476,10 @@ int main(void)
 	  switch(ucKeyCode){ 
                  
                   case DIR_CW_PRES ://Dir =1 ,PTE29-CW,KEY1
-				  	// Dir = 1;
+				  	 Dir = 1;
                     en_t.HorizonStop_flag=0;
 			          BLDCMotor.Lock_Time=0;
-                    if(Dir == 0) //
-	   			    {
-
-                        if((motor_ref.motor_run == 1)&&(motor_ref.Dir_flag == 0))//motor is runing
-                        {
-                            
-                              PWM_Duty= 10;
-							  uwStep = HallSensor_GetPinState();
-				              HALLSensor_Detected_BLDC( PWM_Duty);
-							   PWM_Duty = 5;
-							  uwStep = HallSensor_GetPinState();
-							  HALLSensor_Detected_BLDC( PWM_Duty);
-                              DelayMs(30);
-                         
-                              motor_ref.Dir_flag =1;
-                              Dir =1;
-                            
-                          
-                        }
-						else 
-						{
-							Dir=1;
-                       		 motor_ref.Dir_flag =1;
-						}
-						
-                     }
-                      else
-                      {
-                        Dir=1;
-                        motor_ref.Dir_flag =1;
-                       
-                       
-                      
-                      }
+                  
                          UART_WriteBlocking(DEMO_UART, printx1, sizeof(printx1) - 1);
 				    HALL_Pulse =0;
                       
@@ -526,43 +495,11 @@ int main(void)
 				  break;
 		
 				 case DIR_CCW_PRES: //Dir = 0;PTE24 = CCW,KEY3
-				   // Dir = 0 ; //
+				    Dir = 0 ; //
 				 
 				   PRINTF("DIR =0\r\n");
 	  			   
-			     if(Dir==1) // Dir = 0; //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½×ª
-				   {
-	               
-	                 if((motor_ref.motor_run == 1) &&(motor_ref.Dir_flag ==1))//motor is runing
-	                 {
-	                   
-	                      PWM_Duty = 10;
-						  uwStep = HallSensor_GetPinState();
-			              HALLSensor_Detected_BLDC( PWM_Duty);
-						   PWM_Duty = 5;
-						  uwStep = HallSensor_GetPinState();
-						  HALLSensor_Detected_BLDC( PWM_Duty);
-	                      DelayMs(30);
-	                   
-	             
-	                      Dir =0;
-	                    
-	                 }
-						else
-						{
-						  Dir =0;
-						 
-	                     
-						}
-						
-	               }
-	               else
-	                  {
-	                     
-	                     Dir = 0;
-	                    
-	                  
-	                  }
+			    
 				   HALL_Pulse =0;
 				   BLDCMotor.Lock_Time=0;
                  UART_WriteBlocking(DEMO_UART, printx2, sizeof(printx2) - 1);
