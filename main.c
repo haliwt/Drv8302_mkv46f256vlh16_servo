@@ -44,7 +44,7 @@ PID_TypeDef  sPID;
 __IO int32_t  PID_PWM_Duty;
 BLDC_Typedef BLDCMotor;
 
-struct _pid_reference pid_r={0.1f,0.01f,0.1f,0.1f,0.01f,0.1f};
+struct _pid_reference pid_r={0.1f,0.01f,0.1f,0.5f,0.01f,0.5f};
 /*******************************************************************************
  *
  * Code
@@ -61,7 +61,7 @@ int main(void)
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
  
-     uint8_t ucKeyCode=0,z=0,m=0;
+     uint8_t ucKeyCode=0,z=0,m=0,n=0;
      uint8_t RxBuffer[8],i,k0,judge_n;
 
 	
@@ -129,23 +129,24 @@ int main(void)
                    if(j>=3){  /*judge and setup this Home and End Position */
 					
 			               if((EnBuf[0]==EnBuf[1])){
-                     			judge_n++; /*judge home and end position twice*/
+                     			/*judge home and end position twice*/
 								PRINTF("Z==2 ############# \n\r");
                                 PMW_AllClose_ABC_Channel();
                                 motor_ref.motor_run = 0;
-								PRINTF("judge_n =%d \n\r",judge_n);
 								/*To judge  Home position and End position*/
 
 								 if(Dir ==0){/*honrizon Position*/
-							    		PRINTF("HALL > 0\n\r");
+								 	    judge_n++; 
+							    		PRINTF("judge_n = %d\r\n",judge_n);
 								 		if(judge_n==1){
 										        en_t.Home_flag = 1;
 												en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 												en_t.First_H_dec = 1;
 												PRINTF("HorizPos_1 = %d\r\n",en_t.Horizon_Position);
-												PRINTF("Hor_HALL_1 = %d\r\n",en_t.Horizon_HALL_Pulse);
+												PRINTF("judge_n = %d\r\n",judge_n);
 								 		}
 										else{
+												PRINTF("judge_n = %d\r\n",judge_n);
 												if((judge_n==2)&&(en_t.End_V_flag !=1)){
 
 												        /* */
@@ -170,7 +171,8 @@ int main(void)
 					                     }
 								 }
 								else{
-										/*HALL_Pulse < 0*/
+									    judge_n++; 
+								        /*HALL_Pulse < 0*/
 										PRINTF("judge_n = %d\n\r",judge_n);
 										PRINTF("End_H_flag = %d \r\n",en_t.End_H_flag);
 										PRINTF("First_H_dec = %d \r\n",en_t.First_H_dec);
@@ -228,6 +230,7 @@ int main(void)
 						
 					}
                     if(j>=3)j=0;
+                    
 			}
             if(eIn_n >= 3)eIn_n =0;
         }
