@@ -44,7 +44,7 @@ PID_TypeDef  sPID;
 __IO int32_t  PID_PWM_Duty;
 BLDC_Typedef BLDCMotor;
 
-struct _pid_reference pid_r={1.0f,1.0f,1.0,1.0f,1.0f,1.0f};
+struct _pid_reference pid_r={0.1f,0.01f,0.1f,0.01f,0.1f};
 /*******************************************************************************
  *
  * Code
@@ -70,9 +70,6 @@ int main(void)
 	 uint32_t eIn_n= 0;
 	 int16_t j=0;
    
-
-	 
-    
     XBARA_Init(XBARA);
     BOARD_InitPins();
     BOARD_BootClockRUN();
@@ -118,7 +115,7 @@ int main(void)
         if(en_t.eInit_n ==0)
         {
             PWM_Duty=50 ;
-			 if(eIn_n > 2 ){
+			 if(eIn_n > 5 ){
                    
 				   j++;
                    if(j==1){
@@ -232,7 +229,7 @@ int main(void)
 					}
                     if(j>=2)j=0;
 			}
-            if(eIn_n > 2)eIn_n =0;
+            if(eIn_n > 5)eIn_n =0;
         }
 #endif 
          
@@ -241,7 +238,7 @@ int main(void)
      {
    		  if(en_t.eInit_n == 1){
 			   PWM_Duty = PID_PWM_Duty;
-			   PRINTF("motor run pwm: %d\r\n",PID_PWM_Duty);
+			   
    		  	}
 		  else if(en_t.eInit_n == 0)
 		  {
@@ -262,7 +259,7 @@ int main(void)
             PRINTF("start pwm : %d\r\n", PWM_Duty);
 			}  
 		  }
-   		   
+   		   PRINTF("motor start pwm: %d\r\n",PID_PWM_Duty);
 		   #ifdef DRV8302 
             GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 		   #endif 
@@ -311,6 +308,8 @@ int main(void)
 						}
 					    else if(en_t.HorizonStop_flag ==2){
 						     PWM_Duty = 0;
+							 iError =0;
+							 last_iError =0;
 					    }
 					    else{
 							dError_sum += iError; 
