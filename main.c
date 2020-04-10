@@ -61,8 +61,9 @@ int main(void)
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
  
-     uint8_t ucKeyCode=0,z=0,m=0,n=0;
+     uint8_t ucKeyCode=0,m=0;
      uint8_t RxBuffer[8],i,k0,judge_n;
+     uint16_t z=0;
 
 	
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
@@ -296,15 +297,15 @@ int main(void)
 						//#endif
 				       	HDff = iError;
 					   	HDff = abs(iError);
-				        if(HDff <= 500 ){
+				        if(HDff <= 200 ){
 						  
 						    en_t.HorizonStop_flag =2;
-                            for(z=0;z<250;z++){
+                            for(z=0;z<500;z++){
                             Dir =1;
                             PWM_Duty =50;
                             uwStep = HallSensor_GetPinState();
                             HALLSensor_Detected_BLDC(PWM_Duty);
-							PRINTF("Stop500 CurrPos : %d\r\n", mCurPosValue);
+							PRINTF("Stop200 CurrPos : %d\r\n", mCurPosValue);
                             Dir =0;
                            }
 												
@@ -409,10 +410,10 @@ int main(void)
      else if(en_t.HorizonStop_flag==2){
        
           Dir =1;
-          PWM_Duty =30;
+          PWM_Duty =32; /*real be test*/
           uwStep = HallSensor_GetPinState();
           HALLSensor_Detected_BLDC(PWM_Duty);
- 		  PRINTF("flag=2 CurrPos : %d\r\n", mCurPosValue);
+ 		  PRINTF("flag=2 stop CurrPos : %d\r\n", mCurPosValue);
           Dir =0;
 		 
      
