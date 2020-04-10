@@ -44,7 +44,7 @@ PID_TypeDef  sPID;
 __IO int32_t  PID_PWM_Duty;
 BLDC_Typedef BLDCMotor;
 
-struct _pid_reference pid_r={0.1f,0.01f,0.1f,0.01f,0.1f};
+struct _pid_reference pid_r={0.1f,0.01f,0.1f,0.1f,0.01f,0.1f};
 /*******************************************************************************
  *
  * Code
@@ -115,18 +115,18 @@ int main(void)
         if(en_t.eInit_n ==0)
         {
             PWM_Duty=50 ;
-			 if(eIn_n > 5 ){
+			 if(eIn_n >= 3 ){
                    
 				   j++;
                    if(j==1){
                             EnBuf[0]=mHoldPos;
                             
 							   }
-				   else if(j==2){
+				   else if(j==3){
 				   			EnBuf[1]= mCurPosValue;
                            }
 
-                   if(j>=2){  /*judge and setup this Home and End Position */
+                   if(j>=3){  /*judge and setup this Home and End Position */
 					
 			               if((EnBuf[0]==EnBuf[1])){
                      			judge_n++; /*judge home and end position twice*/
@@ -227,9 +227,9 @@ int main(void)
 						    }
 						
 					}
-                    if(j>=2)j=0;
+                    if(j>=3)j=0;
 			}
-            if(eIn_n > 5)eIn_n =0;
+            if(eIn_n >= 3)eIn_n =0;
         }
 #endif 
          
@@ -323,7 +323,7 @@ int main(void)
 								else if(PID_PWM_Duty == 0)PRINTF("hpid_pwm= %d\r \n",PID_PWM_Duty);
 								else PRINTF("-hpid_pwm= -%d\r \n",PID_PWM_Duty);
 							//#endif
-							PID_PWM_Duty = abs(PID_PWM_Duty);
+							PID_PWM_Duty = abs(PID_PWM_Duty)/2;
 							if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
 
 		                 	last_iError = iError;
@@ -383,9 +383,9 @@ int main(void)
 								else if(PID_PWM_Duty == 0)PRINTF("PID pwm= %d\r \n",PID_PWM_Duty);
 								else PRINTF("-PID pwm= -%d\r \n",PID_PWM_Duty);
 							//#endif
-							PID_PWM_Duty = abs(PID_PWM_Duty);
+							PID_PWM_Duty = abs(PID_PWM_Duty)/2;
 						    
-							if(PID_PWM_Duty >=50)
+					
 						    if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
 
 		                 	last_iError = iError;
