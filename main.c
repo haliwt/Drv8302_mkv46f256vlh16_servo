@@ -58,18 +58,17 @@ int main(void)
      enc_config_t mEncConfigStruct;
 	 volatile int32_t dError_sum;
 	 volatile int32_t iError,last_iError ;
-     uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
-     uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
+    
  
-     uint8_t ucKeyCode=0,m=0,sh=0;
+     uint8_t ucKeyCode=0,m=0;
      uint8_t RxBuffer[8],i,k0,judge_n;
      uint16_t z=0;
 
 	
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
 	 volatile int32_t mCurPosValue,mHoldPos,HDff,VDff,Dff;
-	 uint32_t eIn_n= 0,mn=0;
-	 int16_t j=0,ldiff,lvendpos;
+	 uint32_t eIn_n= 0;
+	 int16_t j=0,ldiff;
    
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -98,7 +97,8 @@ int main(void)
     ENC_DoSoftwareLoadInitialPositionValue(DEMO_ENC_BASEADDR); /* Update the position counter with initial value. */
     #endif
 	Dir=3;
-   
+    en_t.First_V_dec =0;
+    en_t.First_H_dec =0;
 	
    while(1)
    {
@@ -253,33 +253,40 @@ int main(void)
 		  {
 			if(Dir ==0){
 
-		       mn++;
+		        PWM_Duty = 50 - m;
 			   ldiff = abs(1024 - abs(mCurPosValue));
-			//   lvendpos = en_t.Vertical_Position - mCurPosValue;
-			//   printf("lvendpos = %ld \r\n",lvendpos);
-                printf("ldiff -1 = %ld \r\n",ldiff ); 
-			    printf("mn = %ld \r\n",mn);
-            
-                  printf("ldiff -2 = %ld \r\n",ldiff ); 
-                 if(ldiff >800){
-			   	
-			   			
-						   for(z=0;z<500;z++){
-		                    Dir =1;
-		                    PWM_Duty =30;
-		                    uwStep = HallSensor_GetPinState();
-		                    HALLSensor_Detected_BLDC(PWM_Duty);
-							PRINTF("horchecPos-1 : %d\r\n", mCurPosValue);
-		                    Dir =0;
+               printf("ldiff -1 = %ld \r\n",ldiff ); 
+			 
+               if((ldiff >900)&&(en_t.First_V_dec ==1)){
+
+						for(z=0;z<500;z++){
+						Dir =1;
+						PWM_Duty =30;
+						uwStep = HallSensor_GetPinState();
+						HALLSensor_Detected_BLDC(PWM_Duty);
+						PRINTF("horchecPos-2 : %d\r\n", mCurPosValue);
+						Dir =0;
+						}
+						PWM_Duty=0; 	
+               	 }
+                 else if((en_t.First_V_dec !=1)&&(ldiff<200)&&(HALL_Pulse>30)){
 							
-				   	  }
-                     }
-					  
-			   
+
+								for(z=0;z<500;z++){
+			                    Dir =1;
+			                    PWM_Duty =30;
+			                    uwStep = HallSensor_GetPinState();
+			                    HALLSensor_Detected_BLDC(PWM_Duty);
+								PRINTF("horchecPos-1 : %d\r\n", mCurPosValue);
+			                    Dir =0;
+								
+							}
+					PWM_Duty=0; 	
+                } 
                
-              else 
-              {
-                  PWM_Duty = 50 - m;
+			   else 
+              	{
+                  
                   if(PWM_Duty > 0) 
                   {
                       if(Time_CNT % 1000 == 0 && Time_CNT !=0)
@@ -288,12 +295,13 @@ int main(void)
 						
                       }
                   }
+                  else PWM_Duty=0;
                  
                   if(Time_CNT >=1000)Time_CNT =0;
-                  PWM_Duty = abs(PWM_Duty);
-                  PRINTF("start pwm : %d\r\n", PWM_Duty);
+    
+         
 			   } 
-               if(mn >= 30) mn =0;
+              
 		      }
 		  }
            printf("startHorHALL = %ld\r\n", HALL_Pulse);
@@ -511,8 +519,7 @@ int main(void)
                     en_t.HorizonStop_flag=0;
 			          BLDCMotor.Lock_Time=0;
                      HALL_Pulse =0;
-                         UART_WriteBlocking(DEMO_UART, printx1, sizeof(printx1) - 1);
-				   
+                     PRINTF("Dir 11111111111111111\n");
                       
 				  	break;
         		
@@ -528,12 +535,11 @@ int main(void)
 				 case DIR_CCW_PRES: //Dir = 0;PTE24 = CCW,KEY3
 				    Dir = 0 ; //
 				
-				   PRINTF("DIR =0\r\n");
+				   PRINTF("DIR =000000000\r\n");
 	  			   
 			    
 				   HALL_Pulse =0;
-				   BLDCMotor.Lock_Time=0;
-                 UART_WriteBlocking(DEMO_UART, printx2, sizeof(printx2) - 1);
+			       
 			   
 			
            		break;
