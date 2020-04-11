@@ -61,15 +61,15 @@ int main(void)
      uint8_t printx1[]="Key Dir = 1 is CW !!!! CW \r\n";
      uint8_t printx2[]="Key Dir = 0 is CCW \r\n";
  
-     uint8_t ucKeyCode=0,m=0;
+     uint8_t ucKeyCode=0,m=0,sh=0;
      uint8_t RxBuffer[8],i,k0,judge_n;
      uint16_t z=0;
 
 	
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
 	 volatile int32_t mCurPosValue,mHoldPos,HDff,VDff,Dff;
-	 uint32_t eIn_n= 0;
-	 int16_t j=0,ldiff;
+	 uint32_t eIn_n= 0,mn=0;
+	 int16_t j=0,ldiff,lvendpos;
    
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -107,6 +107,7 @@ int main(void)
        
 	//#ifdef DEBUG_PRINT 
 		   PRINTF("CPHod: %d\r\n", mHoldPos);
+	      printf("HALL_Pulse = %d\r\n", HALL_Pulse);
      //      PRINTF("en_t.eInit_n: %d\r\n", en_t.eInit_n);
 	//#endif
 			
@@ -135,7 +136,7 @@ int main(void)
                                 PMW_AllClose_ABC_Channel();
                                 motor_ref.motor_run = 0;
 								/*To judge  Home position and End position*/
-
+								
 								 if(Dir ==0){/*honrizon Position*/
 								 	    judge_n++; 
 							    		PRINTF("judge_n = %d\r\n",judge_n);
@@ -192,7 +193,7 @@ int main(void)
 										}
 										else if((judge_n==2)&& (en_t.End_H_flag !=1)){ 
 
-									
+									      
 											/*��һ�μ�⵽��ֱλ�ã��ڶ����Ǽ�⵽ˮƽλ��,hall <0*/
 											if(en_t.First_V_dec == 1){
 												
@@ -233,7 +234,7 @@ int main(void)
 					}
                    if(j>=3){
                      j=0;
-                      HALL_Pulse =0;
+                  
                    }
                     
 			}
@@ -252,44 +253,52 @@ int main(void)
 		  {
 			if(Dir ==0){
 
-			   mHoldPos = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-			   ldiff = abs(1024 - abs(mHoldPos));
-			   if((ldiff <300)&&(HALL_Pulse >25)){
-				for(z=0;z<500;z++){
-                    Dir =1;
-                    PWM_Duty =50;
-                    uwStep = HallSensor_GetPinState();
-                    HALLSensor_Detected_BLDC(PWM_Duty);
-                    Dir =0;
-					PRINTF("horchecPos : %d\r\n", mCurPosValue);
-                    Dir =1;
-                    PWM_Duty =30;
-                    uwStep = HallSensor_GetPinState();
-                    HALLSensor_Detected_BLDC(PWM_Duty);
-                    Dir =0;
-					PRINTF("horchecPos : %d\r\n", mCurPosValue);
-					
-                   }
-				 }
-               else {
+		       mn++;
+			   ldiff = abs(1024 - abs(mCurPosValue));
+			//   lvendpos = en_t.Vertical_Position - mCurPosValue;
+			//   printf("lvendpos = %ld \r\n",lvendpos);
+                printf("ldiff -1 = %ld \r\n",ldiff ); 
+			    printf("mn = %ld \r\n",mn);
+            
+                  printf("ldiff -2 = %ld \r\n",ldiff ); 
+                 if(ldiff >800){
+			   	
+			   			
+						   for(z=0;z<500;z++){
+		                    Dir =1;
+		                    PWM_Duty =30;
+		                    uwStep = HallSensor_GetPinState();
+		                    HALLSensor_Detected_BLDC(PWM_Duty);
+							PRINTF("horchecPos-1 : %d\r\n", mCurPosValue);
+		                    Dir =0;
+							
+				   	  }
+                     }
+					  
+			   
+               
+              else 
+              {
                   PWM_Duty = 50 - m;
                   if(PWM_Duty > 0) 
                   {
-                      if(Time_CNT % 100 == 0)
+                      if(Time_CNT % 1000 == 0 && Time_CNT !=0)
                       {
-                         m=m+5;
-                         
+                         m++;
+						
                       }
                   }
-                  else  PWM_Duty =0;
-                  if(Time_CNT >=100)Time_CNT =0;
+                 
+                  if(Time_CNT >=1000)Time_CNT =0;
                   PWM_Duty = abs(PWM_Duty);
                   PRINTF("start pwm : %d\r\n", PWM_Duty);
-			   }  
+			   } 
+               if(mn >= 30) mn =0;
 		      }
 		  }
            printf("startHorHALL = %ld\r\n", HALL_Pulse);
    		   PRINTF("motor start pwm: %d\r\n",PID_PWM_Duty);
+		   
 		   #ifdef DRV8302 
             GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 		   #endif 
@@ -501,9 +510,9 @@ int main(void)
 				  	 Dir = 1;
                     en_t.HorizonStop_flag=0;
 			          BLDCMotor.Lock_Time=0;
-                    
+                     HALL_Pulse =0;
                          UART_WriteBlocking(DEMO_UART, printx1, sizeof(printx1) - 1);
-				    HALL_Pulse =0;
+				   
                       
 				  	break;
         		
