@@ -44,7 +44,7 @@ PID_TypeDef  sPID;
 __IO int32_t  PID_PWM_Duty;
 BLDC_Typedef BLDCMotor;
 
-struct _pid_reference pid_r={0.1f,0.01f,0.5f,0.5f,0.01f,0.5f};
+struct _pid_reference pid_r={0.1f,0.01f,0.5f,1.0f,0.01f,0.8f};
 /*******************************************************************************
  *
  * Code
@@ -108,7 +108,7 @@ int main(void)
 	//#ifdef DEBUG_PRINT 
 		   PRINTF("CPHod: %d\r\n", mHoldPos);
 	  // printf("HALL_Pulse = %ld\r\n", HALL_Pulse);
-     //      PRINTF("en_t.eInit_n: %d\r\n", en_t.eInit_n);
+          PRINTF("en_t.eInit_n: %d\r\n", en_t.eInit_n);
 	//#endif
 			
 		
@@ -117,7 +117,7 @@ int main(void)
         if(en_t.eInit_n ==0)
         {
             PWM_Duty=50 ;
-			if(eIn_n >= 3 ){
+			if(eIn_n >= 2 ){
                   
 				   j++;
                    if(j==1){
@@ -140,13 +140,17 @@ int main(void)
 								 if(Dir ==0){/*honrizon Position*/
 								 	    judge_n++; 
 							    		PRINTF("judge_n = %d\r\n",judge_n);
-								 		if(judge_n==1){
+								 		if(judge_n==1||j==3){
+											
 										        en_t.Home_flag = 1;
 												en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 												en_t.First_H_dec = 1;
 												PRINTF("HorizPos_1 = %d\r\n",en_t.Horizon_Position);
 												PRINTF("judge_n = %d\r\n",judge_n);
                                                 HALL_Pulse =0;
+												/* one key study*/
+												Dir =1 ; /* motor move horizon  */
+											    motor_ref.motor_run = 1;
 								 		}
 										else{
 												PRINTF("judge_n = %d\r\n",judge_n);
@@ -158,6 +162,9 @@ int main(void)
 															en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 															 HALL_Pulse =0;
 															PRINTF("VerPos_2 = %d\r\n",en_t.Vertical_Position);
+															/* one key study*/
+															Dir =1 ; /* motor move horizon  */
+														    motor_ref.motor_run = 1;
 														}
 														else{
 															/**/
@@ -166,6 +173,9 @@ int main(void)
 															en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 														
 															PRINTF("HoPos_2 = %d\r\n",en_t.Horizon_Position);
+															/* one key study*/
+															Dir =1 ; /* motor move horizon  */
+														    motor_ref.motor_run = 1;
 														
 														}
 											 
@@ -180,15 +190,17 @@ int main(void)
 										PRINTF("End_H_flag = %d \r\n",en_t.End_H_flag);
 										PRINTF("First_H_dec = %d \r\n",en_t.First_H_dec);
 								
-										if(judge_n==1 ){
-								
+										if(judge_n==1 ||j==3 ){
+											 
 											 en_t.First_V_dec =1;
 											 en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 											
 											 PRINTF("--VerPos_1 = %d\r\n",en_t.Vertical_Position);
 											
 											 HALL_Pulse =0;
-
+											 /*one key study*/
+											 Dir =0 ; /* motor move horizon  */
+											 motor_ref.motor_run = 1;
 										
 										}
 										else if((judge_n==2)&& (en_t.End_H_flag !=1)){ 
@@ -202,6 +214,9 @@ int main(void)
 												 en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 												 HALL_Pulse =0;
 												 PRINTF("--HorPos_2 = %d\r\n",en_t.Horizon_Position);
+												  /*one key study*/
+												 Dir =0 ; /* motor move horizon  */
+												 motor_ref.motor_run = 1;
 												 
 											}
 											else{
@@ -212,13 +227,16 @@ int main(void)
 												en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 												HALL_Pulse =0;
 												 PRINTF("--VerPos_2= %d\r\n",en_t.Vertical_Position);
+													  /*one key study*/
+												 Dir =0 ; /* motor move horizon  */
+												 motor_ref.motor_run = 1;
 											}
 										}	
 								
 												
 							      }
 						   }
-						if(judge_n==2){
+						if(judge_n==3){
 						 	      en_t.eInit_n++;
 								  HALL_Pulse =0;
 						         
@@ -238,7 +256,7 @@ int main(void)
                    }
                     
 			}
-            if(eIn_n >= 3)eIn_n =0;
+            if(eIn_n >= 2)eIn_n =0;
         }
 #endif 
          
@@ -246,6 +264,8 @@ int main(void)
      if((motor_ref.motor_run == 1)&&(en_t.HorizonStop_flag !=2))
      {
    		  if(en_t.eInit_n == 1){
+		  	  if(en_t.DIR_flag ==1)PWM_Duty =50;
+			  else
 			  PWM_Duty = PID_PWM_Duty;
 			   
    		  	}
@@ -332,7 +352,7 @@ int main(void)
 					    printf("mCurPosValue= %ld \n\r",mCurPosValue);
 						printf("iError = %ld \r\n",iError);
 					   	HDff = abs(iError);
-				        if(HDff <= 150){
+				        if(HDff <= 200){
 						    en_t.HorizonStop_flag =2;
                             for(z=0;z<200;z++){
                             Dir =1;
@@ -372,7 +392,7 @@ int main(void)
 			}
             /***************************************************/
 			else{  //Vertical Position judge is boundary
-
+					   en_t.DIR_flag=0;
 				       iError = mCurPosValue - en_t.Vertical_Position ; //
 						#ifdef DEBUG_PRINT
                 			PRINTF("HB0= %d \n\r",en_t.Vertical_Position);
@@ -380,22 +400,22 @@ int main(void)
 						    PRINTF("currHALL= %d \n\r",HALL_Pulse);
 						#endif
 				      
-						
+						printf("VerEndPos= %ld \n\r",en_t.Vertical_Position);
 					    printf("vert_iError = %ld \n\r",iError);
                         VDff = iError;
-             			VDff = abs(VDff);
+             			//VDff = abs(VDff);
 			
 					   printf("VcurrHALL= %ld \n\r",HALL_Pulse);
-                      if( VDff<=80 ){
+                      if(( VDff >=-100 || VDff <=100)&&(HALL_Pulse >0)){
 					  	      
-							 
-                    	     PRINTF("VDff= %d \r\n",VDff);
+							 printf("Ver80 pwm  = %d \r\n",PID_PWM_Duty);
 	                         PMW_AllClose_ABC_Channel();
 	                         motor_ref.motor_run =0;
+                             PRINTF("VDffcurrPOS= %d \n\r",mCurPosValue);
 							 PRINTF("VVVVVVVV\r\n");
 							 iError =0;
 							 last_iError=0;
-							 printf("Ver80 pwm  = %d \r\n",PID_PWM_Duty);
+							 
 	                            
 				   	     
 			   	   	        
@@ -438,10 +458,10 @@ int main(void)
  		  
           Dir =0;
 		  PRINTF("flag=2 stop CurrPos : %d\r\n", mCurPosValue);
-		 
+		  printf("flag=2stop HALL : %ld\r\n", HALL_Pulse);
      
      }
-    else { 
+    else if(en_t.eInit_n !=0){ 
             
 		    en_t.HorizonStop_flag=0;
 			PMW_AllClose_ABC_Channel();
@@ -497,21 +517,25 @@ int main(void)
 	  switch(ucKeyCode){ 
                  
                   case DIR_CW_PRES ://Dir =1 ,PTE29-CW,KEY1,motor to Vertical 
-				  	 
+				  	  HALL_Pulse =0;
 	  				  if(en_t.HorizonStop_flag==2){
 							
-						  for(lkeydir=0;lkeydir< 400;lkeydir++){
+						  for(lkeydir=0;lkeydir< 500;lkeydir++){
 							  Dir =1;
 							  PWM_Duty =50; /*real be test*/
 					          uwStep = HallSensor_GetPinState();
 					          HALLSensor_Detected_BLDC(PWM_Duty);
 						  }
+						
 						  en_t.HorizonStop_flag= 0;
                           motor_ref.motor_run =1;
+						  en_t.DIR_flag = 1;
+                          
 	  				  }
-                      else  Dir = 1;
+                      else Dir =1;
+                      
 					  	
-                      en_t.DIR_flag = 1;
+                     
                     
                      PRINTF("Dir 11111111111111111\n");
                       
