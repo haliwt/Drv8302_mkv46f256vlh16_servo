@@ -259,7 +259,7 @@ int main(void)
 			 
                if((ldiff >900)&&(en_t.First_V_dec ==1)){
 
-						for(z=0;z<500;z++){
+						for(z=0;z<300;z++){
 						Dir =1;
 						PWM_Duty =30;
 						uwStep = HallSensor_GetPinState();
@@ -272,7 +272,7 @@ int main(void)
                  else if((en_t.First_V_dec !=1)&&(ldiff<200)&&(HALL_Pulse>30)){
 							
 
-								for(z=0;z<500;z++){
+								for(z=0;z<800;z++){
 			                    Dir =1;
 			                    PWM_Duty =30;
 			                    uwStep = HallSensor_GetPinState();
@@ -298,11 +298,8 @@ int main(void)
                   else PWM_Duty=0;
                  
                   if(Time_CNT >=1000)Time_CNT =0;
-    
-         
-			   } 
-              
-		      }
+    			  } 
+              }
 		  }
            printf("startHALL_dir = %ld\r\n", HALL_Pulse);
    		   printf("motor start pwm= %ld\r\n",PID_PWM_Duty);
@@ -331,13 +328,13 @@ int main(void)
 			mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 			if(Dir == 0)//CCW HB0 = Horizion
 			{
-				        iError =mCurPosValue - en_t.Horizon_Position ; //����?
+				        iError =mCurPosValue - en_t.Horizon_Position ; /*  pid error  */
 					    printf("mCurPosValue= %ld \n\r",mCurPosValue);
 						printf("iError = %ld \r\n",iError);
 					   	HDff = abs(iError);
-				        if(HDff <= 300){
+				        if(HDff <= 150){
 						    en_t.HorizonStop_flag =2;
-                            for(z=0;z<400;z++){
+                            for(z=0;z<200;z++){
                             Dir =1;
                             PWM_Duty =30;
                             uwStep = HallSensor_GetPinState();
