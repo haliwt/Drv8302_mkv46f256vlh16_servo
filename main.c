@@ -44,7 +44,7 @@ PID_TypeDef  sPID;
 __IO int32_t  PID_PWM_Duty;
 BLDC_Typedef BLDCMotor;
 
-struct _pid_reference pid_r={0.1f,0.01f,0.5f,5.0f,0.01f,2.0f};
+struct _pid_reference pid_r={0.1f,0.01f,0.5f,4.0f,0.01f,1.0f};
 /*******************************************************************************
  *
  * Code
@@ -117,23 +117,22 @@ int main(void)
         if(en_t.eInit_n ==0)
         {
             PWM_Duty=50 ;
-			if(eIn_n >= 3 ){
+			if(eIn_n >= 2 ){
                   
 				   j++;
                    if(j==1){
                             EnBuf[0]=mHoldPos;
                             
 							   }
-				   else if(j==2){
+				   else if(j==3){
 				   			EnBuf[1]= mCurPosValue;
                            }
 
-                   if(j==2){  /*judge and setup this Home and End Position */
+                   if(j==3){  /*judge and setup this Home and End Position */
 					
-			               if((EnBuf[0]==EnBuf[1])||((EnBuf[0] +1 == EnBuf[1])||(EnBuf[0] -1 == EnBuf[1]))\
-													||(EnBuf[1] +1 == EnBuf[0])||(EnBuf[1] -1 == EnBuf[0])){
+			               if((EnBuf[0]==EnBuf[1])){
                      			/*judge home and end position twice*/
-								PRINTF("Z==2 ############# \n\r");
+                               printf("################################################# \n");
                                 PMW_AllClose_ABC_Channel();
                                 motor_ref.motor_run = 0;
 								/*To judge  Home position and End position*/
@@ -277,7 +276,7 @@ int main(void)
                    }
                     
 			}
-            if(eIn_n >= 3)eIn_n =0;
+            if(eIn_n >= 2)eIn_n =0;
         }
 #endif 
          
@@ -300,7 +299,7 @@ int main(void)
 			 
                if((ldiff >900)&&(en_t.First_V_dec ==1)){
 
-						for(z=0;z<300;z++){
+						for(z=0;z<400;z++){
 						Dir =1;
 						PWM_Duty =30;
 						uwStep = HallSensor_GetPinState();
@@ -313,28 +312,33 @@ int main(void)
                  else if((en_t.First_V_dec !=1)&&(ldiff<200)&&(HALL_Pulse>30)){
 							
 
-								for(z=0;z<800;z++){
+								for(z=0;z<400;z++){
 			                    Dir =1;
 			                    PWM_Duty =30;
 			                    uwStep = HallSensor_GetPinState();
 			                    HALLSensor_Detected_BLDC(PWM_Duty);
-								printf("HorPowerPos-1 : %ld\r\n", mCurPosValue);
+								printf("HorStartPos-1 : %ld\r\n", mCurPosValue);
 			                    Dir =0;
 								
 							}
 					PWM_Duty=0; 	
                 } 
                
-			   else {
+			   else 
+              	{
                   
-                  if(Time_CNT % 1000 == 0 && Time_CNT !=0){
-                           m++;
-                          
-                    }
-                    if(m>=50) PWM_Duty=0;
-                   
-                    if(Time_CNT >=1000)Time_CNT =0;
-    			 } 
+                  if(PWM_Duty > 0) 
+                  {
+                      if(Time_CNT % 1000 == 0 && Time_CNT !=0)
+                      {
+                         m++;
+						
+                      }
+                  }
+                  else PWM_Duty=0;
+                 
+                  if(Time_CNT >=1000)Time_CNT =0;
+    			  } 
               }
 		  }
            printf("run_HALL_dir = %ld\r\n", HALL_Pulse);
@@ -350,6 +354,11 @@ int main(void)
 	    
                
 		   eIn_n ++; 
+           if(eIn_n > 0xffffe){
+            
+		       if(en_t.eInit_n ==1) eIn_n = 1;
+               else eIn_n =0 ;
+           }
            Time_CNT++;
 #if 1    
         /* 100ms arithmetic PID */
