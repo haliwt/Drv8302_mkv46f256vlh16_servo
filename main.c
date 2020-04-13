@@ -44,7 +44,7 @@ PID_TypeDef  sPID;
 __IO int32_t  PID_PWM_Duty;
 BLDC_Typedef BLDCMotor;
 
-struct _pid_reference pid_r={0.1f,0.01f,0.5f,4.0f,0.01f,1.0f};
+struct _pid_reference pid_r={0.1f,0.01f,0.5f,5.0f,0.01f,2.0f};
 /*******************************************************************************
  *
  * Code
@@ -124,13 +124,14 @@ int main(void)
                             EnBuf[0]=mHoldPos;
                             
 							   }
-				   else if(j==3){
+				   else if(j==2){
 				   			EnBuf[1]= mCurPosValue;
                            }
 
-                   if(j==3){  /*judge and setup this Home and End Position */
+                   if(j==2){  /*judge and setup this Home and End Position */
 					
-			               if((EnBuf[0]==EnBuf[1])){
+			               if((EnBuf[0]==EnBuf[1])||((EnBuf[0] +1 == EnBuf[1])||(EnBuf[0] -1 == EnBuf[1]))\
+													||(EnBuf[1] +1 == EnBuf[0])||(EnBuf[1] -1 == EnBuf[0])){
                      			/*judge home and end position twice*/
 								PRINTF("Z==2 ############# \n\r");
                                 PMW_AllClose_ABC_Channel();
@@ -324,26 +325,21 @@ int main(void)
 					PWM_Duty=0; 	
                 } 
                
-			   else 
-              	{
+			   else {
                   
-                  if(PWM_Duty > 0) 
-                  {
-                      if(Time_CNT % 1000 == 0 && Time_CNT !=0)
-                      {
-                         m++;
-						
-                      }
-                  }
-                  else PWM_Duty=0;
-                 
-                  if(Time_CNT >=1000)Time_CNT =0;
-    			  } 
+                  if(Time_CNT % 1000 == 0 && Time_CNT !=0){
+                           m++;
+                          
+                    }
+                    if(m>=50) PWM_Duty=0;
+                   
+                    if(Time_CNT >=1000)Time_CNT =0;
+    			 } 
               }
 		  }
            printf("run_HALL_dir = %ld\r\n", HALL_Pulse);
    		   printf("motor start pwm= %d\r\n",PID_PWM_Duty);
-		   
+		   printf("Dir = %d \n",Dir);
 		   #ifdef DRV8302 
             GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 		   #endif 
@@ -354,11 +350,6 @@ int main(void)
 	    
                
 		   eIn_n ++; 
-           if(eIn_n > 0xffffe){
-            
-		       if(en_t.eInit_n ==1) eIn_n = 1;
-               else eIn_n =0 ;
-           }
            Time_CNT++;
 #if 1    
         /* 100ms arithmetic PID */
