@@ -44,7 +44,7 @@ PID_TypeDef  sPID;
 __IO int32_t  PID_PWM_Duty;
 BLDC_Typedef BLDCMotor;
 
-struct _pid_reference pid_r={0.1f,0.01f,0.5f,1.0f,0.01f,0.8f};
+struct _pid_reference pid_r={0.1f,0.01f,0.5f,4.0f,0.01f,1.0f};
 /*******************************************************************************
  *
  * Code
@@ -117,7 +117,7 @@ int main(void)
         if(en_t.eInit_n ==0)
         {
             PWM_Duty=50 ;
-			if(eIn_n >= 2 ){
+			if(eIn_n >= 3 ){
                   
 				   j++;
                    if(j==1){
@@ -140,16 +140,23 @@ int main(void)
 								 if(Dir ==0){/*honrizon Position*/
 								 	    judge_n++; 
 							    		PRINTF("judge_n = %d\r\n",judge_n);
-								 		if(judge_n==1||j==3){
+								 		if(judge_n==1||judge_n==3){
 											
-										        en_t.Home_flag = 1;
-												en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-												en_t.First_H_dec = 1;
-												PRINTF("HorizPos_1 = %d\r\n",en_t.Horizon_Position);
-												PRINTF("judge_n = %d\r\n",judge_n);
+										        en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+												if(judge_n==1){
+													en_t.First_H_dec = 0;
+													printf("HorizPos_1 = %d\r\n",en_t.Horizon_Position);
+												}
+												else{ 
+													en_t.First_H_dec = 1;
+													printf("HorizPos_3 = %d\r\n",en_t.Horizon_Position);
+												    en_t.Home_flag = 1;
+												}
+												
                                                 HALL_Pulse =0;
 												/* one key study*/
 												Dir =1 ; /* motor move horizon  */
+												PWM_Duty =50 ;
 											    motor_ref.motor_run = 1;
 								 		}
 										else{
@@ -164,6 +171,7 @@ int main(void)
 															PRINTF("VerPos_2 = %d\r\n",en_t.Vertical_Position);
 															/* one key study*/
 															Dir =1 ; /* motor move horizon  */
+															PWM_Duty =50;
 														    motor_ref.motor_run = 1;
 														}
 														else{
@@ -175,6 +183,7 @@ int main(void)
 															PRINTF("HoPos_2 = %d\r\n",en_t.Horizon_Position);
 															/* one key study*/
 															Dir =1 ; /* motor move horizon  */
+															PWM_Duty = 50;
 														    motor_ref.motor_run = 1;
 														
 														}
@@ -190,17 +199,24 @@ int main(void)
 										PRINTF("End_H_flag = %d \r\n",en_t.End_H_flag);
 										PRINTF("First_H_dec = %d \r\n",en_t.First_H_dec);
 								
-										if(judge_n==1 ||j==3 ){
+										if(judge_n==1 ||judge_n==3 ){
 											 
-											 en_t.First_V_dec =1;
+											 
 											 en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-											
-											 PRINTF("--VerPos_1 = %d\r\n",en_t.Vertical_Position);
-											
+											 if(judge_n ==1){
+											 	en_t.First_V_dec =0;
+												printf("--VerPos_1 = %ld\r\n",en_t.Vertical_Position);
+											 }
+											 else{ 
+											 		en_t.First_V_dec =1;
+											 		printf("--VerPos_3 = %ld\r\n",en_t.Vertical_Position);
+											 	}
 											 HALL_Pulse =0;
 											 /*one key study*/
 											 Dir =0 ; /* motor move horizon  */
+											 PWM_Duty =50;
 											 motor_ref.motor_run = 1;
+											 printf("ML auto dir reverse = 0 \n");
 										
 										}
 										else if((judge_n==2)&& (en_t.End_H_flag !=1)){ 
@@ -216,7 +232,9 @@ int main(void)
 												 PRINTF("--HorPos_2 = %d\r\n",en_t.Horizon_Position);
 												  /*one key study*/
 												 Dir =0 ; /* motor move horizon  */
+												 PWM_Duty =50;
 												 motor_ref.motor_run = 1;
+												 printf("ML auto dir reverse = 0 \n");
 												 
 											}
 											else{
@@ -229,7 +247,9 @@ int main(void)
 												 PRINTF("--VerPos_2= %d\r\n",en_t.Vertical_Position);
 													  /*one key study*/
 												 Dir =0 ; /* motor move horizon  */
+												 PWM_Duty =50;
 												 motor_ref.motor_run = 1;
+												 printf("ML auto dir reverse = 0 \n");
 											}
 										}	
 								
@@ -256,7 +276,7 @@ int main(void)
                    }
                     
 			}
-            if(eIn_n >= 2)eIn_n =0;
+            if(eIn_n >= 3)eIn_n =0;
         }
 #endif 
          
@@ -271,7 +291,7 @@ int main(void)
    		  	}
 		  else if(en_t.eInit_n == 0)
 		  {
-			if(Dir ==0){
+			if(Dir ==0){/*start detected horizon position motor  speed slowly limit*/
 
 		        PWM_Duty = 50 - m;
 			   ldiff = abs(1024 - abs(mCurPosValue));
@@ -321,8 +341,8 @@ int main(void)
     			  } 
               }
 		  }
-           printf("startHALL_dir = %ld\r\n", HALL_Pulse);
-   		   printf("motor start pwm= %ld\r\n",PID_PWM_Duty);
+           printf("run_HALL_dir = %ld\r\n", HALL_Pulse);
+   		   printf("motor start pwm= %d\r\n",PID_PWM_Duty);
 		   
 		   #ifdef DRV8302 
             GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
