@@ -145,6 +145,7 @@ int main(void)
 										        en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 												if(judge_n==1){
 													en_t.First_H_dec = 0;
+													en_t.oneKey_H_flag =1;
 													printf("HorizPos_1 = %d\r\n",en_t.Horizon_Position);
 												}
 												else{ 
@@ -161,34 +162,19 @@ int main(void)
 								 		}
 										else{
 												PRINTF("judge_n = %d\r\n",judge_n);
-												if((judge_n==2)&&(en_t.End_V_flag !=1)){
+												if((judge_n==2)&&(en_t.End_V_flag !=1)&&(en_t.oneKey_V_flag==1)){
 
-												        /* */
-													    if(en_t.First_H_dec==1){
-													        en_t.End_H_flag = 1;
-															en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-															 HALL_Pulse =0;
-															PRINTF("VerPos_2 = %d\r\n",en_t.Vertical_Position);
-															/* one key study*/
-															Dir =1 ; /* motor move horizon  */
-															PWM_Duty =50;
-														    motor_ref.motor_run = 1;
-														}
-														else{
-															/**/
-						                                    HALL_Pulse =0;
-													        en_t.End_H_flag = 1;
-															en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+												       
+													en_t.End_H_flag = 1;
+													en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+													 HALL_Pulse =0;
+													PRINTF("HorzionPos_2 = %d\r\n",en_t.Horizon_Position);
+													/* one key study*/
+													Dir =1 ; /* motor move horizon  */
+													PWM_Duty =50;
+													motor_ref.motor_run = 1;
 														
-															PRINTF("HoPos_2 = %d\r\n",en_t.Horizon_Position);
-															/* one key study*/
-															Dir =1 ; /* motor move horizon  */
-															PWM_Duty = 50;
-														    motor_ref.motor_run = 1;
-														
-														}
-											 
-										        }
+												}
 										 
 					                     }
 								 }
@@ -205,6 +191,7 @@ int main(void)
 											 en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 											 if(judge_n ==1){
 											 	en_t.First_V_dec =0;
+												en_t.oneKey_V_flag =1;
 												printf("--VerPos_1 = %ld\r\n",en_t.Vertical_Position);
 											 }
 											 else{ 
@@ -219,39 +206,20 @@ int main(void)
 											 printf("ML auto dir reverse = 0 \n");
 										
 										}
-										else if((judge_n==2)&& (en_t.End_H_flag !=1)){ 
+										else if((judge_n==2)&& (en_t.End_H_flag !=1) && (en_t.oneKey_H_flag ==1)){ 
 
-									      
-											/*��һ�μ�⵽��ֱλ�ã��ڶ����Ǽ�⵽ˮƽλ��,hall <0*/
-											if(en_t.First_V_dec == 1){
+									            en_t.End_V_flag = 1;
 												
-												 en_t.Horizon_HALL_Pulse = HALL_Pulse;
-												 en_t.End_V_flag = 1;
-												 en_t.Horizon_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+												en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 												 HALL_Pulse =0;
-												 PRINTF("--HorPos_2 = %d\r\n",en_t.Horizon_Position);
+												 PRINTF("--VerPos_2 = %d\r\n",en_t.Vertical_Position);
 												  /*one key study*/
 												 Dir =0 ; /* motor move horizon  */
 												 PWM_Duty =50;
 												 motor_ref.motor_run = 1;
 												 printf("ML auto dir reverse = 0 \n");
 												 
-											}
-											else{
-												
-												/*�ڶ��δ�ֱλ��*/
-											
-										        en_t.End_V_flag = 1;
-												en_t.Vertical_Position = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-												HALL_Pulse =0;
-												 PRINTF("--VerPos_2= %d\r\n",en_t.Vertical_Position);
-													  /*one key study*/
-												 Dir =0 ; /* motor move horizon  */
-												 PWM_Duty =50;
-												 motor_ref.motor_run = 1;
-												 printf("ML auto dir reverse = 0 \n");
-											}
-										}	
+									    }	
 								
 												
 							      }
@@ -344,6 +312,8 @@ int main(void)
            printf("run_HALL_dir = %ld\r\n", HALL_Pulse);
    		   printf("motor start pwm= %d\r\n",PID_PWM_Duty);
 		   printf("Dir = %d \n",Dir);
+		   printf("VerticalPos = %ld\r\n",en_t.Vertical_Position);
+		   printf("HorzionPos = %ld\r\n",en_t.Horizon_Position);
 		   #ifdef DRV8302 
             GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 		   #endif 

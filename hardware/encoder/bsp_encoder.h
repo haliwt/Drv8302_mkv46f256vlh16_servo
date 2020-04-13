@@ -28,6 +28,8 @@ typedef struct _encoder_t_
   int32_t VH_Total_Dis;
   int32_t mini_value;
   uint8_t DIR_flag; /*方向标志位*/
+  uint8_t oneKey_H_flag;
+  uint8_t oneKey_V_flag;
  }encoder_t;
 
 
