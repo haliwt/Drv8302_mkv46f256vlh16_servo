@@ -68,7 +68,7 @@ int main(void)
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
 	 volatile int32_t mCurPosValue,mHoldPos,HDff,VDff,Dff;
 	 uint32_t eIn_n= 0,mn=0;
-	 int16_t j=0,ldiff,lkeydir, lverticalpos,lhorizonpos;
+	 int16_t j=0,ldiff,lkeydir, lverticalpos,lhorizonpos,lstarthor;
    
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -107,9 +107,9 @@ int main(void)
 	en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
        
 	
-		  PRINTF("currePosHold: %d\r\n", mHoldPos);
+		  printf("currePosHold: %ld\r\n", mHoldPos);
 	      printf("position diff = %d\r\n", en_t.Pos_diff);
-          PRINTF("en_t.eInit_n: %d\r\n", en_t.eInit_n);
+          printf("en_t.eInit_n: %d\r\n", en_t.eInit_n);
 	 
 
 			
@@ -162,10 +162,11 @@ int main(void)
 												Dir =1 ; /* motor move horizon  */
 												PWM_Duty =50 ;
 											    motor_ref.motor_run = 1;
+                                                 printf("ML auto dir=0 13 ^^^^^^^^^^ \n");
 								 		}
 										else{
 												PRINTF("judge_n = %d\r\n",judge_n);
-												if((judge_n==2)&&(en_t.End_V_flag !=1)&&(en_t.oneKey_V_flag==1)){
+												if((judge_n==2)&&(en_t.End_V_flag !=1)){
 
 												       
 													en_t.End_H_flag = 1;
@@ -176,7 +177,7 @@ int main(void)
 													Dir =1 ; /* motor move horizon  */
 													PWM_Duty =50;
 													motor_ref.motor_run = 1;
-														
+													 printf("ML auto dir =0 2 $$$$$$$$$$$$$$$$ \n");	
 												}
 										 
 					                     }
@@ -206,10 +207,10 @@ int main(void)
 											 Dir =0 ; /* motor move horizon  */
 											 PWM_Duty =50;
 											 motor_ref.motor_run = 1;
-											 printf("ML auto dir reverse = 0 \n");
+											 printf("ML auto dir reverse = 13 ^^^^^^^^^^ \n");
 										
 										}
-										else if((judge_n==2)&& (en_t.End_H_flag !=1) && (en_t.oneKey_H_flag ==1)){ 
+										else if((judge_n==2)&& (en_t.End_H_flag !=1)){ 
 
 									            en_t.End_V_flag = 1;
 												
@@ -220,7 +221,7 @@ int main(void)
 												 Dir =0 ; /* motor move horizon  */
 												 PWM_Duty =50;
 												 motor_ref.motor_run = 1;
-												 printf("ML auto dir reverse = 0 \n");
+												 printf("ML auto dir reverse = 2@@@@@@@@@@@ \n");
 												 
 									    }	
 								
@@ -265,10 +266,13 @@ int main(void)
 			if(Dir ==0){/*start detected horizon position motor  speed slowly limit*/
 
 		        PWM_Duty = 50 - m;
-			   ldiff = abs(1024 - abs(mCurPosValue));
-               printf("ldiff -0 = %ld \r\n",ldiff ); 
 			 
-               if((ldiff >900)&&(en_t.First_V_dec ==1)){
+               printf("start_Hor_Vertical_Position  = %ld \r\n", en_t.Vertical_Position ); 
+			 
+               if(abs(en_t.Vertical_Position) > 800 && en_t.Pos_diff >0 && en_t.mini_value !=2){
+
+			   		    ldiff =abs(mCurPosValue);
+						if(ldiff <=200){
 
 						for(z=0;z<400;z++){
 						Dir =1;
@@ -277,12 +281,15 @@ int main(void)
 						HALLSensor_Detected_BLDC(PWM_Duty);
 						PRINTF("HorPowerPos-2 : %d\r\n", mCurPosValue);
 						Dir =0;
+						en_t.mini_value =1;
 						}
+					}
 						PWM_Duty=0; 	
                	 }
-                 else if((en_t.First_V_dec !=1)&&(ldiff<200)&&(HALL_Pulse>30)){
+                 else if(abs(en_t.Vertical_Position)  < 200){
 							
-								
+								ldiff =1024-abs(mCurPosValue);
+								if(ldiff < 200 && en_t.Pos_diff>0 && en_t.mini_value !=1){
 								for(z=0;z<400;z++){
 			                    Dir =1;
 			                    PWM_Duty =30;
@@ -290,8 +297,10 @@ int main(void)
 			                    HALLSensor_Detected_BLDC(PWM_Duty);
 								printf("HorStartPos-1 : %ld\r\n", mCurPosValue);
 			                    Dir =0;
+								en_t.mini_value =2;
+							   }
+							    }
 								
-							}
 					PWM_Duty=0; 	
                 } 
                
@@ -341,7 +350,8 @@ int main(void)
 			mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 			if(Dir == 0)//CCW HB0 = Horizion
 			{
-				        iError =mCurPosValue - en_t.Horizon_Position ; /*  pid error  */
+						en_t.DIR_flag =0;
+						iError =mCurPosValue - en_t.Horizon_Position ; /*  pid error  */
 					    printf("mCurPosValue= %ld \n\r",mCurPosValue);
 						printf("iError = %ld \r\n",iError);
 						
