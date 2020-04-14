@@ -346,7 +346,7 @@ int main(void)
 						printf("iError = %ld \r\n",iError);
 						
 					     printf("lhorizonpos = %ld \r\n",lhorizonpos);
-				        if(abs(en_t.Horizon_Position) < 100 && (en_t.Pos_diff > 0)){
+				        if(abs(en_t.Horizon_Position) < 300 && (en_t.Pos_diff > 0)){
 						    lhorizonpos = abs(mCurPosValue)-abs(en_t.Horizon_Position) ;
 						    if(lhorizonpos <=200){
 						    en_t.HorizonStop_flag =2;
@@ -420,7 +420,7 @@ int main(void)
              		    VDff = abs(VDff);
 						if(abs(en_t.Vertical_Position) > 800 &&(en_t.Pos_diff < 0)){
 							
-							 lverticalpos = abs(en_t.Vertical_Position) - abs(mCurPosValue) ;
+							 lverticalpos = (abs(en_t.Vertical_Position)+(abs(en_t.Horizon_Position))) - abs(mCurPosValue) ;
 							 if(lverticalpos <100){
 					  	      
 							 printf("Ver80 pwm  = %d \r\n",PID_PWM_Duty);
@@ -435,9 +435,9 @@ int main(void)
 							 }
 							 
 						}
-						else if(abs(en_t.Vertical_Position) < 100 &&(en_t.Pos_diff < 0)){
+						else if(abs(en_t.Vertical_Position) < 300 &&(en_t.Pos_diff < 0)){
 							
-							 lverticalpos =abs(mCurPosValue)- abs(en_t.Vertical_Position)  ;
+							 lverticalpos =abs(mCurPosValue)- (abs(en_t.Vertical_Position)+(abs(en_t.Horizon_Position)))  ;
 							 if(lverticalpos < 100){
 					  	      
 							 printf("Ver80 pwm  = %d \r\n",PID_PWM_Duty);
