@@ -289,7 +289,7 @@ int main(void)
                	 }
                  else if(abs(en_t.Horizon_Position)  < 200  && en_t.Pos_diff >0){
 							
-								//ldiff =1024-abs(mCurPosValue);
+								ldiff = abs(mCurPosValue);
 								if(ldiff > 800 && en_t.Pos_diff>0 ){
 								for(z=0;z<200;z++){
 			                    Dir =1;
@@ -307,7 +307,7 @@ int main(void)
 				     } 
                
 			  
-                      if(Time_CNT % 20000 == 0 && Time_CNT !=0)
+                      if(Time_CNT % 1000 == 0 && Time_CNT !=0)
                       {
                          m++;
 						
@@ -315,7 +315,7 @@ int main(void)
                   
                   if(m>=50) PWM_Duty=0;
                  
-                  if(Time_CNT >=20000)Time_CNT =0;
+                  if(Time_CNT >=1000)Time_CNT =0;
     			  } 
               }
 		
@@ -393,7 +393,7 @@ int main(void)
 							 last_iError =0;
 							  HALL_Pulse =0;
 					    }
-					    else{
+					    {
 							dError_sum += iError; 
 							
 						    if(dError_sum > 1000)dError_sum =1000; /*error accumulate */
