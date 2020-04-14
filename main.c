@@ -68,7 +68,7 @@ int main(void)
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
 	 volatile int32_t mCurPosValue,mHoldPos,HDff,VDff,Dff;
 	 uint32_t eIn_n= 0,mn=0;
-	 int16_t j=0,ldiff,lkeydir, lverticalpos;
+	 int16_t j=0,ldiff,lkeydir, lverticalpos,lhorizonpos;
    
     XBARA_Init(XBARA);
     BOARD_InitPins();
@@ -282,7 +282,7 @@ int main(void)
                	 }
                  else if((en_t.First_V_dec !=1)&&(ldiff<200)&&(HALL_Pulse>30)){
 							
-
+								
 								for(z=0;z<400;z++){
 			                    Dir =1;
 			                    PWM_Duty =30;
@@ -344,19 +344,39 @@ int main(void)
 				        iError =mCurPosValue - en_t.Horizon_Position ; /*  pid error  */
 					    printf("mCurPosValue= %ld \n\r",mCurPosValue);
 						printf("iError = %ld \r\n",iError);
-					   	HDff = abs(iError);
-				        if(HDff <= 200){
+						
+					     printf("lhorizonpos = %ld \r\n",lhorizonpos);
+				        if(abs(en_t.Horizon_Position) < 100 && (en_t.Pos_diff > 0)){
+						    lhorizonpos = abs(mCurPosValue)-abs(en_t.Horizon_Position) ;
+						    if(lhorizonpos <=200){
 						    en_t.HorizonStop_flag =2;
-                            for(z=0;z<200;z++){
+                            for(z=0;z<300;z++){
                             Dir =1;
                             PWM_Duty =30;
                             uwStep = HallSensor_GetPinState();
                             HALLSensor_Detected_BLDC(PWM_Duty);
                              Dir =0;
 							 printf("Stop300 CurrPos : %ld\r\n", mCurPosValue);
-							
-                           }
+                            }
+						   }
 							 HALL_Pulse =0;					
+						}
+						else if(abs(en_t.Horizon_Position) >800 && (en_t.Pos_diff > 0)){
+
+								lhorizonpos =abs(en_t.Horizon_Position)-abs(mCurPosValue);
+							    if(lhorizonpos <=200){
+							    en_t.HorizonStop_flag =2;
+	                            for(z=0;z<300;z++){
+		                            Dir =1;
+		                            PWM_Duty =30;
+		                            uwStep = HallSensor_GetPinState();
+		                            HALLSensor_Detected_BLDC(PWM_Duty);
+		                            Dir =0;
+									printf("Stop800 CurrPos : %ld\r\n", mCurPosValue);
+                                }
+						   }
+							 HALL_Pulse =0;					
+
 						}
 					    else if(en_t.HorizonStop_flag ==2){
                              Dir = 1;
