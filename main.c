@@ -44,7 +44,7 @@ PID_TypeDef  sPID;
 __IO int32_t  PID_PWM_Duty;
 BLDC_Typedef BLDCMotor;
 
-struct _pid_reference pid_r={0.1f,0.01f,0.5f,5.0f,0.01f,1.0f};
+struct _pid_reference pid_r={0.1f,0.01f,0.1f,5.0f,0.01f,1.0f};
 /*******************************************************************************
  *
  * Code
@@ -67,7 +67,7 @@ int main(void)
 	
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
 	 volatile int32_t mCurPosValue,mHoldPos,HDff,VDff,Dff;
-	 uint32_t eIn_n= 0,mn=0;
+	 uint32_t eIn_n= 0,mn=0,lstartHorValue=0;
 	 int16_t j=0,ldiff,lkeydir, lverticalpos,lhorizonpos,lstarthor;
    
     XBARA_Init(XBARA);
@@ -267,14 +267,14 @@ int main(void)
 
 		        PWM_Duty = 50 - m;
 			 
-               printf("start_Hor_Vertical_Position  = %ld \r\n", en_t.Vertical_Position ); 
+               printf("start_Hor_Horizon_Position  = %ld \r\n", en_t.Horizon_Position ); 
 			 
-               if(abs(en_t.Vertical_Position) > 800 && en_t.Pos_diff >0 && en_t.mini_value !=2){
+               if(abs(en_t.Horizon_Position) > 800 && en_t.Pos_diff >0){
 
 			   		    ldiff =abs(mCurPosValue);
-						if(ldiff <=200){
+						if(ldiff > 800){
 
-						for(z=0;z<400;z++){
+						for(z=0;z<200;z++){
 						Dir =1;
 						PWM_Duty =30;
 						uwStep = HallSensor_GetPinState();
@@ -283,14 +283,15 @@ int main(void)
 						Dir =0;
 						en_t.mini_value =1;
 						}
+						PWM_Duty=0; 
 					}
-						PWM_Duty=0; 	
-               	 }
-                 else if(abs(en_t.Vertical_Position)  < 200){
 							
-								ldiff =1024-abs(mCurPosValue);
-								if(ldiff < 200 && en_t.Pos_diff>0 && en_t.mini_value !=1){
-								for(z=0;z<400;z++){
+               	 }
+                 else if(abs(en_t.Horizon_Position)  < 200  && en_t.Pos_diff >0){
+							
+								//ldiff =1024-abs(mCurPosValue);
+								if(ldiff > 800 && en_t.Pos_diff>0 ){
+								for(z=0;z<200;z++){
 			                    Dir =1;
 			                    PWM_Duty =30;
 			                    uwStep = HallSensor_GetPinState();
@@ -299,28 +300,25 @@ int main(void)
 			                    Dir =0;
 								en_t.mini_value =2;
 							   }
-							    }
+									PWM_Duty=0; 	
+
+						}
 								
-					PWM_Duty=0; 	
-                } 
+				     } 
                
-			   else 
-              	{
-                  
-                  if(PWM_Duty > 0) 
-                  {
-                      if(Time_CNT % 1000 == 0 && Time_CNT !=0)
+			  
+                      if(Time_CNT % 20000 == 0 && Time_CNT !=0)
                       {
                          m++;
 						
                       }
-                  }
-                  else PWM_Duty=0;
+                  
+                  if(m>=50) PWM_Duty=0;
                  
-                  if(Time_CNT >=1000)Time_CNT =0;
+                  if(Time_CNT >=20000)Time_CNT =0;
     			  } 
               }
-		  }
+		
            printf("run_HALL_dir = %ld\r\n", HALL_Pulse);
    		   printf("motor start pwm= %d\r\n",PWM_Duty);
 		   printf("Dir = %d \n",Dir);
@@ -428,10 +426,11 @@ int main(void)
 						printf("VcurrHALL= %ld \n\r",HALL_Pulse);
 						VDff = ivError;
              		    VDff = abs(VDff);
-						if(abs(en_t.Vertical_Position) > 800 &&(en_t.Pos_diff < 0)){
+						if(abs(en_t.Horizon_Position) > 800 &&(en_t.Pos_diff < 0)){
 							
-							 lverticalpos = (abs(en_t.Vertical_Position)+(abs(en_t.Horizon_Position))) - abs(mCurPosValue) ;
-							 if(lverticalpos <100){
+							// lverticalpos = abs(en_t.Horizon_Position) - 100;
+							 //lverticalpos= abs(mCurPosValue) ;
+							 if(abs(mCurPosValue)<100){
 					  	      
 							 printf("Ver80 pwm  = %d \r\n",PID_PWM_Duty);
 	                         PMW_AllClose_ABC_Channel();
@@ -445,10 +444,10 @@ int main(void)
 							 }
 							 
 						}
-						else if(abs(en_t.Vertical_Position) < 300 &&(en_t.Pos_diff < 0)){
+						else if(abs(en_t.Horizon_Position) < 300 &&(en_t.Pos_diff < 0)){
 							
-							 lverticalpos =abs(mCurPosValue)- (abs(en_t.Vertical_Position)+(abs(en_t.Horizon_Position)))  ;
-							 if(lverticalpos < 100){
+							 lverticalpos =(abs(en_t.Vertical_Position)+(abs(en_t.Horizon_Position)))-100  ;
+							 if(abs(mCurPosValue) >  lverticalpos){
 					  	      
 							 printf("Ver80 pwm  = %d \r\n",PID_PWM_Duty);
 	                         PMW_AllClose_ABC_Channel();
