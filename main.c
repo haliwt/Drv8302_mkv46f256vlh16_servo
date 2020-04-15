@@ -44,7 +44,7 @@ PID_TypeDef  sPID;
 __IO int32_t  PID_PWM_Duty;
 BLDC_Typedef BLDCMotor;
 
-struct _pid_reference pid_r={0.1f,0.01f,0.1f,5.0f,0.01f,1.0f};
+struct _pid_reference pid_r={0.1f,0.01f,0.1f,5.0f,0.01f,2.0f};
 /*******************************************************************************
  *
  * Code
@@ -62,12 +62,12 @@ int main(void)
  
      uint8_t ucKeyCode=0,m=0;
      uint8_t RxBuffer[8],i,k0,judge_n;
-     uint16_t z=0;
+     uint16_t z=0,ldectnum=0, tempadd;
 
-	
+	 volatile int16_t DectBuf[6];
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
 	 volatile int32_t mCurPosValue,mHoldPos,HDff,VDff,Dff;
-	 uint32_t eIn_n= 0,mn=0,lstartHorValue=0;
+	 uint32_t eIn_n= 0,mn=0,lstartHorValue=0,lhoradd;
 	 int16_t j=0,ldiff,lkeydir, lverticalpos,lhorizonpos,lstarthor;
    
     XBARA_Init(XBARA);
@@ -231,7 +231,8 @@ int main(void)
 						if(judge_n==3){
 						 	      en_t.eInit_n++;
 								  HALL_Pulse =0;
-						         
+						           lhoradd=0;
+							        tempadd=0;
                                   iError =0;
                                   PID_PWM_Duty=50;
 								  /* algorithm */
@@ -265,16 +266,16 @@ int main(void)
 		  {
 			if(Dir ==0){/*start detected horizon position motor  speed slowly limit*/
 
-		        PWM_Duty = 50 - m;
-			 
+		        PWM_Duty = 50 - mn;
+			    m++;
                printf("start_Hor_Horizon_Position  = %ld \r\n", en_t.Horizon_Position ); 
-			 
+			   printf("mn =%d \r\n",mn);
                if(abs(en_t.Horizon_Position) > 800 && en_t.Pos_diff >0){
 
 			   		    ldiff =abs(mCurPosValue);
-						if(ldiff > 900){
+						if(ldiff > 850){
 
-						for(z=0;z<100;z++){
+						for(z=0;z<150;z++){
 						Dir =1;
 						PWM_Duty =30;
 						uwStep = HallSensor_GetPinState();
@@ -290,8 +291,8 @@ int main(void)
                  else if(abs(en_t.Horizon_Position)  < 200  && en_t.Pos_diff >0&&en_t.oneKey_V_flag !=1){
 							
 								ldiff = abs(mCurPosValue);
-								if(ldiff > 900 && en_t.Pos_diff>0 ){
-								for(z=0;z<100;z++){
+								if(ldiff > 850 && en_t.Pos_diff>0 ){
+								for(z=0;z<150;z++){
 			                    Dir =1;
 			                    PWM_Duty =30;
 			                    uwStep = HallSensor_GetPinState();
@@ -308,36 +309,31 @@ int main(void)
 				 else if (en_t.oneKey_V_flag ==1){
 
 				     			ldiff = abs(mCurPosValue);
-								if(ldiff < 100 && en_t.Pos_diff>0 ){
-								for(z=0;z<100;z++){
+								if(ldiff < 200 && en_t.Pos_diff>0 ){ /*ANGLE 18 = 200/11*/
+								for(z=0;z<150;z++){
 			                    Dir =1;
 			                    PWM_Duty =30;
 			                    uwStep = HallSensor_GetPinState();
 			                    HALLSensor_Detected_BLDC(PWM_Duty);
 								printf("HorStartPos-3 : %ld\r\n", mCurPosValue);
 			                    Dir =0;
-								en_t.mini_value =2;
+					
 							   }
 									PWM_Duty=0; 	
 
 				 	          }
 				 }
 			  
-                      if(Time_CNT % 1000 == 0 && Time_CNT !=0)
-                      {
-                         m++;
-						
-                      }
+                    
+                  if(m > 1000 ) mn++;
+                  if(mn>=50) PWM_Duty=0;
+				} 
                   
-                  if(m>=50) PWM_Duty=0;
-                 
-                  if(Time_CNT >=1000)Time_CNT =0;
-    			  } 
               }
 		
            printf("run_HALL_dir = %ld\r\n", HALL_Pulse);
    		   printf("motor start pwm= %d\r\n",PWM_Duty);
-		   printf("Dir = %d \n",Dir);
+		   printf("the first Dir = %d \n",Dir);
 		   printf("VerticalPos = %ld\r\n",en_t.Vertical_Position);
 		   printf("HorzionPos = %ld\r\n",en_t.Horizon_Position);
 		   #ifdef DRV8302 
@@ -348,7 +344,27 @@ int main(void)
           
 	      mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 	      en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
-               
+#if 1 
+          if(Dir ==0 && HALL_Pulse >0){
+             
+           lhoradd ++;
+           if(lhoradd % 50 == 0 )
+           {
+                tempadd ++;
+				tempadd = tempadd * 2 ;
+           }
+          }
+          if(Dir==0 && HALL_Pulse> 0){
+			for(i=0;i< tempadd;i++){
+							Dir =1;
+	                        PWM_Duty =30;
+	                        uwStep = HallSensor_GetPinState();
+	                        HALLSensor_Detected_BLDC(PWM_Duty);
+							Dir =0;
+			}
+            printf(" tempadd !!!!!!!!!!!!!!!!!!!!!!!!! =  %d \n", tempadd);
+           }
+#endif 
 		   eIn_n ++; 
            if(eIn_n > 0xffffe){
             
@@ -358,14 +374,25 @@ int main(void)
            Time_CNT++;
 #if 1    
         /* 100ms arithmetic PID */
-    	if((Time_CNT % 25== 0)&&(en_t.eInit_n == 1)){
+    	if((Time_CNT % 25== 0)&&(en_t.eInit_n == 1)&&(en_t.HorizonStop_flag !=2)){
    
             PRINTF("HorizonStandPos: %d\r\n", en_t.Horizon_Position);
 			mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 			if(Dir == 0)//CCW HB0 = Horizion
 			{
 						en_t.DIR_flag =0;
-						iError =mCurPosValue - en_t.Horizon_Position ; /*  pid error  */
+						#if 0
+						lhoradd = lhoradd +10;
+						for(i=0;i<lhoradd;i++){
+							Dir =1;
+	                        PWM_Duty =30;
+	                        uwStep = HallSensor_GetPinState();
+	                        HALLSensor_Detected_BLDC(PWM_Duty);
+							Dir =0;
+						}
+						#endif 
+						printf("lhoradd!!!!!!!!!!!!!!!!!! = %d \n",lhoradd);
+						iError =abs(mCurPosValue) - abs(en_t.Horizon_Position) ; /*  pid error  */
 					    printf("mCurPosValue= %ld \n\r",mCurPosValue);
 						printf("iError = %ld \r\n",iError);
 						
@@ -374,16 +401,19 @@ int main(void)
 						    lhorizonpos = abs(mCurPosValue)-abs(en_t.Horizon_Position) ;
 						    if(lhorizonpos <=200){
 						    en_t.HorizonStop_flag =2;
-                            for(z=0;z<300;z++){
+                            for(z=0;z<400;z++){
                             Dir =1;
                             PWM_Duty =30;
                             uwStep = HallSensor_GetPinState();
                             HALLSensor_Detected_BLDC(PWM_Duty);
-                             Dir =0;
 							 printf("Stop300 CurrPos : %ld\r\n", mCurPosValue);
-                            }
+                             Dir =0;
+							}
+							 lhoradd=0;
+							 tempadd=0;
 						   }
-							 HALL_Pulse =0;					
+							 HALL_Pulse =0;	
+							 
 						}
 						else if(abs(en_t.Horizon_Position) >800 && (en_t.Pos_diff > 0)){
 
@@ -397,18 +427,14 @@ int main(void)
 		                            HALLSensor_Detected_BLDC(PWM_Duty);
 		                            Dir =0;
 									printf("Stop800 CurrPos : %ld\r\n", mCurPosValue);
+									lhoradd=0;
+									 tempadd=0;
                                 }
 						   }
 							 HALL_Pulse =0;					
 
 						}
-					    else if(en_t.HorizonStop_flag ==2){
-                             Dir = 1;
-						     PWM_Duty = 30;
-							 iError =0;
-							 last_iError =0;
-							  HALL_Pulse =0;
-					    }
+					  
 					    {
 							dError_sum += iError; 
 							
@@ -424,8 +450,15 @@ int main(void)
 		                 	last_iError = iError;
 							PWM_Duty = PID_PWM_Duty;
 							HALL_Pulse =0;
+                             if(en_t.HorizonStop_flag ==2){
+                             Dir = 1;
+						     PWM_Duty = 30;
+							 iError =0;
+							 last_iError =0;
+							 HALL_Pulse =0;
+					         }
 							
-					    }
+					   }
 				
 				
 			}
@@ -433,7 +466,7 @@ int main(void)
 			else{  //Vertical Position judge is boundary
 					   
 					   printf("ivError PWM = %d \n",PWM_Duty);
-					   ivError = mCurPosValue - en_t.Vertical_Position ; //
+					   ivError = abs(mCurPosValue) - abs(en_t.Vertical_Position) ; //
 						
 				      
 						printf("VerstandPos= %ld \n\r",en_t.Vertical_Position);
@@ -515,7 +548,14 @@ int main(void)
           Dir =0;
 		  PRINTF("flag=2 stop CurrPos : %d\r\n", mCurPosValue);
 		  printf("flag=2stop HALL : %ld\r\n", HALL_Pulse);
-		 
+		   lhoradd=0;
+			tempadd=0;
+		  if(en_t.mini_value ==1){
+		  printf("auto detected dwon load !!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+                            printf("auto detected dwon load !!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+                            printf("auto detected dwon load !!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+                            printf("auto detected dwon load !!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+		  	}
      
      }
     else if(en_t.eInit_n !=0){ 
