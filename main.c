@@ -365,7 +365,7 @@ int main(void)
 			}
             printf(" tempadd !!!!!!!!!!!!!!!!!!!!!!!!! =  %d \n", tempadd);
            }
-           printf("lhorizonpos = %ld \r\n",lhorizonpos);
+           printf("lhoradd = %ld \r\n",lhoradd);
 #endif 
 		   eIn_n ++; 
            if(eIn_n > 0xffffe){
@@ -403,7 +403,7 @@ int main(void)
 						    lhorizonpos = abs(mCurPosValue)-abs(en_t.Horizon_Position) ;
 						    if(lhorizonpos <=200){
 						    en_t.HorizonStop_flag =2;
-                            for(z=0;z<400;z++){
+                            for(z=0;z<300;z++){
                             Dir =1;
                             PWM_Duty =30;
                             uwStep = HallSensor_GetPinState();
@@ -417,7 +417,7 @@ int main(void)
 							 HALL_Pulse =0;	
 							 
 						}
-						else if(abs(en_t.Horizon_Position) >800 && (en_t.Pos_diff > 0)){
+						else if(abs(en_t.Horizon_Position) >900 && (en_t.Pos_diff > 0)){
 
 								lhorizonpos =abs(en_t.Horizon_Position)-abs(mCurPosValue);
 							    if(lhorizonpos <=200){
@@ -477,7 +477,7 @@ int main(void)
 						printf("VcurrHALL= %ld \n\r",HALL_Pulse);
 						VDff = ivError;
              		    VDff = abs(VDff);
-						if(abs(en_t.Horizon_Position) > 900 &&(en_t.Pos_diff < 0)){
+						if(abs(en_t.Horizon_Position) > 950 &&(en_t.Pos_diff < 0)){
 							
 							// lverticalpos = abs(en_t.Horizon_Position) - 100;
 							 //lverticalpos= abs(mCurPosValue) ;
@@ -508,6 +508,8 @@ int main(void)
 							 ivError =0;
 							 last_iError=0;
 							 en_t.DIR_flag=0;
+                             lhoradd=0;
+							  tempadd=0;
 							 
 							 }	
 						}
