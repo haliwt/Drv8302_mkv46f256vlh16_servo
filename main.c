@@ -345,13 +345,13 @@ int main(void)
 	      mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 	      en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
 #if 1 
-          if(Dir ==0 && HALL_Pulse >0){
+          if(Dir ==0 && HALL_Pulse >0 && en_t.eInit_n==1){
              
            lhoradd ++;
-           if(lhoradd % 50 == 0 )
+           if(lhoradd % 250 == 0 )
            {
                 tempadd ++;
-				tempadd = tempadd * 2 ;
+				tempadd = tempadd * 200 ;
            }
           }
           if(Dir==0 && HALL_Pulse> 0){
@@ -361,9 +361,11 @@ int main(void)
 	                        uwStep = HallSensor_GetPinState();
 	                        HALLSensor_Detected_BLDC(PWM_Duty);
 							Dir =0;
+							printf(" tempadd \\\\\\ =  %d \n", tempadd);
 			}
             printf(" tempadd !!!!!!!!!!!!!!!!!!!!!!!!! =  %d \n", tempadd);
            }
+           printf("lhorizonpos = %ld \r\n",lhorizonpos);
 #endif 
 		   eIn_n ++; 
            if(eIn_n > 0xffffe){
@@ -396,7 +398,7 @@ int main(void)
 					    printf("mCurPosValue= %ld \n\r",mCurPosValue);
 						printf("iError = %ld \r\n",iError);
 						
-					     printf("lhorizonpos = %ld \r\n",lhorizonpos);
+					     
 				        if(abs(en_t.Horizon_Position) < 300 && (en_t.Pos_diff > 0)){
 						    lhorizonpos = abs(mCurPosValue)-abs(en_t.Horizon_Position) ;
 						    if(lhorizonpos <=200){
@@ -475,7 +477,7 @@ int main(void)
 						printf("VcurrHALL= %ld \n\r",HALL_Pulse);
 						VDff = ivError;
              		    VDff = abs(VDff);
-						if(abs(en_t.Horizon_Position) > 800 &&(en_t.Pos_diff < 0)){
+						if(abs(en_t.Horizon_Position) > 900 &&(en_t.Pos_diff < 0)){
 							
 							// lverticalpos = abs(en_t.Horizon_Position) - 100;
 							 //lverticalpos= abs(mCurPosValue) ;
@@ -485,7 +487,7 @@ int main(void)
 	                         PMW_AllClose_ABC_Channel();
 	                         motor_ref.motor_run =0;
                              printf("VDffcurrPOS= %d \n\r",mCurPosValue);
-							 printf("V>800\r\n");
+							 printf("V>900\r\n");
 							 printf("V~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n");
 							 ivError =0;
 							 last_iError=0;
@@ -603,7 +605,9 @@ int main(void)
 					}
         // PRINTF("Motor Stop !!!!!!!!!!! \r\n");
         // PRINTF("motor_run = %d \r\n",motor_ref.motor_run );
-                
+
+		lhoradd=0;
+		tempadd=0;
     }
             
     
@@ -671,7 +675,7 @@ int main(void)
 			
            		break;
 				case MOTOR_STOP_PRES:
-                    en_t.HorizonStop_flag=0;
+                     en_t.HorizonStop_flag=0;
 					 motor_ref.motor_run = 3;
 					 HALL_Pulse =0;
 				     BLDCMotor.Lock_Time=0;
