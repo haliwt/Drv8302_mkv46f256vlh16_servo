@@ -272,9 +272,9 @@ int main(void)
                if(abs(en_t.Horizon_Position) > 800 && en_t.Pos_diff >0){
 
 			   		    ldiff =abs(mCurPosValue);
-						if(ldiff > 800){
+						if(ldiff > 900){
 
-						for(z=0;z<200;z++){
+						for(z=0;z<100;z++){
 						Dir =1;
 						PWM_Duty =30;
 						uwStep = HallSensor_GetPinState();
@@ -287,11 +287,11 @@ int main(void)
 					}
 							
                	 }
-                 else if(abs(en_t.Horizon_Position)  < 200  && en_t.Pos_diff >0){
+                 else if(abs(en_t.Horizon_Position)  < 200  && en_t.Pos_diff >0&&en_t.oneKey_V_flag !=1){
 							
 								ldiff = abs(mCurPosValue);
-								if(ldiff > 800 && en_t.Pos_diff>0 ){
-								for(z=0;z<200;z++){
+								if(ldiff > 900 && en_t.Pos_diff>0 ){
+								for(z=0;z<100;z++){
 			                    Dir =1;
 			                    PWM_Duty =30;
 			                    uwStep = HallSensor_GetPinState();
@@ -305,7 +305,23 @@ int main(void)
 						}
 								
 				     } 
-               
+				 else if (en_t.oneKey_V_flag ==1){
+
+				     			ldiff = abs(mCurPosValue);
+								if(ldiff < 100 && en_t.Pos_diff>0 ){
+								for(z=0;z<100;z++){
+			                    Dir =1;
+			                    PWM_Duty =30;
+			                    uwStep = HallSensor_GetPinState();
+			                    HALLSensor_Detected_BLDC(PWM_Duty);
+								printf("HorStartPos-3 : %ld\r\n", mCurPosValue);
+			                    Dir =0;
+								en_t.mini_value =2;
+							   }
+									PWM_Duty=0; 	
+
+				 	          }
+				 }
 			  
                       if(Time_CNT % 1000 == 0 && Time_CNT !=0)
                       {
