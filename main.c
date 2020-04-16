@@ -344,27 +344,28 @@ int main(void)
           
 	      mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 	      en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
-#if 0 
+#if 1 
           if(Dir ==0 && HALL_Pulse >0 && en_t.eInit_n==1){
              
-           lhoradd ++;
-           if(lhoradd % 250 == 0 )
+           mn ++;
+           if(mn % 250 == 0 )
            {
-                tempadd ++;
-				tempadd = tempadd * 200 ;
-           }
-          }
+                
+           
+          
           if(Dir==0 && HALL_Pulse> 0){
-			for(i=0;i< tempadd;i++){
+			for(i=0;i<20;i++){
 							Dir =1;
 	                        PWM_Duty =30;
 	                        uwStep = HallSensor_GetPinState();
 	                        HALLSensor_Detected_BLDC(PWM_Duty);
 							Dir =0;
-							printf(" tempadd \\\\\\ =  %d \n", tempadd);
+							printf(" first tempadd \\\\\\ 20 \n");
 			}
-            printf(" tempadd !!!!!!!!!!!!!!!!!!!!!!!!! =  %d \n", tempadd);
+            printf(" mn !!!!!!!!!!!!!!!!!!!!!!!!! =  %d \n", mn);
            }
+           }
+          }
            printf("lhoradd = %ld \r\n",lhoradd);
 #endif 
 		   eIn_n ++; 
