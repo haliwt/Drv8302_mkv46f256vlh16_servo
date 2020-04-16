@@ -107,9 +107,9 @@ int main(void)
 	en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
        
 	
-		  printf("currePosHold: %ld\r\n", mHoldPos);
-	      printf("position diff = %d\r\n", en_t.Pos_diff);
-          printf("en_t.eInit_n: %d\r\n", en_t.eInit_n);
+	//	  printf("currePosHold: %ld\r\n", mHoldPos);
+	//      printf("position diff = %d\r\n", en_t.Pos_diff);
+    //      printf("en_t.eInit_n: %d\r\n", en_t.eInit_n);
 	 
 
 			
@@ -120,7 +120,7 @@ int main(void)
         {
             PWM_Duty=50 ;
 			LED2=!LED2;
-			if(eIn_n >= 2 ){
+			if(eIn_n >= 3){
                   
 				   j++;
                    if(j==1){
@@ -196,18 +196,38 @@ int main(void)
 											 if(judge_n ==1){
 											 	en_t.First_V_dec =0;
 												en_t.oneKey_V_flag =1;
-												printf("--VerPos_1 = %ld\r\n",en_t.Vertical_Position);
+												
+                                                if(abs(en_t.Vertical_Position)==0||abs(en_t.Vertical_Position)<10){
+                                                   judge_n =0;
+                                                   Dir =1 ; /* motor move horizon  */
+                                                   PWM_Duty =50;
+                                                   motor_ref.motor_run = 1;
+                                                   printf("ML auto dir reverse = 1010101010 !!!!!!!!!! \n");
+                                                   printf("--VerPos_10 = %ld\r\n",en_t.Vertical_Position);
+                                                  
+                                                }
+                                                else {
+                                                  HALL_Pulse =0;
+                                                   /*one key study*/
+                                                   Dir =0 ; /* motor move horizon  */
+                                                   PWM_Duty =50;
+                                                   motor_ref.motor_run = 1;
+                                                   printf("ML auto dir reverse = 11 @@@@@@@@@@@ \n");
+                                                   printf("--VerPos_1 = %ld\r\n",en_t.Vertical_Position);
 											 }
+                                             }
 											 else{ 
 											 		en_t.First_V_dec =1;
 											 		printf("--VerPos_3 = %ld\r\n",en_t.Vertical_Position);
-											 	}
-											 HALL_Pulse =0;
-											 /*one key study*/
-											 Dir =0 ; /* motor move horizon  */
-											 PWM_Duty =50;
-											 motor_ref.motor_run = 1;
-											 printf("ML auto dir reverse = 13 ^^^^^^^^^^ \n");
+											 	
+                                                   
+                                                   HALL_Pulse =0;
+                                                   /*one key study*/
+                                                   Dir =0 ; /* motor move horizon  */
+                                                   PWM_Duty =50;
+                                                   motor_ref.motor_run = 1;
+                                                   printf("ML auto dir reverse = 13 ^^^^^^^^^^ \n");
+                                             }
 										
 										}
 										else if((judge_n==2)&& (en_t.End_H_flag !=1)){ 
@@ -249,7 +269,7 @@ int main(void)
                    }
                     
 			}
-            if(eIn_n >= 2)eIn_n =0;
+            if(eIn_n >= 3)eIn_n =0;
         }
 #endif 
          
@@ -328,46 +348,24 @@ int main(void)
                   if(m > 1000 ) mn++;
                   if(mn>=50) PWM_Duty=0;
 				} 
+                else PWM_Duty = 50;
                   
               }
 		
-           printf("run_HALL_dir = %ld\r\n", HALL_Pulse);
+      //     printf("run_HALL_dir = %ld\r\n", HALL_Pulse);
    		   printf("motor start pwm= %d\r\n",PWM_Duty);
-		   printf("the first Dir = %d \n",Dir);
-		   printf("VerticalPos = %ld\r\n",en_t.Vertical_Position);
-		   printf("HorzionPos = %ld\r\n",en_t.Horizon_Position);
+	//	   printf("the first Dir = %d \n",Dir);
+	//	   printf("VerticalPos = %ld\r\n",en_t.Vertical_Position);
+	//	   printf("HorzionPos = %ld\r\n",en_t.Horizon_Position);
 		   #ifdef DRV8302 
-            GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
+           // GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
 		   #endif 
 		  uwStep = HallSensor_GetPinState();
           HALLSensor_Detected_BLDC(PWM_Duty);
           
 	      mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 	      en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
-#if 1 
-          if(Dir ==0 && HALL_Pulse >0 && en_t.eInit_n==1){
-             
-           mn ++;
-           if(mn % 250 == 0 )
-           {
-                
-           
-          
-          if(Dir==0 && HALL_Pulse> 0){
-			for(i=0;i<20;i++){
-							Dir =1;
-	                        PWM_Duty =30;
-	                        uwStep = HallSensor_GetPinState();
-	                        HALLSensor_Detected_BLDC(PWM_Duty);
-							Dir =0;
-							printf(" first tempadd \\\\\\ 20 \n");
-			}
-            printf(" mn !!!!!!!!!!!!!!!!!!!!!!!!! =  %d \n", mn);
-           }
-           }
-          }
-           printf("lhoradd = %ld \r\n",lhoradd);
-#endif 
+
 		   eIn_n ++; 
            if(eIn_n > 0xffffe){
             
@@ -384,30 +382,19 @@ int main(void)
 			if(Dir == 0)//CCW HB0 = Horizion
 			{
 						en_t.DIR_flag =0;
-						#if 1
-                        lhoradd ++;
-						tempadd  = lhoradd / 10  * 50 ;
-						for(i=0;i<tempadd;i++){
-							Dir =1;
-	                        PWM_Duty =30;
-	                        uwStep = HallSensor_GetPinState();
-	                        HALLSensor_Detected_BLDC(PWM_Duty);
-							Dir =0;
-                            printf(" tempadd \\\\\\ =  %d \n", tempadd);
-						}
-                        if(tempadd >=50)tempadd =0;
-						#endif 
-						printf("lhoradd!!!!!!!!!!!!!!!!!! = %d \n",lhoradd);
+					
+						
+					//	printf("lhoradd!!!!!!!!!!!!!!!!!! = %d \n",lhoradd);
 						iError =abs(mCurPosValue) - abs(en_t.Horizon_Position) ; /*  pid error  */
-					    printf("mCurPosValue= %ld \n\r",mCurPosValue);
-						printf("iError = %ld \r\n",iError);
+					//   printf("mCurPosValue= %ld \n\r",mCurPosValue);
+					//   printf("iError = %ld \r\n",iError);
 						
 					     
 				        if(abs(en_t.Horizon_Position) < 300 && (en_t.Pos_diff > 0)){
 						    lhorizonpos = abs(mCurPosValue)-abs(en_t.Horizon_Position) ;
-						    if(lhorizonpos <=200){
+						    if(lhorizonpos <=300){
 						    en_t.HorizonStop_flag =2;
-                            for(z=0;z<300;z++){
+                            for(z=0;z<400;z++){
                             Dir =1;
                             PWM_Duty =30;
                             uwStep = HallSensor_GetPinState();
@@ -421,12 +408,12 @@ int main(void)
 							 HALL_Pulse =0;	
 							 
 						}
-						else if(abs(en_t.Horizon_Position) >900 && (en_t.Pos_diff > 0)){
+						else if(abs(en_t.Horizon_Position) >800 && (en_t.Pos_diff > 0)){
 
 								lhorizonpos =abs(en_t.Horizon_Position)-abs(mCurPosValue);
-							    if(lhorizonpos <=200){
+							    if(lhorizonpos <=300){
 							    en_t.HorizonStop_flag =2;
-	                            for(z=0;z<300;z++){
+	                            for(z=0;z<400;z++){
 		                            Dir =1;
 		                            PWM_Duty =30;
 		                            uwStep = HallSensor_GetPinState();
@@ -470,15 +457,16 @@ int main(void)
 			}
             /***************************************************/
 			else{  //Vertical Position judge is boundary
-					   
-					   printf("ivError PWM = %d \n",PWM_Duty);
+					   PWM_Duty=50;
+
+					//   printf("ivError PWM = %d \n",PWM_Duty);
 					   ivError = abs(mCurPosValue) - abs(en_t.Vertical_Position) ; //
 						
 				      
-						printf("VerstandPos= %ld \n\r",en_t.Vertical_Position);
-					    printf("vert_ivError = %ld \n\r",ivError);
-						printf("mCurPosValue= %ld \n\r",mCurPosValue);
-						printf("VcurrHALL= %ld \n\r",HALL_Pulse);
+					//	printf("VerstandPos= %ld \n\r",en_t.Vertical_Position);
+					//    printf("vert_ivError = %ld \n\r",ivError);
+					//	printf("mCurPosValue= %ld \n\r",mCurPosValue);
+					//	printf("VcurrHALL= %ld \n\r",HALL_Pulse);
 						VDff = ivError;
              		    VDff = abs(VDff);
 						if(abs(en_t.Horizon_Position) > 950 &&(en_t.Pos_diff < 0)){
@@ -501,8 +489,8 @@ int main(void)
 						}
 						else if(abs(en_t.Horizon_Position) < 300 &&(en_t.Pos_diff < 0)){
 							
-							 lverticalpos =(abs(en_t.Vertical_Position)+(abs(en_t.Horizon_Position)))-100  ;
-							 if(abs(mCurPosValue) >  lverticalpos){
+							 
+							 if(abs(mCurPosValue) >  900){
 					  	      
 							 printf("Ver80 pwm  = %d \r\n",PID_PWM_Duty);
 	                         PMW_AllClose_ABC_Channel();
@@ -517,6 +505,7 @@ int main(void)
 							 
 							 }	
 						}
+#if 0
 					  else {
 					        dvError_sum += ivError; 
 					
@@ -536,6 +525,7 @@ int main(void)
 							
 							
 					  	}
+#endif 
 			    
 			}
 			
