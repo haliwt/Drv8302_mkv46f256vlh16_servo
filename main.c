@@ -293,9 +293,9 @@ int main(void)
                if(abs(en_t.Horizon_Position) > 800 && en_t.Pos_diff >0){
 
 			   		    ldiff =abs(mCurPosValue);
-						if(ldiff > 850){
+						if(ldiff > 1000){
 
-						for(z=0;z<100;z++){
+						for(z=0;z<150;z++){
 						Dir =1;
 						PWM_Duty =30;
 						uwStep = HallSensor_GetPinState();
