@@ -295,7 +295,7 @@ int main(void)
 			   		    ldiff =abs(mCurPosValue);
 						if(ldiff > 850){
 
-						for(z=0;z<150;z++){
+						for(z=0;z<100;z++){
 						Dir =1;
 						PWM_Duty =30;
 						uwStep = HallSensor_GetPinState();
@@ -312,7 +312,7 @@ int main(void)
 							
 								ldiff = abs(mCurPosValue);
 								if(ldiff > 850 && en_t.Pos_diff>0 ){
-								for(z=0;z<150;z++){
+								for(z=0;z<100;z++){
 			                    Dir =1;
 			                    PWM_Duty =30;
 			                    uwStep = HallSensor_GetPinState();
@@ -345,7 +345,7 @@ int main(void)
 				 }
 			  
                     
-                  if(m > 300 ) mn++;
+                  if(m > 200 ) mn++;
                   if(mn>=50) PWM_Duty=0;
 				} 
                 else PWM_Duty = 50;
@@ -377,7 +377,7 @@ int main(void)
         /* 100ms arithmetic PID */
     	if((Time_CNT % 25== 0)&&(en_t.eInit_n == 1)&&(en_t.HorizonStop_flag !=2)){
    
-            PRINTF("HorizonStandPos: %d\r\n", en_t.Horizon_Position);
+          //  PRINTF("HorizonStandPos: %d\r\n", en_t.Horizon_Position);
 			mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 			if(Dir == 0)//CCW HB0 = Horizion
 			{
@@ -392,7 +392,7 @@ int main(void)
 					     
 				        if(abs(en_t.Horizon_Position) < 300 && (en_t.Pos_diff > 0)){
 						    lhorizonpos = abs(mCurPosValue)-abs(en_t.Horizon_Position) ;
-						    if(lhorizonpos <=300){
+						    if(lhorizonpos <=340){
 						    en_t.HorizonStop_flag =2;
                             for(z=0;z<400;z++){
                             Dir =1;
@@ -544,16 +544,9 @@ int main(void)
           HALLSensor_Detected_BLDC(PWM_Duty);
  		  
           Dir =0;
-		  PRINTF("flag=2 stop CurrPos : %d\r\n", mCurPosValue);
-		  printf("flag=2stop HALL : %ld\r\n", HALL_Pulse);
-		   lhoradd=0;
-			tempadd=0;
-		  if(en_t.mini_value ==1){
-		  printf("auto detected dwon load !!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-                            printf("auto detected dwon load !!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-                            printf("auto detected dwon load !!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-                            printf("auto detected dwon load !!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-		  	}
+		  PRINTF("flag=2 stop CurrPos !!!!!!!\n");
+		  
+		  
      
      }
     else if(en_t.eInit_n !=0){ 
