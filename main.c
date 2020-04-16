@@ -352,12 +352,12 @@ int main(void)
                   
               }
 		  #if 1 
-          if(Dir ==0 &&en_t.Pos_diff >0 && en_t.eInit_n==1){
-             
+          if(Dir ==0 &&en_t.Pos_diff >0 && en_t.eInit_n==1&&HALL_Pulse >0){
+            printf("iNPUT SPEED --------------\n");
            mn ++;
-           if(mn % 250 == 0 )
+           if(mn >=250 )
            {
-            if(Dir==0 && HALL_Pulse> 0){
+            
 			for(i=0;i<20;i++){
 							Dir =1;
 	                        PWM_Duty =30;
@@ -365,11 +365,12 @@ int main(void)
 	                        HALLSensor_Detected_BLDC(PWM_Duty);
 							Dir =0;
 							printf(" first MN !!!!!!! 20 \n");
-			}
-            printf(" mn !!!!!!!!!!!!!!!!!!!!!!!!! =  %d \n", mn);
+                            }
+                        printf(" mn !!!!!!!!!!!!!!!!!!!!!!!!! =  %d \n", mn);
+              }
            }
-           }
-          }
+           
+          
            
 #endif 
 		  if(Dir == 0){
@@ -379,6 +380,7 @@ int main(void)
 		   printf("the first Dir = %d \n",Dir);
 		   printf("VerticalPos = %ld\r\n",en_t.Vertical_Position);
 		   printf("HorzionPos = %ld\r\n",en_t.Horizon_Position);
+           printf("POS_diff = %d \r\n", en_t.Pos_diff);
 		  }
 		  uwStep = HallSensor_GetPinState();
           HALLSensor_Detected_BLDC(PWM_Duty);
