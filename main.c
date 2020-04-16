@@ -351,15 +351,35 @@ int main(void)
                 else PWM_Duty = 50;
                   
               }
-		
-      //     printf("run_HALL_dir = %ld\r\n", HALL_Pulse);
+		  #if 1 
+          if(Dir ==0 &&en_t.Pos_diff >0 && en_t.eInit_n==1){
+             
+           mn ++;
+           if(mn % 250 == 0 )
+           {
+            if(Dir==0 && HALL_Pulse> 0){
+			for(i=0;i<20;i++){
+							Dir =1;
+	                        PWM_Duty =30;
+	                        uwStep = HallSensor_GetPinState();
+	                        HALLSensor_Detected_BLDC(PWM_Duty);
+							Dir =0;
+							printf(" first MN !!!!!!! 20 \n");
+			}
+            printf(" mn !!!!!!!!!!!!!!!!!!!!!!!!! =  %d \n", mn);
+           }
+           }
+          }
+           
+#endif 
+		  if(Dir == 0){
+            printf("mn = %ld \r\n",mn);
+            printf("run_HALL_dir = %ld\r\n", HALL_Pulse);
    		   printf("motor start pwm= %d\r\n",PWM_Duty);
-	//	   printf("the first Dir = %d \n",Dir);
-	//	   printf("VerticalPos = %ld\r\n",en_t.Vertical_Position);
-	//	   printf("HorzionPos = %ld\r\n",en_t.Horizon_Position);
-		   #ifdef DRV8302 
-           // GPIO_PinWrite(DRV8302_EN_GATE_GPIO,DRV8302_EN_GATE_GPIO_PIN,1);
-		   #endif 
+		   printf("the first Dir = %d \n",Dir);
+		   printf("VerticalPos = %ld\r\n",en_t.Vertical_Position);
+		   printf("HorzionPos = %ld\r\n",en_t.Horizon_Position);
+		  }
 		  uwStep = HallSensor_GetPinState();
           HALLSensor_Detected_BLDC(PWM_Duty);
           
@@ -382,15 +402,26 @@ int main(void)
 			if(Dir == 0)//CCW HB0 = Horizion
 			{
 						en_t.DIR_flag =0;
-					
-						
-					//	printf("lhoradd!!!!!!!!!!!!!!!!!! = %d \n",lhoradd);
+
+						#if 1
+                        lhoradd ++;
+						tempadd  = lhoradd / 10  * 50 ;
+						for(i=0;i<tempadd;i++){
+							Dir =1;
+	                        PWM_Duty =30;
+	                        uwStep = HallSensor_GetPinState();
+	                        HALLSensor_Detected_BLDC(PWM_Duty);
+							Dir =0;
+                            printf(" tempadd \\\\\\ =  %d \n", tempadd);
+						}
+                        if(tempadd >=50)tempadd =0;
+                        mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
+						#endif 
+						printf("lhoradd!!!!!!!!!!!!!!!!!! = %d \n",lhoradd);
 						iError =abs(mCurPosValue) - abs(en_t.Horizon_Position) ; /*  pid error  */
-					//   printf("mCurPosValue= %ld \n\r",mCurPosValue);
-					//   printf("iError = %ld \r\n",iError);
-						
-					     
-				        if(abs(en_t.Horizon_Position) < 300 && (en_t.Pos_diff > 0)){
+					    printf("mCurPosValue= %ld \n\r",mCurPosValue);
+						printf("iError = %ld \r\n",iError);
+					    if(abs(en_t.Horizon_Position) < 300 && (en_t.Pos_diff > 0)){
 						    lhorizonpos = abs(mCurPosValue)-abs(en_t.Horizon_Position) ;
 						    if(lhorizonpos <=340){
 						    en_t.HorizonStop_flag =2;
@@ -469,17 +500,17 @@ int main(void)
 					//	printf("VcurrHALL= %ld \n\r",HALL_Pulse);
 						VDff = ivError;
              		    VDff = abs(VDff);
-						if(abs(en_t.Horizon_Position) > 950 &&(en_t.Pos_diff < 0)){
+						if(abs(en_t.Horizon_Position) > 800 &&(en_t.Pos_diff < 0)){
 							
 							// lverticalpos = abs(en_t.Horizon_Position) - 100;
 							 //lverticalpos= abs(mCurPosValue) ;
-							 if(abs(mCurPosValue)<100){
+							 if(abs(mCurPosValue)<200){
 					  	      
 							 printf("Ver80 pwm  = %d \r\n",PID_PWM_Duty);
 	                         PMW_AllClose_ABC_Channel();
 	                         motor_ref.motor_run =0;
                              printf("VDffcurrPOS= %d \n\r",mCurPosValue);
-							 printf("V>900\r\n");
+							 printf("V>800\r\n");
 							 printf("V~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n");
 							 ivError =0;
 							 last_iError=0;
@@ -490,7 +521,7 @@ int main(void)
 						else if(abs(en_t.Horizon_Position) < 300 &&(en_t.Pos_diff < 0)){
 							
 							 
-							 if(abs(mCurPosValue) >  900){
+							 if(abs(mCurPosValue) >  800){
 					  	      
 							 printf("Ver80 pwm  = %d \r\n",PID_PWM_Duty);
 	                         PMW_AllClose_ABC_Channel();
