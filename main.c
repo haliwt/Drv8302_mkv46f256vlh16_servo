@@ -344,7 +344,7 @@ int main(void)
           
 	      mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 	      en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
-#if 1 
+#if 0 
           if(Dir ==0 && HALL_Pulse >0 && en_t.eInit_n==1){
              
            lhoradd ++;
@@ -383,15 +383,18 @@ int main(void)
 			if(Dir == 0)//CCW HB0 = Horizion
 			{
 						en_t.DIR_flag =0;
-						#if 0
-						lhoradd = lhoradd +10;
-						for(i=0;i<lhoradd;i++){
+						#if 1
+                        lhoradd ++;
+						tempadd  = lhoradd / 10  * 50 ;
+						for(i=0;i<tempadd;i++){
 							Dir =1;
 	                        PWM_Duty =30;
 	                        uwStep = HallSensor_GetPinState();
 	                        HALLSensor_Detected_BLDC(PWM_Duty);
 							Dir =0;
+                            printf(" tempadd \\\\\\ =  %d \n", tempadd);
 						}
+                        if(tempadd >=50)tempadd =0;
 						#endif 
 						printf("lhoradd!!!!!!!!!!!!!!!!!! = %d \n",lhoradd);
 						iError =abs(mCurPosValue) - abs(en_t.Horizon_Position) ; /*  pid error  */
