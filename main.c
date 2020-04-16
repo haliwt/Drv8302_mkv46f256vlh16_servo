@@ -60,9 +60,9 @@ int main(void)
 	 volatile int32_t iError,last_iError,ivError,last_ivError ;
     
  
-     uint8_t ucKeyCode=0,m=0;
+     uint8_t ucKeyCode=0;
      uint8_t RxBuffer[8],i,k0,judge_n;
-     uint16_t z=0,ldectnum=0, tempadd;
+     uint16_t z=0,ldectnum=0, tempadd,m=0;
 
 	 volatile int16_t DectBuf[6];
      volatile uint16_t Time_CNT,EnBuf[2]={0,0};
@@ -345,7 +345,7 @@ int main(void)
 				 }
 			  
                     
-                  if(m > 1000 ) mn++;
+                  if(m > 300 ) mn++;
                   if(mn>=50) PWM_Duty=0;
 				} 
                 else PWM_Duty = 50;
