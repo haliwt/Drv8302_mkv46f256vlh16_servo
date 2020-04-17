@@ -133,7 +133,9 @@ int main(void)
 					
 			               if((EnBuf[0]==EnBuf[1])){
                      			/*judge home and end position twice*/
-                               printf("################################################# \n");
+                             printf("################################################################################# \n");
+                              printf("################################################################################# \n");
+                               printf("################################################################################# \n");
                                 PMW_AllClose_ABC_Channel();
                                 motor_ref.motor_run = 0;
 								/*To judge  Home position and End position*/
@@ -168,9 +170,9 @@ int main(void)
 								 			}
 										else{ /*judge_n ==2,from vertical to horizon position*/
 												PRINTF("judge_n = %d\r\n",judge_n);
-												if(judge_n==2){
+												if((judge_n==2)||(judge_n==4)){
 
-												   
+												     if(judge_n ==4)judge_n =2;
 													en_t.End_H_flag = 1;
 													en_t.Horizon_Position = mHoldPos;
 													 HALL_Pulse =0;
@@ -183,7 +185,7 @@ int main(void)
 
 													    }
 													
-													else if(abs(en_t.Horizon_Position) < 100){
+													else if(abs(en_t.Horizon_Position) < 200){
 													/* one key study*/
 													Dir =1 ; /* motor move horizon  */
 													PWM_Duty =50;
@@ -203,7 +205,7 @@ int main(void)
 										PRINTF("End_H_flag = %d \r\n",en_t.End_H_flag);
 										PRINTF("First_H_dec = %d \r\n",en_t.First_H_dec);
 								       
-										if((judge_n==1 ||judge_n==3 )){
+										if(judge_n==1 ||judge_n==3 ){
 											 
 											    en_t.First_V_dec =1;
 												en_t.oneKey_V_flag =1;
@@ -231,8 +233,9 @@ int main(void)
 											
                                              
                                              }
-										    else if(judge_n==2){ 
+										    else if((judge_n==2)||(judge_n ==4)){ 
 											    
+													if(judge_n==4)judge_n=2;
 													en_t.Vertical_Position = mHoldPos;
 												   if(abs(en_t.mini_value) <300 && en_t.First_V_dec ==1&& abs(mHoldPos)<300){
 													 judge_n=0;  
@@ -269,7 +272,7 @@ int main(void)
 												}
 									   		 }	
 								}
-						if(judge_n==3){
+						if(judge_n==3 ){
 						 	      en_t.eInit_n++;
 								  HALL_Pulse =0;
 						           lhoradd=0;
@@ -297,7 +300,7 @@ int main(void)
 		}//end en_t.eIn_n == 0
         
 #endif 
-         
+    /********************************************************************************/     
     /***********motor run main*********************/
      if((motor_ref.motor_run == 1)&&(en_t.HorizonStop_flag !=2))
      {
@@ -406,7 +409,7 @@ int main(void)
 		
 		  //if(Dir == 0)
 		  	{
-          // printf("mn = %ld \r\n",mn);
+             printf("judge_n = %d \r\n",judge_n);
            printf("run_HALL_dir = %ld\r\n", HALL_Pulse);
    		   printf("motor start pwm= %d\r\n",PWM_Duty);
 		   printf("the first Dir = %d \n",Dir);
@@ -577,27 +580,7 @@ int main(void)
 							 
 							 }	
 						}
-#if 0
-					  else {
-					        dvError_sum += ivError; 
-					
-						    if(dvError_sum > 1000)dvError_sum =1000; 
-							if(dvError_sum < -1000)dvError_sum = -1000; 
-		                    PID_PWM_Duty = (int32_t)(ivError *pid_r.KP_V + dvError_sum * pid_r.KI_V + (ivError - last_ivError)*pid_r.KD_V);//proportion + itegral + differential
-					     
-							printf("vert_PIDpwm= %ld\r \n",PID_PWM_Duty);
-							
-							PID_PWM_Duty = abs(PID_PWM_Duty)/2;
-						    printf("vert_PIDpwm /2 = %ld\r \n",PID_PWM_Duty);
-					
-						    if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
 
-		                 	last_ivError = ivError;
-							PWM_Duty = PID_PWM_Duty;
-							
-							
-					  	}
-#endif 
 			    
 			}
 			
