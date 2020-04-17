@@ -233,12 +233,13 @@ int main(void)
 										    else if(judge_n==2){ 
 											    
 													en_t.Vertical_Position = mHoldPos;
-												   if(en_t.mini_value <300 && en_t.First_V_dec ==1){
+												   if(abs(en_t.mini_value) <300 && en_t.First_V_dec ==1&& abs(mHoldPos)<300){
 													 judge_n --;  
 													Dir =1 ; /* motor move horizon  */
                                                    PWM_Duty =50;
                                                    motor_ref.motor_run = 1;
-                                                   printf(" dir=1 = 200000 !!!!!!!!!! \n");
+												   en_t.Vertical_Position = mHoldPos;
+                                                   printf(" dir=2_0 VerPos2_0=%d \r\n",en_t.Vertical_Position);
                                                    printf("--VerPos_1_1 = %ld\r\n",en_t.Vertical_Position);
 
 													}
@@ -255,7 +256,7 @@ int main(void)
 													 motor_ref.motor_run = 1;
 													 PRINTF("--VerPos_2-0 = %d\r\n",en_t.Vertical_Position);
 												 	}
-												 else if(en_t.Vertical_Position < 100){
+												 else if(abs(en_t.Vertical_Position) < 100){
 														  /*one key study*/
 														 Dir =0 ; /* motor move horizon  */
 														 PWM_Duty =50;
