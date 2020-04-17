@@ -549,11 +549,11 @@ int main(void)
 					//	printf("VcurrHALL= %ld \n\r",HALL_Pulse);
 						VDff = ivError;
              		    VDff = abs(VDff);
-						if(abs(en_t.Horizon_Position) > 800 &&(en_t.Pos_diff < 0)){
+						if(abs(en_t.Horizon_Position) > 900 &&(en_t.Pos_diff < 0)){
 							
 							// lverticalpos = abs(en_t.Horizon_Position) - 100;
 							 //lverticalpos= abs(mCurPosValue) ;
-							 if(abs(mCurPosValue)<200){
+							 if(abs(mCurPosValue)<100){
 					  	      
 							 printf("Ver80 pwm  = %d \r\n",PID_PWM_Duty);
 	                         PMW_AllClose_ABC_Channel();
