@@ -149,10 +149,10 @@ int main(void)
 													en_t.First_H_dec = 1;
 													en_t.oneKey_H_flag =1;
 													
-													en_t.Horizon_Position = mHoldPos;
+					
 													printf("HorizPos_1 = %d\r\n",en_t.Horizon_Position);
 													HALL_Pulse =0;
-													if(abs(en_t.Horizon_Position)< 200 ||HALL_Pulse ==0){
+													if(abs(en_t.Horizon_Position)< 200 ){
 														Dir =0 ; /* motor move horizon  */
 														PWM_Duty =50 ;
 														motor_ref.motor_run = 1;
@@ -164,6 +164,8 @@ int main(void)
 														PWM_Duty =50 ;
 													    motor_ref.motor_run = 1;
 		                                                printf("HorizonPos 1_3 =%d \r\n",en_t.Horizon_Position);
+														if(abs(en_t.Horizon_Position) <800)
+															en_t.Horizon_Position=1024;
 													}
 													
 												
@@ -211,7 +213,7 @@ int main(void)
 												en_t.oneKey_V_flag =1;
 											 en_t.Vertical_Position = mHoldPos;
 												 printf("Vertical_Position = %ld\r\n",en_t.Vertical_Position);
-                                                if(abs(en_t.Vertical_Position)<800 || HALL_Pulse == 0){
+                                                if(abs(en_t.Vertical_Position)<800 ){
                                                    en_t.mini_value = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
                                                    Dir =1 ; /* motor move horizon  */
                                                    PWM_Duty =50;
@@ -228,8 +230,9 @@ int main(void)
                                                    printf("3333333333333333333 \n");
                                                    printf("--VerPos_1_3 = %ld\r\n",en_t.Vertical_Position);
 												   en_t.Vertical_Position = mHoldPos;
+												   
                                                   
-													}
+												}
 											
                                              
                                              }
@@ -272,12 +275,13 @@ int main(void)
 												}
 									   		 }	
 								}
-						if(judge_n==3 ){
+						if(judge_n==2 ){
 						 	      en_t.eInit_n++;
 								  HALL_Pulse =0;
 						           lhoradd=0;
-							        tempadd=0;
+							       tempadd=0;
                                   iError =0;
+								  en_t.VH_Total_Dis=1;
                                   PID_PWM_Duty=50;
 								  /* algorithm */
 								  if(en_t.Horizon_Position > en_t.Vertical_Position)
@@ -305,7 +309,8 @@ int main(void)
      if((motor_ref.motor_run == 1)&&(en_t.HorizonStop_flag !=2))
      {
    		  if(en_t.eInit_n == 1){
-		  	  if(en_t.DIR_flag ==1)PWM_Duty =50;
+            
+           if(en_t.DIR_flag ==1)PWM_Duty =50;
 			  else
 			  PWM_Duty = PID_PWM_Duty;
 			   
