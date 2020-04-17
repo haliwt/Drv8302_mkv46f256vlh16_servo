@@ -108,9 +108,9 @@ int main(void)
 	en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
        
 	
-		  printf("currePosHold: %ld\r\n", mHoldPos);
+	//	  printf("currePosHold: %ld\r\n", mHoldPos);
 	//     printf("position diff = %d\r\n", en_t.Pos_diff);
-          printf("en_t.eInit_n: %d\r\n", en_t.eInit_n);
+    //      printf("en_t.eInit_n: %d\r\n", en_t.eInit_n);
 	 
 #if 1
 	 /***********Position :Home and End*****************/
@@ -412,7 +412,7 @@ int main(void)
 					
 			     }
 		
-		  //if(Dir == 0)
+		  if(Dir == 0)
 		  	{
              printf("judge_n = %d \r\n",judge_n);
            printf("run_HALL_dir = %ld\r\n", HALL_Pulse);
@@ -472,8 +472,13 @@ int main(void)
                             PWM_Duty =30;
                             uwStep = HallSensor_GetPinState();
                             HALLSensor_Detected_BLDC(PWM_Duty);
-							 printf("Stop300 CurrPos : %ld\r\n", mCurPosValue);
+							
                              Dir =0;
+                             PWM_Duty =0;
+                             uwStep = HallSensor_GetPinState();
+                            HALLSensor_Detected_BLDC(PWM_Duty);
+                            DelayMs(2);
+                              printf("Stop300 CurrPos : %ld\r\n", mCurPosValue);
 							}
 							 lhoradd=0;
 							 tempadd=0;
@@ -536,17 +541,16 @@ int main(void)
 				
 			}
             /***************************************************/
+            /****************************************************/
+            /**************************************************/
 			else{  //Vertical Position judge is boundary
 					   PWM_Duty=50;
 
-					//   printf("ivError PWM = %d \n",PWM_Duty);
+					
 					   ivError = abs(mCurPosValue) - abs(en_t.Vertical_Position) ; //
 						
 				      
-					//	printf("VerstandPos= %ld \n\r",en_t.Vertical_Position);
-					//    printf("vert_ivError = %ld \n\r",ivError);
-					//	printf("mCurPosValue= %ld \n\r",mCurPosValue);
-					//	printf("VcurrHALL= %ld \n\r",HALL_Pulse);
+				
 						VDff = ivError;
              		    VDff = abs(VDff);
 						if(abs(en_t.Horizon_Position) > 900 &&(en_t.Pos_diff < 0)){
