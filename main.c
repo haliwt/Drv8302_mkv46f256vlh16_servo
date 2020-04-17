@@ -402,9 +402,9 @@ int main(void)
 						PWM_Duty=0; 
 						uwStep = HallSensor_GetPinState();
 						HALLSensor_Detected_BLDC(PWM_Duty);
-						DelayMs(3);
+						DelayMs(2);
 						mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-						if(abs(mCurPosValue)==(abs(en_t.Horizon_Position -100))||abs(mCurPosValue)>(abs(en_t.Horizon_Position)-100))
+						if(abs(mCurPosValue)==(abs(en_t.Horizon_Position -150))||abs(mCurPosValue)>(abs(en_t.Horizon_Position)-150))
 				        en_t.HorizonStop_flag =2;
 						}
 						PWM_Duty=0; 
@@ -490,7 +490,7 @@ int main(void)
 						else if(abs(en_t.Horizon_Position) >800 && (en_t.Pos_diff > 0)){
 
 								lhorizonpos =abs(mCurPosValue);
-							    if(lhorizonpos > 800){
+							    if(lhorizonpos > 700){
 							  //  en_t.HorizonStop_flag =2;
 	                            for(z=0;z<150;z++){
 		                            Dir =1;
@@ -498,6 +498,11 @@ int main(void)
 		                            uwStep = HallSensor_GetPinState();
 		                            HALLSensor_Detected_BLDC(PWM_Duty);
 		                            Dir =0;
+                                    
+                                     PWM_Duty =0;
+                                     uwStep = HallSensor_GetPinState();
+                                    HALLSensor_Detected_BLDC(PWM_Duty);
+                                    DelayMs(1);
 									printf("Stop800 CurrPos : %ld\r\n", mCurPosValue);
 									lhoradd=0;
 									 tempadd=0;
