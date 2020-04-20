@@ -516,8 +516,7 @@ int main(void)
                               printf("Stop300 CurrPos : %ld\r\n", mCurPosValue);
 							  en_t.HorizonStop_flag =1;
 							}
-							 lhoradd=0;
-							 tempadd=0;
+					
 						   }
 							 HALL_Pulse =0;	
 							
@@ -540,8 +539,7 @@ int main(void)
                                     HALLSensor_Detected_BLDC(PWM_Duty);
                                     DelayMs(1);
 									printf("Stop800 CurrPos : %ld\r\n", mCurPosValue);
-									lhoradd=0;
-									 tempadd=0;
+									
                                 }
 								PWM_Duty = 0;
 								en_t.HorizonStop_flag =1;
@@ -554,7 +552,7 @@ int main(void)
 						}
 					   
 					    {
-														dError_sum += iError; 
+						    dError_sum += iError; 
 							
 						    if(dError_sum > 1000)dError_sum =1000; /*error accumulate */
 							if(dError_sum < -1000)dError_sum = -1000; 
