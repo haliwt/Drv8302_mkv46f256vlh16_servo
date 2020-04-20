@@ -596,7 +596,7 @@ int main(void)
 							
 							// lverticalpos = abs(en_t.Horizon_Position) - 100;
 							 //lverticalpos= abs(mCurPosValue) ;
-							 if(abs(mHoldPos) >800){
+							 if(abs(mHoldPos) >1000){
 					  	      
 							 printf("Ver80 pwm  = %d \r\n",PID_PWM_Duty);
 	                         PMW_AllClose_ABC_Channel();
