@@ -281,7 +281,10 @@ int main(void)
 						
 						
 						}//end if(EndBuf[0]==EndBuf[1])
-						  if(judge_n==3){
+                  
+                  
+                   }//end if(j==3)
+                   if(judge_n==3){
 						 	      en_t.eInit_n++;
 								  printf("eInit_n = %d \r\n",en_t.eInit_n);
 								  en_t.HorizonStop_flag=0;
@@ -299,18 +302,14 @@ int main(void)
 								  else en_t.mini_value = en_t.Horizon_Position ;
 								  en_t.VH_Total_Dis = abs(en_t.Horizon_Position -en_t.Vertical_Position);//Toatal= horizonPos-verticalPos
 						    }
-                  
-                  
-                   }//end if(j==3)
-                 
 				    if(j>=3){
                      j=0;
                     
 			} //end if(eIn_n >=3)
             
         }
-       
-		
+        if(eIn_n >= 3)eIn_n =0;
+		if(judge_n > 4)judge_n =0;
 		}//end en_t.eIn_n == 0
         
 #endif 
@@ -324,13 +323,8 @@ int main(void)
 			  else
 			  PWM_Duty = PID_PWM_Duty;
 			   
-   		  }
-		  else{
-				if(Dir ==0)PWM_Duty =40;
-
-		  }
-		  #if 0
-		  if(en_t.eInit_n == 0)
+   		  	}
+		  else if(en_t.eInit_n == 0)
 		  {
 			if(Dir ==0){/*start detected horizon position motor  speed slowly limit*/
                    m++;
@@ -408,7 +402,7 @@ int main(void)
        
               }//end if(en_t.eIn_n == 0)
 			
-		#endif 
+		
 				 if(Dir==0)
 				  	{
 						  uwStep = HallSensor_GetPinState();
@@ -589,14 +583,19 @@ int main(void)
             /**************************************************/
 			else{  //Vertical Position judge is boundary
 					   PWM_Duty=50;
-					mHoldPos = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
-					  printf("PID vertical !!!!!!!!!!!!!!!!\n");
 
-						if(abs(en_t.Vertical_Position) > 900 ){
+					
+					   ivError = abs(mCurPosValue) - abs(en_t.Vertical_Position) ; //
+						
+				      
+				
+						VDff = ivError;
+             		    VDff = abs(VDff);
+						if(abs(en_t.Horizon_Position) > 900 &&(en_t.Pos_diff < 0)){
 							
 							// lverticalpos = abs(en_t.Horizon_Position) - 100;
 							 //lverticalpos= abs(mCurPosValue) ;
-							 if(abs(mHoldPos) >1000){
+							 if(abs(mCurPosValue)<100){
 					  	      
 							 printf("Ver80 pwm  = %d \r\n",PID_PWM_Duty);
 	                         PMW_AllClose_ABC_Channel();
@@ -610,10 +609,10 @@ int main(void)
 							 }
 							 
 						}
-						else if(abs(en_t.Vertical_Position) < 300 ){
+						else if(abs(en_t.Horizon_Position) < 300 &&(en_t.Pos_diff < 0)){
 							
 							 
-							 if(abs(mHoldPos) < 100){
+							 if(abs(mCurPosValue) >  800){
 					  	      
 							 printf("Ver80 pwm  = %d \r\n",PID_PWM_Duty);
 	                         PMW_AllClose_ABC_Channel();
