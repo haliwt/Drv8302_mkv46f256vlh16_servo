@@ -35,7 +35,11 @@ typedef struct _pid_t_
 	 uint8_t  balance_stop_flag; 
 	 uint8_t  horizon_balance_stop_flag;   
 	 uint8_t  g_memory_n;
+	 
 }pid_t;
+
+
+extern pid_t gpid_t;
 
 struct _pid_reference
 {
@@ -50,21 +54,9 @@ struct _pid_reference
 };
 
 uint8_t SWAP(uint8_t *p1,uint8_t *p2);
-
-#if 0
-void Horizontal_Decelerate_Function(void);
-void Vertical_Decelerate_Function(void);
-void Detect_HorVer_Position(void);
-
-void HorizonStop_Region(void);
-void VerticalStop_Regin(void);
-
-void Balance_Stop_Function(void);
+void Self_Locking(void);
 
 
-extern pid_t algpid_t ;
-
-#endif 
 
 
 #endif 
