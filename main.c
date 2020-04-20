@@ -45,7 +45,7 @@ PID_TypeDef  sPID;
 __IO int32_t  PID_PWM_Duty;
 BLDC_Typedef BLDCMotor;
 
-struct _pid_reference pid_r={0.1f,0.01f,0.4f,0.5f,0.01f,0.5f};
+struct _pid_reference pid_r={0.4f,0.01f,0.8f,0.5f,0.01f,0.5f};
 /*******************************************************************************
  *
  * Code
@@ -486,27 +486,6 @@ int main(void)
 			{
 						en_t.DIR_flag =0;
 
-						#if 0
-                        lhoradd ++;
-                        if(lhoradd > 500) {
-                             lhoradd=lhoradd  - 500;
-						     tempadd  = 50 + lhoradd;
-                             
-                        }
-                        
-						for(i=0;i<tempadd;i++){
-							Dir =1;
-	                        PWM_Duty =30;
-	                        uwStep = HallSensor_GetPinState();
-	                        HALLSensor_Detected_BLDC(PWM_Duty);
-							Dir =0;
-                            printf(" tempadd \\\\\\ =  %d \n", tempadd);
-						
-	                        if(tempadd >=50)tempadd =0;
-							printf("lhoradd!!!!!!!!!!!!!!!!!! = %d \n",lhoradd);
-							}
-						#endif 
-						
 						iError =abs(mCurPosValue) - abs(en_t.Horizon_Position) ; /*  pid error  */
 					    printf("mCurPosValue= %ld \n\r",mCurPosValue);
 						printf("iError = %ld \r\n",iError);
@@ -533,10 +512,10 @@ int main(void)
 							
 							 
 						}
-						else if(abs(en_t.Horizon_Position) >800){
+						else if(abs(en_t.Horizon_Position) >900){
 
 								lhorizonpos =abs(mCurPosValue);
-							    if(lhorizonpos > 700){
+							    if(lhorizonpos > 900){
 	                            for(z=0;z<150;z++){
 		                            Dir =1;
 		                            PWM_Duty =30;
@@ -602,7 +581,7 @@ int main(void)
                        if(abs(en_t.Horizon_Position) > 800 ){
 							
 							
-							 if(abs(mCurPosValue)<200){
+							 if(abs(mCurPosValue)<300){
 					  	      
 							    for(ldectnum =0;ldectnum<30;ldectnum++){
 								 ldectnum++;
