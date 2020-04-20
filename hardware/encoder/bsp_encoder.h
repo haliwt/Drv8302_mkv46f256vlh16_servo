@@ -27,6 +27,10 @@ typedef struct _encoder_t_
   uint8_t HorizonStop_flag; /* 水平停止标志位 */
   int32_t VH_Total_Dis;
   int32_t mini_value;
+  uint8_t DIR_flag; /*方向标志位*/
+  uint8_t oneKey_H_flag;
+  uint8_t oneKey_V_flag;
+  int16_t Pos_diff; /*phaseA - phaseB value*/
  }encoder_t;
 
 

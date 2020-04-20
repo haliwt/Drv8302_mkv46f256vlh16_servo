@@ -1,6 +1,19 @@
 #include <stdio.h>
 #include "bsp_algorithm.h"
 
+uint8_t SWAP(uint8_t *p,uint8_t *q)
+{
+     uint8_t temp = *p;
+	 if(*p < *q){
+		  *p = *q;
+		  *q = temp;
+	      return *q; 
+	 
+	 }
+	 else return *q;
+
+}
+
 #if 0
 
 pid_t algpid_t ;
