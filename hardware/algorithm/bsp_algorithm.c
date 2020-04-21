@@ -41,10 +41,10 @@ void Search_Start_HorizonPos(void)
 		
 		ldiff = abs(mhorPosValue);
 	    /*horizon decelerate region */
-		if(abs(en_t.X_axis)  < 1100 && ldiff >= 1000 ){
+		if(abs(en_t.X_axis)  < 1300 && ldiff >= 1000 ){
 			    printf("Horizon_Pos <200 @@@@@@\r\n");
 				
-				for(j=0;j<20;j++){
+				for(j=0;j<100;j++){
 				Dir =1;
 				PWM_Duty =30;
 				uwStep = HallSensor_GetPinState();
@@ -56,13 +56,14 @@ void Search_Start_HorizonPos(void)
 				horBuf[1]=mhorPosValue;
 				if((en_t.Pos_diff==0||(abs(horBuf[0])==abs(horBuf[1])))){
 
-				         PWM_Duty =30;
+				         PWM_Duty =0;
 						 en_t.End_V_flag=2;
 		                 en_t.eInit_n=1 ;
 		                 en_t.Y_axis =0;
 		                 en_t.X_axis = horBuf[0];
 						 PMW_AllClose_ABC_Channel();
-		                 motor_ref.motor_run = 0;
+		                 //en_t.HorizonStop_flag=2;
+						 motor_ref.motor_run = 0;
 		                 printf("X_Pos_10 = %d\r\n",en_t.X_axis);
 		                 printf("Y_Pos_10 = %d\r\n",en_t.Y_axis);
 						
@@ -71,25 +72,8 @@ void Search_Start_HorizonPos(void)
 				en_t.End_H_flag = 1;
 		        	
 		}
-		
-		
-      if(i==3){          
-		if((en_t.Pos_diff==0||(abs(horBuf[0])==abs(horBuf[1]))) &&( abs(horBuf[1])>900 || abs(horBuf[0])> 900)){
-
-				         PWM_Duty =30;
-						 en_t.End_V_flag=2;
-		                 en_t.eInit_n=1 ;
-		                 en_t.Y_axis =0;
-		                 en_t.X_axis = horBuf[0];
-						 PMW_AllClose_ABC_Channel();
-		                 motor_ref.motor_run = 0;
-		                 printf("X_Pos_10 = %d\r\n",en_t.X_axis);
-		                 printf("Y_Pos_10 = %d\r\n",en_t.Y_axis);
-						 
-
-			}
-      }
-	 if(i>=3)i=0;
+		if(i>=3)i=0;
+	
 
 
 }
@@ -178,18 +162,13 @@ void Horizon_Decelerate(void)
 
 	lhorizonpos =abs(mCurPosValue);
 	if(lhorizonpos > 800){
-		for(z=0;z<200;z++){
-		Dir =1;
-		PWM_Duty =30;
-		uwStep = HallSensor_GetPinState();
-		HALLSensor_Detected_BLDC(PWM_Duty);
-		Dir =0;
-
-		 PWM_Duty =0;
-		 uwStep = HallSensor_GetPinState();
-		HALLSensor_Detected_BLDC(PWM_Duty);
-		DelayMs(1);
-		printf("Stop800 CurrPos : %ld\r\n", mCurPosValue);
+		for(z=0;z<400;z++){
+			Dir =1;
+			PWM_Duty =30;
+			uwStep = HallSensor_GetPinState();
+			HALLSensor_Detected_BLDC(PWM_Duty);
+			Dir =0;
+			printf("Stop800 CurrPos : %ld\r\n", mCurPosValue);
 
 		}
 		PWM_Duty = 0;
@@ -203,37 +182,36 @@ void Horizon_Decelerate(void)
 	}
 
 
-	{
-	dError_sum += iError; 
+	
+		dError_sum += iError; 
 
-	if(dError_sum > 1000)dError_sum =1000; /*error accumulate */
-	if(dError_sum < -1000)dError_sum = -1000; 
-	PID_PWM_Duty = (int32_t)(iError *pid_r.KP_H + dError_sum * pid_r.KI_H + (iError - last_iError)*pid_r.KD_H);//proportion + itegral + differential
+		if(dError_sum > 1000)dError_sum =1000; /*error accumulate */
+		if(dError_sum < -1000)dError_sum = -1000; 
+		PID_PWM_Duty = (int32_t)(iError *pid_r.KP_H + dError_sum * pid_r.KI_H + (iError - last_iError)*pid_r.KD_H);//proportion + itegral + differential
 
-	printf("hor_pwm= %ld\r \n",PID_PWM_Duty);
+		printf("hor_pwm= %ld\r \n",PID_PWM_Duty);
 
-	PID_PWM_Duty = abs(PID_PWM_Duty)/2;
-	if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
+		PID_PWM_Duty = abs(PID_PWM_Duty)/2;
+		if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
 
-	last_iError = iError;
-	PWM_Duty = PID_PWM_Duty;
-	HALL_Pulse =0;
+		last_iError = iError;
+		PWM_Duty = PID_PWM_Duty;
+		HALL_Pulse =0;
+		
 	if(en_t.HorizonStop_flag ==2){
-	Dir = 1;
-	PWM_Duty = 30;
-	iError =0;
-	last_iError =0;
-	HALL_Pulse =0;
-	}
+		Dir = 1;
+		PWM_Duty = 30;
+		iError =0;
+		last_iError =0;
+		HALL_Pulse =0;
+   }
 	if(en_t.HorizonStop_flag ==1){
-	Dir =1;
-	PWM_Duty =30;
-	uwStep = HallSensor_GetPinState();
-	HALLSensor_Detected_BLDC(PWM_Duty);
+		Dir =1;
+		PWM_Duty =30;
+		uwStep = HallSensor_GetPinState();
+		HALLSensor_Detected_BLDC(PWM_Duty);
 
-	}
-
-
+	
 	}
 
 
@@ -257,7 +235,7 @@ void Vertical_Decelerate(void)
    if(abs(en_t.X_axis) > 800 ){
 		
 		
-		 if(abs(mCurPosValue)<300){
+		 if(abs(mCurPosValue)<100){
 		  
 			for(ldectnum =0;ldectnum<30;ldectnum++){
 			 ldectnum++;
@@ -415,22 +393,22 @@ void Balance_HorizonRegion(void)
 	lhorizonpos =abs(abs(en_t.X_axis) - abs(mCurPosValue));
 
 	printf("stop lhorizonpos = %d \n",lhorizonpos);
-	if(lhorizonpos <=400 ||lhorizonpos > 700){
+	if(lhorizonpos <300 ){
 
-	for(z=0;z<150;z++){
-	Dir =1;
-	PWM_Duty =30;
-	uwStep = HallSensor_GetPinState();
-	HALLSensor_Detected_BLDC(PWM_Duty);
-	printf("HorStopPos flag=1 300 : %d\r\n", mCurPosValue);
-	Dir =0;
-	PWM_Duty=0; 
-	uwStep = HallSensor_GetPinState();
-	HALLSensor_Detected_BLDC(PWM_Duty);
-	DelayMs(2);
-	mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-	if(abs(mCurPosValue)==(abs(en_t.X_axis -150))||abs(mCurPosValue)>(abs(en_t.X_axis)-150))
-	en_t.HorizonStop_flag =2;
+		for(z=0;z<200;z++){
+		Dir =1;
+		PWM_Duty =30;
+		uwStep = HallSensor_GetPinState();
+		HALLSensor_Detected_BLDC(PWM_Duty);
+		printf("HorStopPos flag=1 300 : %d\r\n", mCurPosValue);
+		Dir =0;
+		PWM_Duty=0; 
+		uwStep = HallSensor_GetPinState();
+		HALLSensor_Detected_BLDC(PWM_Duty);
+		DelayMs(1);
+		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+		if(abs(mCurPosValue)==(abs(en_t.X_axis -150))||abs(mCurPosValue)>(abs(en_t.X_axis)-150))
+		en_t.HorizonStop_flag =2;
 	}
 	//PWM_Duty=0; 
 	}

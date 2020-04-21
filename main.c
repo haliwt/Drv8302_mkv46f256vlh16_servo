@@ -106,12 +106,12 @@ int main(void)
     mHoldPos = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 	en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
        
-	
+	if(en_t.eInit_n !=1){
 		printf("currePosHold: %ld\r\n", mHoldPos);
 	    printf("Xpos = %d\r\n", en_t.X_axis);
         printf("Ypos = %d\r\n", en_t.Y_axis);
         printf("en_t.eInit_n: %d\r\n", en_t.eInit_n);
-	 
+	}
 
 	 /***********Position :Home and End*****************/
         if(en_t.eInit_n !=1) {
