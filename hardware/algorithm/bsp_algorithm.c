@@ -14,7 +14,7 @@ void Search_Start_VerticalPos(void)
 {
 	
 	int32_t mCurPosValue,mvHold, vBuf[2]={0,0};
-	uint16_t vn=0;
+
 	
 	    mvHold = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
 		en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
@@ -44,12 +44,12 @@ void Search_Start_VerticalPos(void)
 				
 			}
 		
-		if(vn>=3)vn =0;
+		
 }        
             
 /************************************************
 	*
-	*
+	*Function Name:void Horizon_Accelerate(void)
 	*
 	*
 	*
@@ -57,7 +57,8 @@ void Search_Start_VerticalPos(void)
 void Horizon_Accelerate(void)
 {
     int16_t iError,dError,last_iError,dError_sum;
-	int16_t mCurPosValue,lhorizonpos,z;
+	int16_t lhorizonpos,z;
+    int32_t mCurPosValue;
 	mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
 	en_t.DIR_flag =0;
 
@@ -162,10 +163,11 @@ void Horizon_Accelerate(void)
 ************************************************/
 void Vertical_SlowDown(void)
 {
-	uint16_t ldectnum,mCurPosValue;
+	uint16_t ldectnum;
+    int32_t mCurPosValue;
 	mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
-   PWM_Duty=50;
-
+    PWM_Duty=50;
+    en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
    if(abs(en_t.X_axis) > 800 ){
 		
 		
@@ -183,7 +185,6 @@ void Vertical_SlowDown(void)
 		 }
 		 PMW_AllClose_ABC_Channel();
 		 motor_ref.motor_run =0;
-		 printf("VDffcurrPOS= %d \n\r",mCurPosValue);
 		 printf("V>800\r\n");
 		 printf("V~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n");
 		
@@ -192,10 +193,12 @@ void Vertical_SlowDown(void)
 		 }
 		 
 	}
-	else if(abs(en_t.X_axis) < 300 ){
+	else if(abs(en_t.X_axis) < 200 ){
 		
 		 
-		 if(abs(mCurPosValue) >  1000){
+		 if(abs(mCurPosValue) >  1000 ){
+
+		 if(en_t.Pos_diff ==0){
 		  
 		 for(ldectnum =0;ldectnum<30;ldectnum++){
 			 ldectnum++;
@@ -206,13 +209,15 @@ void Vertical_SlowDown(void)
 			 uwStep = HallSensor_GetPinState();
 			 HALLSensor_Detected_BLDC(PWM_Duty);
 			 PRINTF("V < 100 break #####\r\n");
+			 printf("vHALLdir= %d\r\n",HALL_Pulse);
+		    }
+		 
+			 PMW_AllClose_ABC_Channel();
+			 motor_ref.motor_run =0;
+			 printf("v100Pos= %d \n\r",mCurPosValue);
+			 printf("V < 100 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\r\n");
 		 }
-		 PMW_AllClose_ABC_Channel();
-		 motor_ref.motor_run =0;
-		 printf("VDffcurrPOS= %d \n\r",mCurPosValue);
-		 printf("V < 100 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\r\n");
 		
-		 en_t.DIR_flag=0;
 		
 		 
 		 }	

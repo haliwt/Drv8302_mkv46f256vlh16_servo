@@ -125,6 +125,7 @@ int main(void)
 			if(Dir == 1)
 			{
 		       en_t.End_V_flag = 1;  
+			   HALL_Pulse =0;
 			   Search_Start_VerticalPos();
 			}
 			if(eIn_n >= 3 && en_t.End_V_flag!=1){
@@ -361,7 +362,7 @@ int main(void)
 	      en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
 #if 1
            if(Dir == 0){
-	           printf("judge_n = %d \r\n",judge_n);
+	          
 	           printf("run_HALL_dir = %ld\r\n", HALL_Pulse);
 	   		   printf("motor start pwm= %d\r\n",PWM_Duty);
 			   printf("motor Dir = %d\n",Dir);
@@ -410,7 +411,7 @@ int main(void)
         /* 100ms arithmetic PID */
     	if((Time_CNT == 100)&&(en_t.eInit_n == 1)&&(en_t.HorizonStop_flag !=2)&&(en_t.HorizonStop_flag !=1)){
    
-           
+            HALL_Pulse =0;
 			mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
             printf("mXPos: %d\r\n", mCurPosValue);
 	
