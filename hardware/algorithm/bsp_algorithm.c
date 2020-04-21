@@ -232,10 +232,10 @@ void Vertical_Decelerate(void)
 	mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
     PWM_Duty=50;
     en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
-   if(abs(en_t.X_axis) > 800 ){
+   if(abs(en_t.X_axis) > 700 ){
 		
 		
-		 if(abs(mCurPosValue)<100){
+		 if(abs(mCurPosValue)<300){
 		  
 			for(ldectnum =0;ldectnum<30;ldectnum++){
 			 ldectnum++;
