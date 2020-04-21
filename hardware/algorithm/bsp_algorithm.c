@@ -131,7 +131,7 @@ void Search_Start_VerticalPos(void)
 void Horizon_Decelerate(void)
 {
     int16_t iError,last_iError,dError_sum;
-	int16_t lhorizonpos,z;
+	int16_t lhorizonpos,n;
     int32_t mCurPosValue;
 	en_t.DIR_flag=0;
 	mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
@@ -140,21 +140,22 @@ void Horizon_Decelerate(void)
 	printf("mCurPosValue= %ld \n\r",mCurPosValue);
 	printf("iError = %ld \r\n",iError);
 	
-	if(abs(en_t.X_axis) < 100){/*refer vertical*/
+	if(abs(en_t.X_axis) < 600){/*refer vertical*/
 		lhorizonpos = abs(mCurPosValue);
-		if(lhorizonpos <=300){
-		for(z=0;z<400;z++){
+		if(lhorizonpos <=400){
+		for(n=0;n<600;n++){
 		Dir =1;
 		PWM_Duty =30;
 		uwStep = HallSensor_GetPinState();
 		HALLSensor_Detected_BLDC(PWM_Duty);
-		Dir =0;
-
-		printf("Stop300 CurrPos : %ld\r\n", mCurPosValue);
-
-		en_t.HorizonStop_flag =1;
-		}
-
+		//Dir =0;
+        }
+		 PWM_Duty = 0;
+		 en_t.HorizonStop_flag =1;
+		 dError_sum = 0;
+			iError=0;
+			last_iError =0;
+         printf("Stop300 CurrPos ##############################: %ld\r\n", mCurPosValue);
 		}
 		HALL_Pulse =0;	
 	}
@@ -162,7 +163,7 @@ void Horizon_Decelerate(void)
 
 		lhorizonpos =abs(mCurPosValue);
 		if(lhorizonpos > 700){
-			for(z=0;z<600;z++){
+			for(n=0;n<600;n++){
 				Dir =1;
 				PWM_Duty =30;
 				uwStep = HallSensor_GetPinState();
@@ -261,12 +262,9 @@ void Vertical_Decelerate(void)
 	}
 	else if(abs(en_t.X_axis) < 200 ){
 		
-		 
-		 if(abs(mCurPosValue) >  1000 ){
+		 if(abs(mCurPosValue) >  900 ){
 
-		 if(en_t.Pos_diff ==0){
-		  
-		 for(ldectnum =0;ldectnum<30;ldectnum++){
+	       for(ldectnum =0;ldectnum<30;ldectnum++){
 			 ldectnum++;
 			if(ldectnum <=30){
 				 PWM_Duty = 30 - ldectnum;
@@ -274,19 +272,16 @@ void Vertical_Decelerate(void)
 			 else  PWM_Duty =0;
 			 uwStep = HallSensor_GetPinState();
 			 HALLSensor_Detected_BLDC(PWM_Duty);
-			 PRINTF("V < 100 break #####\r\n");
-			 printf("vHALLdir= %d\r\n",HALL_Pulse);
+			 printf("V < 100 break #####\r\n");
+			
 		    }
 		 
 			 PMW_AllClose_ABC_Channel();
 			 motor_ref.motor_run =0;
 			 printf("v100Pos= %d \n\r",mCurPosValue);
 			 printf("V < 100 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\r\n");
-		 }
-		
-		
 		 
-		 }	
+		}	
 	}
 	
 }
