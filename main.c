@@ -409,7 +409,7 @@ int main(void)
            Time_CNT++;
 #if 1    
         /* 100ms arithmetic PID */
-    	if((Time_CNT == 100)&&(en_t.eInit_n == 1)&&(en_t.HorizonStop_flag !=2)&&(en_t.HorizonStop_flag !=1)){
+    	if((Time_CNT % 25 == 0)&&(en_t.eInit_n == 1)&&(en_t.HorizonStop_flag !=2)&&(en_t.HorizonStop_flag !=1)){
    
             HALL_Pulse =0;
 			mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
@@ -417,7 +417,7 @@ int main(void)
 	
 			if(Dir == 0)//CCW  Horizion Direction
 			{
-						Horizon_Accelerate();
+						Horizon_SlowDown();
 				
 			}
 			else{  //Vertical Position judge is boundary
@@ -427,7 +427,7 @@ int main(void)
 			}
 			
 		}
-	   if(Time_CNT >=100){
+	   if(Time_CNT >=25){
 			Time_CNT = 0;
 			
 	   	}

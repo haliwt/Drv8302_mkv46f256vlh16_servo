@@ -49,12 +49,12 @@ void Search_Start_VerticalPos(void)
             
 /************************************************
 	*
-	*Function Name:void Horizon_Accelerate(void)
+	*Function Name:void Horizon_SlowDown(void)
 	*
 	*
 	*
 ************************************************/
-void Horizon_Accelerate(void)
+void Horizon_SlowDown(void)
 {
     int16_t iError,dError,last_iError,dError_sum;
 	int16_t lhorizonpos,z;
@@ -66,7 +66,7 @@ void Horizon_Accelerate(void)
 						iError =abs(mCurPosValue) - abs(en_t.X_axis) ; /*  pid error  */
 					    printf("mCurPosValue= %ld \n\r",mCurPosValue);
 						printf("iError = %ld \r\n",iError);
-					    if(abs(en_t.X_axis) < 200){/*refer vertical*/
+					    if(abs(en_t.X_axis) < 300){/*refer vertical*/
 						    lhorizonpos = abs(mCurPosValue);
                              if(lhorizonpos <=300){
                             for(z=0;z<400;z++){
@@ -76,10 +76,8 @@ void Horizon_Accelerate(void)
                             HALLSensor_Detected_BLDC(PWM_Duty);
 							
                              Dir =0;
-                             PWM_Duty =0;
-                             uwStep = HallSensor_GetPinState();
-                             HALLSensor_Detected_BLDC(PWM_Duty);
-                             DelayMs(2);
+                            
+                            
                               printf("Stop300 CurrPos : %ld\r\n", mCurPosValue);
 							  en_t.HorizonStop_flag =1;
 							}

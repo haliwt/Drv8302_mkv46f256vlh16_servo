@@ -61,7 +61,7 @@ extern tpid_refer pid_r;
 uint8_t SWAP(uint8_t *p1,uint8_t *p2);
 void Self_Locking(int16_t standerd);
 void Vertical_SlowDown(void);
-void Horizon_Accelerate(void);
+void Horizon_SlowDown(void);
 
 void Search_Start_VerticalPos(void);
 
