@@ -2,8 +2,51 @@
 #include "bsp_algorithm.h"
 
 tpid_refer pid_r={0.4f,0.01f,0.8f,0.5f,0.01f,0.5f};
+/***************************************************
+	*
+	*Function Name:void Search_Start_VerticalPos(void)
+	*
+	*
+	*
+***************************************************/
 
+void Search_Start_VerticalPos(void)
+{
+	
+	int32_t mCurPosValue,mvHold, vBuf[2]={0,0};
+	uint16_t vn=0;
+	
+	    mvHold = ENC_GetHoldPositionValue(DEMO_ENC_BASEADDR);
+		en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
 
+		PWM_Duty =50;
+        uwStep = HallSensor_GetPinState();
+        HALLSensor_Detected_BLDC(PWM_Duty);
+		
+		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
+        
+		  vBuf[0]= mvHold;
+		
+          printf("vBuf_0 = %d\r\n",vBuf[0]);
+          printf("vBuf_1 = %d\r\n",vBuf[1]);
+									
+			if(en_t.Pos_diff==0 &&( abs(vBuf[1])>900 || abs(vBuf[0])> 900)){
+
+	                 PWM_Duty =30;
+					 en_t.End_V_flag=2;
+	                 en_t.eInit_n=1 ;
+	                 en_t.X_axis =0;
+	                 en_t.Y_axis = vBuf[0];
+					 PMW_AllClose_ABC_Channel();
+	                 motor_ref.motor_run = 0;
+	                 printf("X_Pos_10 = %d\r\n",en_t.X_axis);
+	                 printf("Y_Pos_10 = %d\r\n",en_t.Y_axis);
+				
+			}
+		
+		if(vn>=3)vn =0;
+}        
+            
 /************************************************
 	*
 	*

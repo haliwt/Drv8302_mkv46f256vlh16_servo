@@ -63,6 +63,8 @@ void Self_Locking(int16_t standerd);
 void Vertical_SlowDown(void);
 void Horizon_Accelerate(void);
 
+void Search_Start_VerticalPos(void);
+
 
 
 
