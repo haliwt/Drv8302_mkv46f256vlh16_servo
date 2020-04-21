@@ -145,7 +145,7 @@ int main(void)
 			   
    		  }
 
-		  if(en_t.HorizonStop_flag ==1 && en_t.eInit_n ==1){
+		 if(en_t.HorizonStop_flag ==1 && en_t.eInit_n ==1){
 
 				Balance_HorizonRegion();
 					
@@ -162,11 +162,12 @@ int main(void)
 	  	}
 		mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
 		en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
-
+    
 #if 1
          if(Dir == 0){
 	          
-	           iPrintf();
+	          // iPrintf();
+	          printf("PWM_Duty = %d \r\n",PWM_Duty);
 		 }
 #endif
 		   
@@ -178,13 +179,11 @@ int main(void)
     	if((Time_CNT % 25 == 0)&&(en_t.eInit_n == 1)&&(en_t.HorizonStop_flag !=2)&&(en_t.HorizonStop_flag !=1)){
    
             HALL_Pulse =0;
-			//mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR); /*read current position of value*/
-            //printf("mXPos: %d\r\n", mCurPosValue);
 	
 			if(Dir == 0)//CCW  Horizion Direction
 			{
 						en_t.DIR_flag =0;
-						Horizon_Decelerate();
+					    Horizon_Decelerate();
 						printf("PID_PWM_H 25 = %d\r\n",PID_PWM_Duty);
 				
 			}

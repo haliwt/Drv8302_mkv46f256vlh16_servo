@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "bsp_algorithm.h"
 
-tpid_refer pid_r={0.02f,0.001f,0.2f,0.5f,0.01f,0.5f};
+tpid_refer pid_r={0.01f,0.001f,0.1f,0.5f,0.01f,0.5f};
 /****************************************************
 	*
 	*Function Name:void Search_Start_HorizonPos(void)
@@ -142,7 +142,7 @@ void Horizon_Decelerate(void)
 	
 	if(abs(en_t.X_axis) < 100){/*refer vertical*/
 		lhorizonpos = abs(mCurPosValue);
-		if(lhorizonpos <=400){
+		if(lhorizonpos <=300){
 		for(z=0;z<400;z++){
 		Dir =1;
 		PWM_Duty =30;
@@ -160,24 +160,25 @@ void Horizon_Decelerate(void)
 	}
 	else if(abs(en_t.X_axis) >800){
 
-	lhorizonpos =abs(mCurPosValue);
-	if(lhorizonpos > 800){
-		for(z=0;z<400;z++){
-			Dir =1;
-			PWM_Duty =30;
-			uwStep = HallSensor_GetPinState();
-			HALLSensor_Detected_BLDC(PWM_Duty);
-			Dir =0;
-			printf("Stop800 CurrPos : %ld\r\n", mCurPosValue);
+		lhorizonpos =abs(mCurPosValue);
+		if(lhorizonpos > 700){
+			for(z=0;z<600;z++){
+				Dir =1;
+				PWM_Duty =30;
+				uwStep = HallSensor_GetPinState();
+				HALLSensor_Detected_BLDC(PWM_Duty);
+			//	Dir =0;
+			//	printf("Stop800 CurrPos : %ld\r\n", mCurPosValue);
 
-		}
-		PWM_Duty = 0;
-		en_t.HorizonStop_flag =1;
-		dError_sum = 0;
-		iError=0;
-		last_iError =0;
-		}
-		HALL_Pulse =0;					
+			}
+			PWM_Duty = 0;
+			en_t.HorizonStop_flag =1;
+			dError_sum = 0;
+			iError=0;
+			last_iError =0;
+			printf("Stop800 CurrPos : %ld\r\n", mCurPosValue);
+			}
+			HALL_Pulse =0;					
 
 	}
 
@@ -189,7 +190,7 @@ void Horizon_Decelerate(void)
 		if(dError_sum < -1000)dError_sum = -1000; 
 		PID_PWM_Duty = (int32_t)(iError *pid_r.KP_H + dError_sum * pid_r.KI_H + (iError - last_iError)*pid_r.KD_H);//proportion + itegral + differential
 
-		printf("hor_pwm= %ld\r \n",PID_PWM_Duty);
+		//printf("hor_pwm= %ld\r \n",PID_PWM_Duty);
 
 		PID_PWM_Duty = abs(PID_PWM_Duty)/2;
 		if(PID_PWM_Duty >=50)PID_PWM_Duty=50;
@@ -229,13 +230,14 @@ void Vertical_Decelerate(void)
 {
 	uint16_t ldectnum;
     int32_t mCurPosValue;
+	en_t.DIR_flag =1;
 	mCurPosValue = ENC_GetPositionValue(DEMO_ENC_BASEADDR);
     PWM_Duty=50;
     en_t.Pos_diff = (int16_t)ENC_GetHoldPositionDifferenceValue(DEMO_ENC_BASEADDR);
-   if(abs(en_t.X_axis) > 700 ){
+   if(abs(en_t.X_axis) > 800 ){
 		
 		
-		 if(abs(mCurPosValue)<300){
+		 if(abs(mCurPosValue)<250){
 		  
 			for(ldectnum =0;ldectnum<30;ldectnum++){
 			 ldectnum++;
