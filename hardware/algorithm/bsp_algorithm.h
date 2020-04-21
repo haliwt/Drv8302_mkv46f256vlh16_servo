@@ -60,10 +60,15 @@ extern tpid_refer pid_r;
 
 uint8_t SWAP(uint8_t *p1,uint8_t *p2);
 void Self_Locking(int16_t standerd);
-void Vertical_SlowDown(void);
-void Horizon_SlowDown(void);
+void Vertical_Decelerate(void);
+void Horizon_Decelerate(void);
 
-void Search_Start_VerticalPos(void);
+void Search_Start_VerticalPos(void); /* look for start vertical position*/
+void Search_Start_HorizonPos(void);
+void iPrintf(void);
+void Balance_HorizonRegion(void);
+
+
 
 
 
