@@ -5,12 +5,14 @@
 
 #define  float_t     float;    
 /* ���ų����Ķ���            */
-#define GENMAX  	1000 /*ѧϰ���ظ�����*/
+#define GENMAX  	1000 /* learning   */
 #define NODENO  	15  /*Qֵ�Ľڵ���*/
 #define ALPHA  		1   /*ѧϰϵ��*/
 #define GAMMA 		0.9/*�ۿ���*/
 #define EPSILON 	2 /*ˮƽ����ѧϰϵͳ*/
 #define SEED 		32767 /*�������seed*/
+
+//#define SWAP((t),(x),(y)   
 
 typedef struct _pid_t_
 {
@@ -41,7 +43,7 @@ typedef struct _pid_t_
 
 extern pid_t gpid_t;
 
-struct _pid_reference
+typedef struct _pid_reference
 {
   float  KP_H;
   float  KI_H;
@@ -51,10 +53,15 @@ struct _pid_reference
  float  KI_V;
  float  KD_V;
 
-};
+} tpid_refer;
+extern tpid_refer pid_r;
+
+
 
 uint8_t SWAP(uint8_t *p1,uint8_t *p2);
-void Self_Locking(void);
+void Self_Locking(int16_t standerd);
+void Vertical_SlowDown(void);
+void Horizon_Accelerate(void);
 
 
 

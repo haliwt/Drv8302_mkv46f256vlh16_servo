@@ -12,8 +12,8 @@
 
 typedef struct _encoder_t_
 {
-  int32_t Horizon_Position;
-  int32_t Vertical_Position;
+  int32_t X_axis;
+  int32_t Y_axis;
   int8_t  Home_flag;
   int8_t  End_H_flag;
   int8_t  End_V_flag;
